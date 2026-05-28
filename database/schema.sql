@@ -11,6 +11,13 @@ CREATE TABLE Users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE passwords (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE TABLE DrivingStudents (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT UNIQUE NOT NULL,
@@ -71,6 +78,38 @@ CREATE TABLE Posts (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (instructor_id) REFERENCES Users(id)
 );
+
+CREATE TABLE VehicleTypes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE InstructorVehicleTypes (
+  instructor_id INT NOT NULL,
+  vehicle_type_id INT NOT NULL,
+  PRIMARY KEY (instructor_id, vehicle_type_id),
+  FOREIGN KEY (instructor_id) REFERENCES DrivingInstructor(user_id),
+  FOREIGN KEY (vehicle_type_id) REFERENCES VehicleTypes(id)
+);
+
+ALTER TABLE DrivingStudents
+ADD vehicle_type_id INT NOT NULL;
+
+ALTER TABLE DrivingStudents
+ADD FOREIGN KEY (vehicle_type_id)
+REFERENCES VehicleTypes(id);
+
+CREATE TABLE LicensingOffice (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  address VARCHAR(255) NOT NULL
+);
+
+ALTER TABLE DrivingInstructor
+ADD licensing_office_id INT NOT NULL;
+
+ALTER TABLE DrivingInstructor
+ADD FOREIGN KEY (licensing_office_id)
+REFERENCES LicensingOffice(id);
 
 CREATE VIEW StudentProgress AS
 SELECT s.user_id AS student_id,
