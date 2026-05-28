@@ -83,4 +83,5 @@ LEFT JOIN DrivingLessons l ON l.student_id = s.user_id
 GROUP BY s.user_id;
 
 
+
 --לקשר מורה למכון רישוי
