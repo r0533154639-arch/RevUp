@@ -124,3 +124,31 @@ GROUP BY s.user_id;
 
 
 --לקשר מורה למכון רישוי
+
+-- פידבק של המורה לתלמיד אחרי שיעור
+CREATE TABLE LessonFeedback (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  lesson_id INT NOT NULL UNIQUE,
+  instructor_id INT NOT NULL,
+  student_id INT NOT NULL,
+  progress_rating TINYINT NOT NULL CHECK (progress_rating BETWEEN 1 AND 5),
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (lesson_id) REFERENCES DrivingLessons(id),
+  FOREIGN KEY (instructor_id) REFERENCES DrivingInstructor(user_id),
+  FOREIGN KEY (student_id) REFERENCES DrivingStudents(user_id)
+);
+
+-- דירוג של התלמיד על המורה בסוף התהליך או בעת מעבר למורה אחר
+CREATE TABLE InstructorReview (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT NOT NULL,
+  instructor_id INT NOT NULL,
+  rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  comment TEXT,
+  trigger ENUM('completed', 'transferred') NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (student_id, instructor_id),
+  FOREIGN KEY (student_id) REFERENCES DrivingStudents(user_id),
+  FOREIGN KEY (instructor_id) REFERENCES DrivingInstructor(user_id)
+);
