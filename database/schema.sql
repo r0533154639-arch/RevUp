@@ -6,7 +6,6 @@ CREATE TABLE Users (
   name VARCHAR(100) NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
   phone VARCHAR(20) NOT NULL,
-  password VARCHAR(255) NOT NULL,
   role ENUM('student', 'instructor', 'admin') DEFAULT 'student',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -22,6 +21,7 @@ CREATE TABLE DrivingStudents (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT UNIQUE NOT NULL,
   status ENUM('theory', 'lessons', 'test', 'licensed') DEFAULT 'theory',
+  instructor_id INT  DEFAULT NULL,
   FOREIGN KEY (user_id) REFERENCES Users(id)
 );
 
@@ -40,8 +40,8 @@ CREATE TABLE DrivingLessons (
   date DATE NOT NULL,
   time TIME NOT NULL,
   status ENUM('pending', 'approved', 'unapproved' ,'completed', 'cancelled') DEFAULT 'pending',
-  FOREIGN KEY (student_id) REFERENCES users(user_id),
-  FOREIGN KEY (instructor_id) REFERENCES DrivingInstructor(user_id)
+  FOREIGN KEY (student_id) REFERENCES users(id),
+  FOREIGN KEY (instructor_id) REFERENCES DrivingInstructor(id)
 );
 
 CREATE TABLE Feedback (
@@ -72,7 +72,7 @@ CREATE TABLE Appeals (
 
 CREATE TABLE Posts (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
+  instructor_id INT NOT NULL,
   title VARCHAR(200),
   content TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -114,7 +114,6 @@ REFERENCES LicensingOffice(id);
 CREATE VIEW StudentProgress AS
 SELECT s.user_id AS student_id,
   s.status,
-  s.theory_passed,
   COUNT(l.id) AS total_lessons,
   SUM(l.status = 'completed') AS completed_lessons
 FROM DrivingStudents s
