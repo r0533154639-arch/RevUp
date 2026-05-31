@@ -1,14 +1,14 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Login from './client/pages/Auth/Login.jsx';
-import Register from './client/pages/Auth/Register.jsx';
-import TheoryMaterials from './client/pages/Theory/TheoryMaterials.jsx';
-import TheoryExam from './client/pages/Theory/TheoryExam.jsx';
-import SearchInstructors from './client/pages/Instructors/SearchInstructors.jsx';
-import Dashboard from './client/pages/Lessons/Dashboard.jsx';
-import ScheduleLessons from './client/pages/Lessons/ScheduleLessons.jsx';
-import DrivingTest from './client/pages/Tests/DrivingTest.jsx';
-import LicenseReady from './client/pages/Graduation/LicenseReady.jsx';
-import Navbar from './client/components/Common/Navbar.jsx';
+import Login from './pages/Auth/Login.jsx';
+import Register from './pages/Auth/Register.jsx';
+import TheoryMaterials from './pages/Theory/TheoryMaterials.jsx';
+import TheoryExam from './pages/Theory/TheoryExam.jsx';
+import SearchInstructors from './pages/Instructors/SearchInstructors.jsx';
+import Dashboard from './pages/Lessons/Dashboard.jsx';
+import ScheduleLessons from './pages/Lessons/ScheduleLessons.jsx';
+import DrivingTest from './pages/Tests/DrivingTest.jsx';
+import LicenseReady from './pages/Graduation/LicenseReady.jsx';
+import Navbar from './components/Common/Navbar.jsx';
 
 function App() {
   return (
