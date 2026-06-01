@@ -9,11 +9,13 @@ export default function ScheduleLessons() {
   const [searchParams] = useSearchParams();
   const instructorId = searchParams.get('instructor');
 
-  useEffect(() => { getLessons().then(setLessons); }, []);
+  const fetchLessons = () => getLessons().then(data => setLessons(Array.isArray(data) ? data : []));
+
+  useEffect(() => { fetchLessons(); }, []);
 
   const handleDate = async (date) => {
     await scheduleLesson({ instructorId, date, time: '10:00' });
-    getLessons().then(setLessons);
+    fetchLessons();
   };
 
   return (

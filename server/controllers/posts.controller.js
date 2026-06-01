@@ -1,4 +1,4 @@
-import pool from '../db.js';
+import pool from '../config/db.js';
 
 export const getPosts = async (req, res) => {
   const [rows] = await pool.query('SELECT * FROM Posts ORDER BY created_at DESC');

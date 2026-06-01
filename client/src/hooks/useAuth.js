@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { login as loginService, register as registerService } from '../services/auth.service.js';
 
 export const useAuth = () => {
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || 'null'));
+  const [user, setUser] = useState(() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } });
 
   const login = async (data) => {
     const res = await loginService(data);

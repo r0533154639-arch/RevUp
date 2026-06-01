@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 
 export default function Register() {
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'student' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', role: 'student' });
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -18,6 +18,7 @@ export default function Register() {
       <h2>הרשמה</h2>
       <input placeholder="שם מלא" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
       <input type="email" placeholder="אימייל" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+      <input type="tel" placeholder="טלפון" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required />
       <input type="password" placeholder="סיסמה" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
       <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
         <option value="student">תלמיד</option>

@@ -5,7 +5,7 @@ export const useProgress = () => {
   const [progress, setProgress] = useState(null);
 
   useEffect(() => {
-    getProgress().then(setProgress);
+    getProgress().then(data => setProgress(data?.message ? null : data));
   }, []);
 
   return progress;

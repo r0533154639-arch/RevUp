@@ -1,14 +1,14 @@
-import pool from '../db.js';
+import pool from '../config/db.js';
 
 export const getTestsByStudent = async (id) => {
   const [rows] = await pool.query('SELECT * FROM Tests WHERE student_id = ?', [id]);
   return rows;
 };
 
-export const createTest = async ({ studentId, date, location }) => {
+export const createTest = async ({ studentId, date }) => {
   const [result] = await pool.query(
-    'INSERT INTO Tests (student_id, date, location) VALUES (?, ?, ?)',
-    [studentId, date, location]
+    'INSERT INTO Tests (student_id, date) VALUES (?, ?)',
+    [studentId, date]
   );
   return result.insertId;
 };

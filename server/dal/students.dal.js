@@ -1,13 +1,34 @@
-import pool from '../db.js';
+import pool from '../config/db.js';
 
 export const findUserByEmail = async (email) => {
-  const [rows] = await pool.query('SELECT * FROM Users WHERE email = ?', [email]);
+  const [rows] = await pool.query(
+    'SELECT u.*, p.password_hash AS password FROM Users u JOIN passwords p ON p.user_id = u.id WHERE u.email = ?',
+    [email]
+  );
   return rows[0];
 };
 
-export const createUser = async ({ name, email, password, role }) => {
-  const [result] = await pool.query('INSERT INTO Users (name, email, password, role) VALUES (?, ?, ?, ?)', [name, email, password, role]);
-  return result.insertId;
+export const createUser = async ({ name, email, phone, password, role }) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const [result] = await conn.query(
+      'INSERT INTO Users (name, email, phone, role) VALUES (?, ?, ?, ?)',
+      [name, email, phone, role]
+    );
+    const userId = result.insertId;
+    await conn.query(
+      'INSERT INTO passwords (user_id, password_hash) VALUES (?, ?)',
+      [userId, password]
+    );
+    await conn.commit();
+    return userId;
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
 };
 
 export const getStudentProgress = async (id) => {

@@ -1,6 +1,6 @@
+import './env.js';
 import express from 'express';
 import cors from 'cors';
-import 'dotenv/config';
 import authRoutes from './routes/auth.routes.js';
 import studentsRoutes from './routes/students.routes.js';
 import instructorsRoutes from './routes/instructors.routes.js';

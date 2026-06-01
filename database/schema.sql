@@ -57,7 +57,6 @@ CREATE TABLE Tests (
   student_id INT NOT NULL,
   date DATE NOT NULL,
   time TIME NOT NULL,
-  -- location VARCHAR(150),
   status ENUM('scheduled', 'passed', 'failed') DEFAULT 'scheduled',
   FOREIGN KEY (student_id) REFERENCES Users(id)
 );

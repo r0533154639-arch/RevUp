@@ -3,7 +3,7 @@ export default function CalendarView({ lessons = [], onSelectDate }) {
     <div>
       <input type="date" onChange={(e) => onSelectDate?.(e.target.value)} />
       <ul>
-        {lessons.map((l) => (
+        {lessons?.map((l) => (
           <li key={l.id}>{l.date} {l.time} - {l.status}</li>
         ))}
       </ul>
