@@ -18,10 +18,11 @@ export const login = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    const { name, email, phone, password, role } = req.body;
+    const { name, email, phone, password, role, date_of_birth, status, area, vehicle_types } = req.body;
     const hashed = await bcrypt.hash(password, 10);
-    const id = await createUser({ name, email, phone, password: hashed, role });
-    res.status(201).json({ id });
+    const id = await createUser({ name, email, phone, password: hashed, role, date_of_birth, status, area, vehicle_types });
+    const token = jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.status(201).json({ token, user: { id, name, role } });
   } catch (err) {
     console.error('Register error:', err);
     res.status(500).json({ message: err.message });

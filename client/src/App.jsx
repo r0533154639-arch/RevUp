@@ -1,30 +1,22 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth.js';
 import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx';
-import TheoryMaterials from './pages/Theory/TheoryMaterials.jsx';
-import TheoryExam from './pages/Theory/TheoryExam.jsx';
-import SearchInstructors from './pages/Instructors/SearchInstructors.jsx';
-import Dashboard from './pages/Lessons/Dashboard.jsx';
-import ScheduleLessons from './pages/Lessons/ScheduleLessons.jsx';
-import DrivingTest from './pages/Tests/DrivingTest.jsx';
-import LicenseReady from './pages/Graduation/LicenseReady.jsx';
 import Navbar from './components/Common/Navbar.jsx';
+import DynamicPage from './components/Common/DynamicPage.jsx';
 
 function App() {
+  const { user } = useAuth();
+  const username = user?.id;
+
   return (
     <>
-      <Navbar />
+      <Navbar username={username} />
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/theory" element={<TheoryMaterials />} />
-        <Route path="/theory/exam" element={<TheoryExam />} />
-        <Route path="/instructors" element={<SearchInstructors />} />
-        <Route path="/lessons" element={<Dashboard />} />
-        <Route path="/lessons/schedule" element={<ScheduleLessons />} />
-        <Route path="/test" element={<DrivingTest />} />
-        <Route path="/license" element={<LicenseReady />} />
+        <Route path="/login" element={!user ? <Login /> : <Navigate to={`/users/${username}/homePage`} />} />
+        <Route path="/register" element={!user ? <Register /> : <Navigate to={`/users/${username}/homePage`} />} />
+        <Route path="/users/:username/:page" element={user ? <DynamicPage /> : <Navigate to="/login" />} />
+        <Route path="/" element={<Navigate to={user ? `/users/${username}/homePage` : '/login'} />} />
       </Routes>
     </>
   );

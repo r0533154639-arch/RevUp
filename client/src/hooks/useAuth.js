@@ -1,8 +1,17 @@
-import { useState } from 'react';
+import { useState, useContext, createContext } from 'react';
+import React from 'react';
 import { login as loginService, register as registerService } from '../services/auth.service.js';
 
-export const useAuth = () => {
-  const [user, setUser] = useState(() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } });
+const AuthContext = createContext(null);
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('user'));
+      if (!u?.id) { localStorage.removeItem('user'); localStorage.removeItem('token'); return null; }
+      return u;
+    } catch { return null; }
+  });
 
   const login = async (data) => {
     const res = await loginService(data);
@@ -12,7 +21,13 @@ export const useAuth = () => {
     return res;
   };
 
-  const register = async (data) => registerService(data);
+  const register = async (data) => {
+    const res = await registerService(data);
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('user', JSON.stringify(res.user));
+    setUser(res.user);
+    return res;
+  };
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -20,5 +35,7 @@ export const useAuth = () => {
     setUser(null);
   };
 
-  return { user, login, register, logout };
+  return React.createElement(AuthContext.Provider, { value: { user, login, register, logout } }, children);
 };
+
+export const useAuth = () => useContext(AuthContext);

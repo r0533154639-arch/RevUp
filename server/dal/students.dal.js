@@ -2,25 +2,34 @@ import pool from '../config/db.js';
 
 export const findUserByEmail = async (email) => {
   const [rows] = await pool.query(
-    'SELECT u.*, p.password_hash AS password FROM Users u JOIN passwords p ON p.user_id = u.id WHERE u.email = ?',
+    'SELECT u.*, p.password_hash AS password FROM users u JOIN passwords p ON p.user_id = u.id WHERE u.email = ?',
     [email]
   );
   return rows[0];
 };
 
-export const createUser = async ({ name, email, phone, password, role }) => {
+export const createUser = async ({ name, email, phone, password, role, date_of_birth, status, area, vehicle_types }) => {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
     const [result] = await conn.query(
-      'INSERT INTO Users (name, email, phone, role) VALUES (?, ?, ?, ?)',
-      [name, email, phone, role]
+      'INSERT INTO users (name, email, phone, role, date_of_birth) VALUES (?, ?, ?, ?, ?)',
+      [name, email, phone, role, date_of_birth]
     );
     const userId = result.insertId;
-    await conn.query(
-      'INSERT INTO passwords (user_id, password_hash) VALUES (?, ?)',
-      [userId, password]
-    );
+    await conn.query('INSERT INTO passwords (user_id, password_hash) VALUES (?, ?)', [userId, password]);
+
+    if (role === 'student') {
+      await conn.query('INSERT INTO driving_students (user_id, status) VALUES (?, ?)', [userId, status || 'theory']);
+    } else if (role === 'instructor') {
+      const [instrResult] = await conn.query('INSERT INTO driving_instructor (user_id, area) VALUES (?, ?)', [userId, area]);
+      const instructorId = instrResult.insertId;
+      if (vehicle_types?.length) {
+        const values = vehicle_types.map(vtId => [instructorId, vtId]);
+        await conn.query('INSERT INTO instructor_vehicle_types (instructor_id, vehicle_type_id) VALUES ?', [values]);
+      }
+    }
+
     await conn.commit();
     return userId;
   } catch (err) {
@@ -32,10 +41,10 @@ export const createUser = async ({ name, email, phone, password, role }) => {
 };
 
 export const getStudentProgress = async (id) => {
-  const [rows] = await pool.query('SELECT * FROM StudentProgress WHERE student_id = ?', [id]);
+  const [rows] = await pool.query('SELECT * FROM student_progress WHERE student_id = ?', [id]);
   return rows[0];
 };
 
 export const setStudentStatus = async (id, status) => {
-  await pool.query('UPDATE Students SET status = ? WHERE user_id = ?', [status, id]);
+  await pool.query('UPDATE driving_students SET status = ? WHERE user_id = ?', [status, id]);
 };
