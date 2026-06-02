@@ -8,7 +8,7 @@ export const findUserByEmail = async (email) => {
   return rows[0];
 };
 
-export const createUser = async ({ name, email, phone, password, role, date_of_birth, status, area, vehicle_types }) => {
+export const createUser = async ({ name, email, phone, password, role, date_of_birth, status, area, vehicle_types, vehicle_type_id }) => {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
@@ -20,7 +20,7 @@ export const createUser = async ({ name, email, phone, password, role, date_of_b
     await conn.query('INSERT INTO passwords (user_id, password_hash) VALUES (?, ?)', [userId, password]);
 
     if (role === 'student') {
-      await conn.query('INSERT INTO driving_students (user_id, status) VALUES (?, ?)', [userId, status || 'theory']);
+      await conn.query('INSERT INTO driving_students (user_id, status, vehicle_type_id) VALUES (?, ?, ?)', [userId, status || 'theory', vehicle_type_id]);
     } else if (role === 'instructor') {
       const [instrResult] = await conn.query('INSERT INTO driving_instructor (user_id, area) VALUES (?, ?)', [userId, area]);
       const instructorId = instrResult.insertId;

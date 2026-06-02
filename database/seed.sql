@@ -1,6 +1,12 @@
 USE revup;
 
-INSERT INTO Users (name, email, password, role) VALUES
+INSERT INTO vehicle_types (id, name) VALUES
+(1, 'רכב פרטי'),
+(2, 'אופנוע'),
+(3, 'משאית'),
+(4, 'אוטובוס');
+
+-- INSERT INTO Users (name, email, password, role) VALUES
 ('דני לוי', 'danny@test.com', '$2b$10$placeholder_hash', 'instructor'),
 ('רחל כהן', 'rachel@test.com', '$2b$10$placeholder_hash', 'instructor'),
 ('יוסי מזרחי', 'yossi@test.com', '$2b$10$placeholder_hash', 'student');

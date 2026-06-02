@@ -117,11 +117,8 @@ CREATE TABLE instructor_vehicle_types (
 );
 
 ALTER TABLE driving_students
-ADD vehicle_type_id INT NOT NULL;
-
-ALTER TABLE driving_students
-ADD FOREIGN KEY (vehicle_type_id)
-REFERENCES vehicle_types(id);
+ADD vehicle_type_id INT NOT NULL DEFAULT 1,
+ADD FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_types(id);
 
 CREATE TABLE test_centers (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -131,9 +128,7 @@ CREATE TABLE test_centers (
 );
 
 ALTER TABLE driving_instructor
-ADD test_center_id INT NOT NULL;
-
-ALTER TABLE driving_instructor
+ADD test_center_id INT DEFAULT NULL,
 ADD FOREIGN KEY (test_center_id)
 REFERENCES test_centers(id);
 
@@ -171,7 +166,7 @@ CREATE TABLE instructor_review (
   instructor_id INT NOT NULL,
   rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
   comment TEXT,
-  trigger ENUM('completed', 'transferred') NOT NULL,
+  reason ENUM('completed', 'transferred') NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE (student_id, instructor_id),
   FOREIGN KEY (student_id) REFERENCES driving_students(user_id),
