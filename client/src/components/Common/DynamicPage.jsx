@@ -9,21 +9,26 @@ import ScheduleLessons from '../../pages/Lessons/ScheduleLessons.jsx';
 import DrivingTest from '../../pages/Tests/DrivingTest.jsx';
 import LicenseReady from '../../pages/Graduation/LicenseReady.jsx';
 
+// allowedRoles: undefined = כולם מורשים
 const PAGE_MAP = {
-  homePage: HomePage,
-  theory: TheoryMaterials,
-  theoryExam: TheoryExam,
-  instructors: SearchInstructors,
-  lessons: HomePage,
-  schedule: ScheduleLessons,
-  test: DrivingTest,
-  license: LicenseReady,
+  homePage:   { component: HomePage },
+  theory:     { component: TheoryMaterials, allowedRoles: ['student'] },
+  theoryExam: { component: TheoryExam,      allowedRoles: ['student'] },
+  instructors:{ component: SearchInstructors },
+  lessons:    { component: Dashboard,        allowedRoles: ['student', 'instructor'] },
+  schedule:   { component: ScheduleLessons,  allowedRoles: ['student'] },
+  test:       { component: DrivingTest,      allowedRoles: ['student'] },
+  license:    { component: LicenseReady,     allowedRoles: ['student'] },
 };
 
 export default function DynamicPage() {
   const { page } = useParams();
   const { user } = useAuth();
-  const Component = PAGE_MAP[page];
-  if (!Component) return <Navigate to="/login" />;
+  const entry = PAGE_MAP[page];
+
+  if (!entry) return <Navigate to="/" />;
+  if (entry.allowedRoles && !entry.allowedRoles.includes(user.role)) return <Navigate to="/" />;
+
+  const Component = entry.component;
   return <Component user={user} />;
 }

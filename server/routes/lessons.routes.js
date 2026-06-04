@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { getLessons, scheduleLesson, submitFeedback } from '../controllers/lessons.controller.js';
-import { verifyToken } from '../middleware/auth.middleware.js';
+import { verifyToken, checkRole } from '../middleware/auth.middleware.js';
 
 const router = Router();
-router.get('/', verifyToken, getLessons);
-router.post('/', verifyToken, scheduleLesson);
-router.post('/:id/feedback', verifyToken, submitFeedback);
+router.get('/', verifyToken, checkRole(['student', 'instructor']), getLessons);
+router.post('/', verifyToken, checkRole(['student']), scheduleLesson);
+router.post('/:id/feedback', verifyToken, checkRole(['instructor']), submitFeedback);
 export default router;
