@@ -8,17 +8,20 @@ import Dashboard from '../../pages/Lessons/Dashboard.jsx';
 import ScheduleLessons from '../../pages/Lessons/ScheduleLessons.jsx';
 import DrivingTest from '../../pages/Tests/DrivingTest.jsx';
 import LicenseReady from '../../pages/Graduation/LicenseReady.jsx';
+import StudentsList from '../../pages/Instructor/StudentsList.jsx';
+import Achievements from '../../pages/Instructor/Achievements.jsx';
 
-// allowedRoles: undefined = כולם מורשים
 const PAGE_MAP = {
-  homePage:   { component: HomePage },
-  theory:     { component: TheoryMaterials, allowedRoles: ['student'] },
-  theoryExam: { component: TheoryExam,      allowedRoles: ['student'] },
-  instructors:{ component: SearchInstructors },
-  lessons:    { component: Dashboard,        allowedRoles: ['student', 'instructor'] },
-  schedule:   { component: ScheduleLessons,  allowedRoles: ['student'] },
-  test:       { component: DrivingTest,      allowedRoles: ['student'] },
-  license:    { component: LicenseReady,     allowedRoles: ['student'] },
+  homePage:     { component: HomePage },
+  theory:       { component: TheoryMaterials,  allowedRoles: ['student'] },
+  theoryExam:   { component: TheoryExam,       allowedRoles: ['student'] },
+  instructors:  { component: SearchInstructors },
+  lessons:      { component: Dashboard,        allowedRoles: ['student', 'instructor'] },
+  schedule:     { component: ScheduleLessons,  allowedRoles: ['student', 'instructor'] },
+  test:         { component: DrivingTest,      allowedRoles: ['student'] },
+  license:      { component: LicenseReady,     allowedRoles: ['student'] },
+  students:     { component: StudentsList,     allowedRoles: ['instructor'] },
+  achievements: { component: Achievements,     allowedRoles: ['instructor'] },
 };
 
 export default function DynamicPage() {
