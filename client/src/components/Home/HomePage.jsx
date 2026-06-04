@@ -10,6 +10,8 @@ const STUDENT_CARDS = [
 
 const INSTRUCTOR_CARDS = [
   { title: 'לוח זמנים', description: 'צפה ועדכן את שיעורי הנהיגה הקרובים שלך', icon: '📅', page: 'schedule' },
+  { title: 'התלמידים שלי', description: 'מעקב אחר התקדמות התלמידים שלך בדרך לרישיון', icon: '👥', page: 'students' },
+  { title: 'הישגים', description: 'כמה שיעורים נעשו, אחוזי מעבר טסט ועוד', icon: '🏆', page: 'achievements' },
   { title: 'פוסטים', description: 'שתף תוכן מקצועי וצפה בפוסטים של מדריכים אחרים', icon: '✏️', page: 'posts' },
 ];
 
