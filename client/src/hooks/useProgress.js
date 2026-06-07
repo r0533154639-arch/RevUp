@@ -8,5 +8,6 @@ export const useProgress = () => {
     getProgress().then(data => setProgress(data?.message ? null : data));
   }, []);
 
+  
   return progress;
 };
