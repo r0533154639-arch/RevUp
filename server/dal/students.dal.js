@@ -73,3 +73,23 @@ export const getStudentsByInstructor = async (instructorId) => {
   );
   return rows;
 };
+
+export const getInstructorAchievements = async (instructorId) => {
+  const [[stats]] = await pool.query(
+    `SELECT
+       COUNT(DISTINCT ds.user_id)                                        AS total_students,
+       SUM(ds.status = 'licensed')                                       AS licensed_students,
+       COUNT(dl.id)                                                      AS total_lessons,
+       SUM(dl.status = 'completed')                                      AS completed_lessons,
+       ROUND(SUM(dl.status = 'completed') / NULLIF(COUNT(dl.id),0)*100)  AS completion_rate,
+       ROUND(AVG(ir.rating),1)                                           AS avg_rating,
+       COUNT(DISTINCT ir.id)                                             AS total_reviews
+     FROM driving_instructor di
+     JOIN driving_students ds   ON ds.instructor_id = di.id
+     LEFT JOIN driving_lessons dl ON dl.instructor_id = di.id
+     LEFT JOIN instructor_review ir ON ir.instructor_id = di.id
+     WHERE di.user_id = ?`,
+    [instructorId]
+  );
+  return stats;
+};

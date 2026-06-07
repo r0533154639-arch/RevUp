@@ -302,6 +302,43 @@ button:hover { background: #1558b0; }
   font-weight: 600;
   padding: 8px;
 }
+
+/* Achievements */
+.achievements-page h2 { font-size: 24px; margin-bottom: 4px; }
+.achievements-sub { color: #888; font-size: 14px; margin-bottom: 24px; }
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.achievement-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  text-align: center;
+}
+.achievement-icon { font-size: 32px; }
+.achievement-value { font-size: 28px; font-weight: 800; color: #1a73e8; }
+.achievement-label { font-size: 13px; color: #555; font-weight: 600; }
+.achievement-sub { font-size: 12px; color: #aaa; }
+.achievement-badge {
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  color: white;
+  border-radius: 16px;
+  padding: 18px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+@media (max-width: 600px) {
+  .achievements-grid { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 500px) {
   .student-modal-grid { grid-template-columns: 1fr; }
   .student-modal { padding: 24px 16px; }
