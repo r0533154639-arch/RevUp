@@ -1,13 +1,36 @@
 import { useState } from 'react';
+import { submitLessonFeedback } from '../../services/stats.service.js';
 
 export default function StudentCard({ student }) {
   const [open, setOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [form, setForm] = useState({ rating: 5, notes: '' });
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const statusLabels = {
     theory: 'תיאוריה',
-    practical: 'שיעורים מעשיים',
-    test_ready: 'מוכן לטסט',
+    lessons: 'שיעורים מעשיים',
+    test: 'מוכן לטסט',
     licensed: 'קיבל רישיון',
+  };
+
+  const handleSubmitFeedback = async () => {
+    if (!student.last_lesson_id) return;
+    setLoading(true);
+    try {
+      await submitLessonFeedback({
+        lessonId: student.last_lesson_id,
+        studentId: student.id,
+        rating: form.rating,
+        notes: form.notes,
+      });
+      setSent(true);
+    } catch {
+      alert('שגיאה בשליחת המשוב');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,6 +87,43 @@ export default function StudentCard({ student }) {
               <div className="student-modal-notes">
                 <span className="label">📋 הערות</span>
                 <p>{student.notes}</p>
+              </div>
+            )}
+
+            <button className="feedback-toggle-btn" onClick={() => { setFeedbackOpen(p => !p); setSent(false); }}>
+              📋 {feedbackOpen ? 'סגור משוב' : 'כתוב משוב על השיעור האחרון'}
+            </button>
+
+            {feedbackOpen && (
+              <div className="feedback-form">
+                {sent ? (
+                  <p className="feedback-sent">✅ המשוב נשלח לתלמיד בהצלחה</p>
+                ) : (
+                  <>
+                    <div className="feedback-rating">
+                      <span className="label">דירוג השיעור</span>
+                      <div className="stars">
+                        {[1,2,3,4,5].map(n => (
+                          <span
+                            key={n}
+                            className={`star ${form.rating >= n ? 'active' : ''}`}
+                            onClick={() => setForm(f => ({ ...f, rating: n }))}
+                          >★</span>
+                        ))}
+                      </div>
+                    </div>
+                    <textarea
+                      className="feedback-textarea"
+                      placeholder={`כתוב משוב ל${student.name} על השיעור האחרון...`}
+                      value={form.notes}
+                      onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+                      rows={4}
+                    />
+                    <button className="feedback-send-btn" onClick={handleSubmitFeedback} disabled={loading || !form.notes.trim()}>
+                      {loading ? '...' : 'שלח משוב לתלמיד'}
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>

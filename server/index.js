@@ -7,6 +7,9 @@ import instructorsRoutes from './routes/instructors.routes.js';
 import lessonsRoutes from './routes/lessons.routes.js';
 import testsRoutes from './routes/tests.routes.js';
 import postsRoutes from './routes/posts.routes.js';
+import communicationRoutes from './routes/communication.routes.js';
+process.on('uncaughtException', err => console.error('UNCAUGHT:', err));
+process.on('unhandledRejection', err => console.error('UNHANDLED:', err));
 
 const app = express();
 app.use(cors({ origin: process.env.CLIENT_URL }));
@@ -18,6 +21,7 @@ app.use('/api/instructors', instructorsRoutes);
 app.use('/api/lessons', lessonsRoutes);
 app.use('/api/tests', testsRoutes);
 app.use('/api/posts', postsRoutes);
+app.use('/api/communication', communicationRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

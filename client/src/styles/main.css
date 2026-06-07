@@ -87,6 +87,13 @@ button:hover { background: #1558b0; }
   .dashboard-cards-container { grid-template-columns: 1fr; }
 }
 
+.students-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
 /* Student Card */
 .student-card {
   display: flex;
@@ -148,8 +155,9 @@ button:hover { background: #1558b0; }
   padding: 36px 32px;
   width: 100%;
   max-width: 640px;
-  max-height: 90vh;
-  overflow-y: auto;
+  height: 90vh;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
   position: relative;
   text-align: center;
   animation: modalIn 0.2s ease;
@@ -237,6 +245,61 @@ button:hover { background: #1558b0; }
 .status-practical { background: #cfe2ff; color: #084298; }
 .status-test_ready { background: #d1e7dd; color: #0a5c36; }
 .status-licensed  { background: #d4edda; color: #155724; }
+
+/* Lesson Feedback */
+.feedback-toggle-btn {
+  margin-top: 20px;
+  width: 100%;
+  background: #f8f9fa;
+  color: #1a73e8;
+  border: 2px solid #1a73e8;
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 15px;
+}
+.feedback-toggle-btn:hover { background: #e8f0fe; }
+.feedback-form {
+  margin-top: 12px;
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: right;
+}
+.feedback-rating { display: flex; flex-direction: column; gap: 6px; }
+.stars { display: flex; gap: 6px; font-size: 28px; cursor: pointer; }
+.star { color: #ddd; transition: color 0.15s; }
+.star.active { color: #f5a623; }
+.star:hover { color: #f5a623; }
+.feedback-textarea {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+  margin: 0;
+}
+.feedback-textarea:focus { border-color: #1a73e8; outline: none; }
+.feedback-send-btn {
+  background: #1a73e8;
+  color: white;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 15px;
+  width: 100%;
+  margin: 0;
+}
+.feedback-send-btn:disabled { background: #aaa; cursor: not-allowed; }
+.feedback-sent {
+  text-align: center;
+  color: #0a5c36;
+  font-weight: 600;
+  padding: 8px;
+}
 @media (max-width: 500px) {
   .student-modal-grid { grid-template-columns: 1fr; }
   .student-modal { padding: 24px 16px; }
