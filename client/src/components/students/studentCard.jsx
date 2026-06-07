@@ -90,7 +90,12 @@ export default function StudentCard({ student }) {
               </div>
             )}
 
-            <button className="feedback-toggle-btn" onClick={() => { setFeedbackOpen(p => !p); setSent(false); }}>
+            <button
+              className="feedback-toggle-btn"
+              onClick={() => { if (student.last_lesson_id) { setFeedbackOpen(p => !p); setSent(false); } }}
+              disabled={!student.last_lesson_id}
+              title={!student.last_lesson_id ? 'אין שיעור קודם עם תלמיד זה' : ''}
+            >
               📋 {feedbackOpen ? 'סגור משוב' : 'כתוב משוב על השיעור האחרון'}
             </button>
 

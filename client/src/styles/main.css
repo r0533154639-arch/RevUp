@@ -258,6 +258,8 @@ button:hover { background: #1558b0; }
   font-size: 15px;
 }
 .feedback-toggle-btn:hover { background: #e8f0fe; }
+.feedback-toggle-btn:disabled { background: #f1f3f4; color: #aaa; border-color: #ddd; cursor: not-allowed; }
+.feedback-toggle-btn:disabled:hover { background: #f1f3f4; }
 .feedback-form {
   margin-top: 12px;
   background: #f8f9fa;

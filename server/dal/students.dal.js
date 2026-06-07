@@ -60,7 +60,10 @@ export const chooseInstructor = async (studentId, instructorId) => {
 export const getStudentsByInstructor = async (instructorId) => {
   const [rows] = await pool.query(
     `SELECT u.id, u.name, u.email, u.phone, u.date_of_birth,
-            ds.status, vt.name AS vehicle_type
+            ds.status, vt.name AS vehicle_type,
+            (SELECT dl.id FROM driving_lessons dl
+             WHERE dl.student_id = u.id AND dl.instructor_id = di.id
+             ORDER BY dl.date DESC LIMIT 1) AS last_lesson_id
      FROM driving_students ds
      JOIN users u ON u.id = ds.user_id
      LEFT JOIN vehicle_types vt ON vt.id = ds.vehicle_type_id
