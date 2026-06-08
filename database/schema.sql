@@ -172,3 +172,16 @@ CREATE TABLE instructor_review (
   FOREIGN KEY (student_id) REFERENCES driving_students(user_id),
   FOREIGN KEY (instructor_id) REFERENCES driving_instructor(id)
 );
+
+
+CREATE TABLE theory_questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    external_id INT,
+    question TEXT NOT NULL,
+    answer1 TEXT NOT NULL,
+    answer2 TEXT NOT NULL,
+    answer3 TEXT NOT NULL,
+    answer4 TEXT NOT NULL,
+    correct_answer INT NOT NULL,
+    category VARCHAR(100)
+);

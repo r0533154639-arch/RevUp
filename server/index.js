@@ -9,6 +9,7 @@ import instructorsRoutes from './routes/instructors.routes.js';
 import lessonsRoutes from './routes/lessons.routes.js';
 import testsRoutes from './routes/tests.routes.js';
 import postsRoutes from './routes/posts.routes.js';
+import theoryRoutes from './routes/theory.routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -22,6 +23,7 @@ app.use('/api/instructors', instructorsRoutes);
 app.use('/api/lessons', lessonsRoutes);
 app.use('/api/tests', testsRoutes);
 app.use('/api/posts', postsRoutes);
+app.use('/api/theory', theoryRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
