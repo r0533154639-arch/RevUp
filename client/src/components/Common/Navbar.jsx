@@ -31,20 +31,37 @@ export default function Navbar() {
   const links = user?.role === 'admin' ? ADMIN_LINKS : user?.role === 'instructor' ? INSTRUCTOR_LINKS : STUDENT_LINKS;
 
   return (
-    <nav>
-      <Link to={user ? `/users/${user.id}/homePage` : '/'}>RevUp</Link>
+    <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <Link to={user ? `/users/${user.id}/homePage` : '/'}>RevUp</Link>
+        {user && links.map(({ label, page }) => (
+          <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
+        ))}
+      </div>
+      
       {user ? (
-        <>
-          {links.map(({ label, page }) => (
-            <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
-          ))}
-          <button onClick={handleLogout} style={{ marginRight: 'auto' }}>התנתקות</button>
-        </>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          {user.profile_image && (
+            <img 
+              src={`http://localhost:3000/uploads/${user.profile_image}`} 
+              alt="פרופיל" 
+              style={{ 
+                width: '40px', 
+                height: '40px', 
+                borderRadius: '50%', 
+                objectFit: 'cover',
+                border: '2px solid #ddd'
+              }} 
+            />
+          )}
+          <span>שלום, {user.name}</span>
+          <button onClick={handleLogout}>התנתקות</button>
+        </div>
       ) : (
-        <>
+        <div style={{ display: 'flex', gap: '10px' }}>
           <Link to="/login">כניסה</Link>
           <Link to="/register">הרשמה</Link>
-        </>
+        </div>
       )}
     </nav>
   );

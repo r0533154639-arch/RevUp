@@ -14,13 +14,26 @@ export default function AdminInstructors() {
 
   const fetchInstructors = async () => {
     try {
+      console.log('Fetching instructors...');
       const res = await fetch('http://localhost:3000/api/admin/instructors', {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
+      console.log('Response status:', res.status);
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Server error:', errorText);
+        setInstructors([]); // מגדיר מערך ריק במקרה של שגיאה
+        return;
+      }
+      
       const data = await res.json();
-      setInstructors(data);
+      console.log('Instructors data:', data);
+      setInstructors(Array.isArray(data) ? data : []); // וודא שזה מערך
     } catch (err) {
       console.error('Error fetching instructors:', err);
+      setInstructors([]); // מגדיר מערך ריק במקרה של שגיאה
     }
   };
 
@@ -40,6 +53,8 @@ export default function AdminInstructors() {
   const toggleUserBlock = async (userId, currentlyBlocked) => {
     try {
       const newBlockStatus = !currentlyBlocked;
+      console.log('Blocking user:', userId, 'new status:', newBlockStatus);
+      
       const res = await fetch(`http://localhost:3000/api/admin/users/${userId}/block`, {
         method: 'PUT',
         headers: {
@@ -49,15 +64,20 @@ export default function AdminInstructors() {
         body: JSON.stringify({ isBlocked: newBlockStatus })
       });
 
+      console.log('Response status:', res.status);
+      const responseText = await res.text();
+      console.log('Response:', responseText);
+
       if (res.ok) {
         fetchInstructors();
         alert(newBlockStatus ? 'המורה נחסם בהצלחה' : 'החסימה הוסרה בהצלחה');
       } else {
-        alert('שגיאה בעדכון סטטוס המורה');
+        console.error('Server error:', responseText);
+        alert('שגיאה בעדכון סטטוס המורה: ' + responseText);
       }
     } catch (err) {
       console.error('Error toggling user block:', err);
-      alert('שגיאה בעדכון סטטוס המורה');
+      alert('שגיאה בעדכון סטטוס המורה: ' + err.message);
     }
   };
 
@@ -65,7 +85,7 @@ export default function AdminInstructors() {
     <div className="admin-instructors">
       <h2>מורי נהיגה</h2>
       <div className="instructors-list">
-        {instructors.map(instructor => (
+        {Array.isArray(instructors) && instructors.map(instructor => (
           <div key={instructor.id} className={`instructor-card ${instructor.is_blocked ? 'blocked' : ''}`}>
             <h3>{instructor.name}</h3>
             <p>אזור: {instructor.area}</p>
@@ -89,6 +109,9 @@ export default function AdminInstructors() {
             </button>
           </div>
         ))}
+        {!Array.isArray(instructors) || instructors.length === 0 && (
+          <p>לא נמצאו מורים</p>
+        )}
       </div>
 
       {achievements && selectedInstructor && (

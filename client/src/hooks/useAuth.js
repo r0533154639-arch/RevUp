@@ -40,7 +40,35 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
   };
 
-  return React.createElement(AuthContext.Provider, { value: { user, token, login, register, logout } }, children);
+  const updateUser = (userData) => {
+    const updatedUser = { ...user, ...userData };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    console.log('User updated:', updatedUser);
+  };
+
+  // פונקציה לרענון מידע המשתמש מהשרת
+  const refreshUser = async () => {
+    try {
+      const currentToken = localStorage.getItem('token');
+      if (!currentToken) return;
+      
+      const response = await fetch('http://localhost:3000/api/auth/me', {
+        headers: { Authorization: `Bearer ${currentToken}` }
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+        console.log('User refreshed:', userData);
+      }
+    } catch (error) {
+      console.error('Error refreshing user:', error);
+    }
+  };
+
+  return React.createElement(AuthContext.Provider, { value: { user, token, login, register, logout, updateUser, refreshUser } }, children);
 };
 
 export const useAuth = () => useContext(AuthContext);

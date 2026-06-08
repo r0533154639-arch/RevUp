@@ -48,3 +48,15 @@ export const getStudentProgress = async (id) => {
 export const setStudentStatus = async (id, status) => {
   await pool.query('UPDATE driving_students SET status = ? WHERE user_id = ?', [status, id]);
 };
+
+export const findUserById = async (id) => {
+  const [rows] = await pool.query(
+    'SELECT u.*, p.password_hash AS password FROM users u JOIN passwords p ON p.user_id = u.id WHERE u.id = ?',
+    [id]
+  );
+  return rows[0];
+};
+
+export const updateProfileImage = async (userId, filename) => {
+  await pool.query('UPDATE users SET profile_image = ? WHERE id = ?', [filename, userId]);
+};

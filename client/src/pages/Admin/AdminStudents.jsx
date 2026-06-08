@@ -49,6 +49,8 @@ export default function AdminStudents() {
   const toggleUserBlock = async (userId, currentlyBlocked) => {
     try {
       const newBlockStatus = !currentlyBlocked;
+      console.log('Blocking user:', userId, 'new status:', newBlockStatus);
+      
       const res = await fetch(`http://localhost:3000/api/admin/users/${userId}/block`, {
         method: 'PUT',
         headers: {
@@ -58,15 +60,20 @@ export default function AdminStudents() {
         body: JSON.stringify({ isBlocked: newBlockStatus })
       });
 
+      console.log('Response status:', res.status);
+      const responseText = await res.text();
+      console.log('Response:', responseText);
+
       if (res.ok) {
         fetchStudents();
         alert(newBlockStatus ? 'התלמיד נחסם בהצלחה' : 'החסימה הוסרה בהצלחה');
       } else {
-        alert('שגיאה בעדכון סטטוס התלמיד');
+        console.error('Server error:', responseText);
+        alert('שגיאה בעדכון סטטוס התלמיד: ' + responseText);
       }
     } catch (err) {
       console.error('Error toggling user block:', err);
-      alert('שגיאה בעדכון סטטוס התלמיד');
+      alert('שגיאה בעדכון סטטוס התלמיד: ' + err.message);
     }
   };
 
@@ -84,7 +91,7 @@ export default function AdminStudents() {
           </tr>
         </thead>
         <tbody>
-          {students.map(student => (
+          {Array.isArray(students) && students.map(student => (
             <tr key={student.id} className={student.is_blocked ? 'blocked-user' : ''}>
               <td>{student.name}</td>
               <td>{student.email}</td>
@@ -109,6 +116,11 @@ export default function AdminStudents() {
               </td>
             </tr>
           ))}
+          {(!Array.isArray(students) || students.length === 0) && (
+            <tr>
+              <td colSpan="5">לא נמצאו תלמידים</td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

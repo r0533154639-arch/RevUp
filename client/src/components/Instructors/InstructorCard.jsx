@@ -7,7 +7,7 @@ export default function InstructorCard({ instructor }) {
   return (
     <div style={{ display: 'flex', gap: 16, padding: 16, border: '1px solid #ddd', borderRadius: 8, alignItems: 'center' }}>
       <img
-        src={instructor.photo ? `${SERVER}${instructor.photo}` : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(instructor.name)}
+        src={instructor.profile_image ? `${SERVER}/uploads/${instructor.profile_image}` : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(instructor.name)}
         alt={instructor.name}
         style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
       />

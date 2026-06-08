@@ -5,10 +5,32 @@ import { getInstructors } from '../../services/stats.service.js';
 export default function SearchInstructors() {
   const [area, setArea] = useState('');
   const [instructors, setInstructors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    getInstructors(area).then(setInstructors);
+    const fetchInstructors = async () => {
+      try {
+        setLoading(true);
+        console.log('Fetching instructors with area:', area);
+        const data = await getInstructors(area);
+        console.log('Instructors data:', data);
+        setInstructors(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching instructors:', err);
+        setError(err.message);
+        setInstructors([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchInstructors();
   }, [area]);
+
+  if (loading) return <div>טוען מורים...</div>;
+  if (error) return <div>שגיאה: {error}</div>;
 
   return (
     <div className="page-container">
