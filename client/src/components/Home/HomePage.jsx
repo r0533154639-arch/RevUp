@@ -8,6 +8,16 @@ const STUDENT_CARDS = [
   { title: 'חפש מורה', description: 'מצא מורה נהיגה באזור שלך', icon: '🔍', page: 'instructors' },
 ];
 
+const ADMIN_CARDS = [
+  { title: 'תלמידים', description: 'צפייה בכל התלמידים והתקדמותם', icon: '👥', page: 'students' },
+  { title: 'שיעורים', description: 'צפייה בכל שיעורי הנהיגה', icon: '🚗', page: 'lessons' },
+  { title: 'לוח זמנים', description: 'צפייה בלוח הזמנים הכללי', icon: '📅', page: 'schedule' },
+  { title: 'מורים', description: 'רשימת כל מורי הנהיגה', icon: '👨‍🏫', page: 'instructors' },
+  { title: 'פוסטים', description: 'צפייה וניהול פוסטים', icon: '✏️', page: 'posts' },
+  { title: 'טסטים', description: 'צפייה בכל הטסטים', icon: '📋', page: 'test' },
+  { title: 'הישגים', description: 'סטטיסטיקות כלליות', icon: '🏆', page: 'achievements' },
+];
+
 const INSTRUCTOR_CARDS = [
   { title: 'לוח זמנים', description: 'צפה ועדכן את שיעורי הנהיגה הקרובים שלך', icon: '📅', page: 'schedule' },
   { title: 'התלמידים שלי', description: 'מעקב אחר התקדמות התלמידים שלך בדרך לרישיון', icon: '👥', page: 'students' },
@@ -16,13 +26,14 @@ const INSTRUCTOR_CARDS = [
 ];
 
 export default function HomePage({ user }) {
-  const cards = user.role === 'instructor' ? INSTRUCTOR_CARDS : STUDENT_CARDS;
+  const cards = user.role === 'admin' ? ADMIN_CARDS : user.role === 'instructor' ? INSTRUCTOR_CARDS : STUDENT_CARDS;
+  const panelLabel = user.role === 'admin' ? 'פאנל אדמין' : user.role === 'instructor' ? 'פאנל מורה' : 'פאנל תלמיד';
 
   return (
     <div className="page-container">
       <div>
         <h3>שלום, {user.name} 👋</h3>
-        <p>{user.role === 'instructor' ? 'פאנל מורה' : 'פאנל תלמיד'}</p>
+        <p>{panelLabel}</p>
       </div>
       <div className="dashboard-cards-container">
         {cards.map(card => (

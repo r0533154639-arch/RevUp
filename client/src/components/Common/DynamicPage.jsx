@@ -14,15 +14,15 @@ import Posts from '../../pages/Instructor/Posts.jsx';
 
 const PAGE_MAP = {
   homePage:     { component: HomePage },
-  theory:       { component: TheoryMaterials,  allowedRoles: ['student'] },
-  theoryExam:   { component: TheoryExam,       allowedRoles: ['student'] },
+  theory:       { component: TheoryMaterials,  allowedRoles: ['student', 'admin'] },
+  theoryExam:   { component: TheoryExam,       allowedRoles: ['student', 'admin'] },
   instructors:  { component: SearchInstructors },
-  lessons:      { component: Dashboard,        allowedRoles: ['student', 'instructor'] },
-  schedule:     { component: ScheduleLessons,  allowedRoles: ['student', 'instructor'] },
-  test:         { component: DrivingTest,      allowedRoles: ['student'] },
-  license:      { component: LicenseReady,     allowedRoles: ['student'] },
-  students:     { component: StudentsList,     allowedRoles: ['instructor'] },
-  achievements: { component: Achievements,     allowedRoles: ['instructor'] },
+  lessons:      { component: Dashboard,        allowedRoles: ['student', 'instructor', 'admin'] },
+  schedule:     { component: ScheduleLessons,  allowedRoles: ['student', 'instructor', 'admin'] },
+  test:         { component: DrivingTest,      allowedRoles: ['student', 'admin'] },
+  license:      { component: LicenseReady,     allowedRoles: ['student', 'admin'] },
+  students:     { component: StudentsList,     allowedRoles: ['instructor', 'admin'] },
+  achievements: { component: Achievements,     allowedRoles: ['instructor', 'admin'] },
   posts:        { component: Posts },
 };
 

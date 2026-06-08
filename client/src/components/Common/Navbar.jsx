@@ -15,13 +15,23 @@ const INSTRUCTOR_LINKS = [
   { label: 'פוסטים', page: 'posts' },
 ];
 
+const ADMIN_LINKS = [
+  { label: 'תלמידים', page: 'students' },
+  { label: 'שיעורים', page: 'lessons' },
+  { label: 'לוח זמנים', page: 'schedule' },
+  { label: 'מורים', page: 'instructors' },
+  { label: 'פוסטים', page: 'posts' },
+  { label: 'טסטים', page: 'test' },
+  { label: 'הישגים', page: 'achievements' },
+];
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
-  const links = user?.role === 'instructor' ? INSTRUCTOR_LINKS : STUDENT_LINKS;
+  const links = user?.role === 'admin' ? ADMIN_LINKS : user?.role === 'instructor' ? INSTRUCTOR_LINKS : STUDENT_LINKS;
 
   return (
     <nav>
