@@ -1,6 +1,8 @@
 import './env.js';
 import express from 'express';
 import cors from 'cors';
+import { fileURLToPath } from 'url';
+import path from 'path';
 import authRoutes from './routes/auth.routes.js';
 import studentsRoutes from './routes/students.routes.js';
 import instructorsRoutes from './routes/instructors.routes.js';
@@ -11,9 +13,11 @@ import communicationRoutes from './routes/communication.routes.js';
 process.on('uncaughtException', err => console.error('UNCAUGHT:', err));
 process.on('unhandledRejection', err => console.error('UNHANDLED:', err));
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentsRoutes);

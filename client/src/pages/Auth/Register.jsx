@@ -42,6 +42,8 @@ export default function Register() {
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [cityOptions, setCityOptions] = useState([]);
+  const [photo, setPhoto] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const { register } = useAuth();
 
   useEffect(() => {
@@ -63,12 +65,28 @@ export default function Register() {
     if (submitted) setErrors(validate(updated));
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPhoto(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
     const errs = validate(form);
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    await register(form);
+    const res = await register(form);
+    if (res?.token && photo && form.role === 'instructor') {
+      const fd = new FormData();
+      fd.append('photo', photo);
+      await fetch('http://localhost:3000/api/instructors/upload-photo', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${res.token}` },
+        body: fd,
+      });
+    }
   };
 
   const toggleVehicleType = (id) => {
@@ -166,6 +184,13 @@ export default function Register() {
               ))}
             </div>
           </fieldset>
+          <div style={{ margin: '8px 0' }}>
+            <label style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>תמונת פרופיל (אופציונלי)</label>
+            <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ padding: 0 }} />
+            {photoPreview && (
+              <img src={photoPreview} alt="preview" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', marginTop: 8 }} />
+            )}
+          </div>
         </>
       )}
 

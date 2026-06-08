@@ -10,6 +10,7 @@ import DrivingTest from '../../pages/Tests/DrivingTest.jsx';
 import LicenseReady from '../../pages/Graduation/LicenseReady.jsx';
 import StudentsList from '../../pages/Instructor/StudentsList.jsx';
 import Achievements from '../../pages/Instructor/Achievements.jsx';
+import Posts from '../../pages/Instructor/Posts.jsx';
 
 const PAGE_MAP = {
   homePage:     { component: HomePage },
@@ -22,6 +23,7 @@ const PAGE_MAP = {
   license:      { component: LicenseReady,     allowedRoles: ['student'] },
   students:     { component: StudentsList,     allowedRoles: ['instructor'] },
   achievements: { component: Achievements,     allowedRoles: ['instructor'] },
+  posts:        { component: Posts },
 };
 
 export default function DynamicPage() {
