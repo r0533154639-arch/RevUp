@@ -11,19 +11,27 @@ import LicenseReady from '../../pages/Graduation/LicenseReady.jsx';
 import StudentsList from '../../pages/Instructor/StudentsList.jsx';
 import Achievements from '../../pages/Instructor/Achievements.jsx';
 import Posts from '../../pages/Instructor/Posts.jsx';
+import AdminStudents from '../../pages/Admin/AdminStudents.jsx';
+import AdminInstructors from '../../pages/Admin/AdminInstructors.jsx';
+import AdminPosts from '../../pages/Admin/AdminPosts.jsx';
+import AdminComments from '../../pages/Admin/AdminComments.jsx';
 
 const PAGE_MAP = {
-  homePage:     { component: HomePage },
-  theory:       { component: TheoryMaterials,  allowedRoles: ['student', 'admin'] },
-  theoryExam:   { component: TheoryExam,       allowedRoles: ['student', 'admin'] },
-  instructors:  { component: SearchInstructors },
-  lessons:      { component: Dashboard,        allowedRoles: ['student', 'instructor', 'admin'] },
-  schedule:     { component: ScheduleLessons,  allowedRoles: ['student', 'instructor', 'admin'] },
-  test:         { component: DrivingTest,      allowedRoles: ['student', 'admin'] },
-  license:      { component: LicenseReady,     allowedRoles: ['student', 'admin'] },
-  students:     { component: StudentsList,     allowedRoles: ['instructor', 'admin'] },
-  achievements: { component: Achievements,     allowedRoles: ['instructor', 'admin'] },
-  posts:        { component: Posts },
+  homePage:        { component: HomePage },
+  theory:          { component: TheoryMaterials,   allowedRoles: ['student', 'admin'] },
+  theoryExam:      { component: TheoryExam,        allowedRoles: ['student', 'admin'] },
+  instructors:     { component: SearchInstructors },
+  lessons:         { component: Dashboard,         allowedRoles: ['student', 'instructor', 'admin'] },
+  schedule:        { component: ScheduleLessons,   allowedRoles: ['student', 'instructor', 'admin'] },
+  test:            { component: DrivingTest,       allowedRoles: ['student', 'admin'] },
+  license:         { component: LicenseReady,      allowedRoles: ['student', 'admin'] },
+  students:        { component: StudentsList,      allowedRoles: ['instructor', 'admin'] },
+  achievements:    { component: Achievements,      allowedRoles: ['instructor', 'admin'] },
+  posts:           { component: Posts },
+  'admin-students':    { component: AdminStudents,     allowedRoles: ['admin'] },
+  'admin-instructors': { component: AdminInstructors,  allowedRoles: ['admin'] },
+  'admin-posts':       { component: AdminPosts,        allowedRoles: ['admin'] },
+  'admin-comments':    { component: AdminComments,     allowedRoles: ['admin'] },
 };
 
 export default function DynamicPage() {

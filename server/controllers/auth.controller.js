@@ -8,6 +8,12 @@ export const login = async (req, res) => {
     const user = await findUserByEmail(email);
     if (!user || !(await bcrypt.compare(password, user.password)))
       return res.status(401).json({ message: 'Invalid credentials' });
+    
+    // בדיקת חסימה
+    if (user.is_blocked) {
+      return res.status(403).json({ message: 'חשבונך נחסם. צור קשר עם המנהל.' });
+    }
+    
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({ token, user: { id: user.id, name: user.name, role: user.role } });
   } catch (err) {

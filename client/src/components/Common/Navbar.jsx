@@ -16,13 +16,10 @@ const INSTRUCTOR_LINKS = [
 ];
 
 const ADMIN_LINKS = [
-  { label: 'תלמידים', page: 'students' },
-  { label: 'שיעורים', page: 'lessons' },
-  { label: 'לוח זמנים', page: 'schedule' },
-  { label: 'מורים', page: 'instructors' },
-  { label: 'פוסטים', page: 'posts' },
-  { label: 'טסטים', page: 'test' },
-  { label: 'הישגים', page: 'achievements' },
+  { label: 'תלמידים', page: 'admin-students' },
+  { label: 'מורי נהיגה', page: 'admin-instructors' },
+  { label: 'פוסטים', page: 'admin-posts' },
+  { label: 'תגובות', page: 'admin-comments' },
 ];
 
 export default function Navbar() {

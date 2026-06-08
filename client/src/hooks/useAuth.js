@@ -13,11 +13,14 @@ export const AuthProvider = ({ children }) => {
     } catch { return null; }
   });
 
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
+
   const login = async (data) => {
     const res = await loginService(data);
     localStorage.setItem('token', res.token);
     localStorage.setItem('user', JSON.stringify(res.user));
     setUser(res.user);
+    setToken(res.token);
     return res;
   };
 
@@ -26,6 +29,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', res.token);
     localStorage.setItem('user', JSON.stringify(res.user));
     setUser(res.user);
+    setToken(res.token);
     return res;
   };
 
@@ -33,9 +37,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
+    setToken(null);
   };
 
-  return React.createElement(AuthContext.Provider, { value: { user, login, register, logout } }, children);
+  return React.createElement(AuthContext.Provider, { value: { user, token, login, register, logout } }, children);
 };
 
 export const useAuth = () => useContext(AuthContext);
