@@ -16,7 +16,10 @@ const INSTRUCTOR_CARDS = [
 ];
 
 export default function HomePage({ user }) {
-  const cards = user.role === 'instructor' ? INSTRUCTOR_CARDS : STUDENT_CARDS;
+  const studentCards = user.role === 'student' && user.instructor_id
+    ? STUDENT_CARDS.filter(c => c.page !== 'instructors')
+    : STUDENT_CARDS;
+  const cards = user.role === 'instructor' ? INSTRUCTOR_CARDS : studentCards;
 
   return (
     <div className="page-container">
