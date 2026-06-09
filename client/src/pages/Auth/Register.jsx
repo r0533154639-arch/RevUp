@@ -78,10 +78,11 @@ export default function Register() {
     const errs = validate(form);
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     const res = await register(form);
-    if (res?.token && photo && form.role === 'instructor') {
+    if (res?.token && photo) {
       const fd = new FormData();
       fd.append('photo', photo);
-      await fetch('http://localhost:3000/api/instructors/upload-photo', {
+      const endpoint = form.role === 'instructor' ? '/api/instructors/upload-photo' : '/api/students/upload-photo';
+      await fetch(`http://localhost:3000${endpoint}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${res.token}` },
         body: fd,

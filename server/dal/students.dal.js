@@ -57,6 +57,14 @@ export const chooseInstructor = async (studentId, instructorId) => {
   );
 };
 
+export const getStudentInstructor = async (studentId) => {
+  const [rows] = await pool.query(
+    'SELECT instructor_id FROM driving_students WHERE user_id = ?',
+    [studentId]
+  );
+  return rows[0];
+};
+
 export const getStudentsByInstructor = async (instructorId) => {
   const [rows] = await pool.query(
     `SELECT u.id, u.name, u.email, u.phone, u.date_of_birth,

@@ -35,7 +35,13 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  return React.createElement(AuthContext.Provider, { value: { user, login, register, logout } }, children);
+  const setInstructorId = (instructorId) => {
+    const updated = { ...user, instructor_id: instructorId };
+    localStorage.setItem('user', JSON.stringify(updated));
+    setUser(updated);
+  };
+
+  return React.createElement(AuthContext.Provider, { value: { user, login, register, logout, setInstructorId } }, children);
 };
 
 export const useAuth = () => useContext(AuthContext);

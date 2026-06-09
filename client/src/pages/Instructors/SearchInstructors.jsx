@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import InstructorCard from '../../components/Instructors/InstructorCard.jsx';
 import { getInstructors } from '../../services/stats.service.js';
+import { useAuth } from '../../hooks/useAuth.js';
 
 export default function SearchInstructors() {
+  const { user } = useAuth();
   const [area, setArea] = useState('');
   const [instructors, setInstructors] = useState([]);
   const [error, setError] = useState('');
@@ -12,12 +15,12 @@ export default function SearchInstructors() {
     setLoading(true);
     setError('');
     getInstructors(area)
-      .then(data => {
-        setInstructors(Array.isArray(data) ? data : []);
-      })
+      .then(data => setInstructors(Array.isArray(data) ? data : []))
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [area]);
+
+  if (user?.instructor_id) return <Navigate to={`/users/${user.id}/homePage`} />;
 
   return (
     <div className="page-container">

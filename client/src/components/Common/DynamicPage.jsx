@@ -1,4 +1,5 @@
-import { Navigate, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import HomePage from '../Home/HomePage.jsx';
 import TheoryMaterials from '../../pages/Theory/TheoryMaterials.jsx';
@@ -29,10 +30,27 @@ const PAGE_MAP = {
 export default function DynamicPage() {
   const { page } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const entry = PAGE_MAP[page];
 
   if (!entry) return <Navigate to="/" />;
   if (entry.allowedRoles && !entry.allowedRoles.includes(user.role)) return <Navigate to="/" />;
+
+  const needsInstructor = (page === 'lessons' || page === 'schedule') && user.role === 'student' && !user.instructor_id;
+  if (needsInstructor) {
+    return (
+      <div className="modal-overlay">
+        <div className="modal-box">
+          <p className="modal-title">⚠️ לא נבחר מורה</p>
+          <p className="modal-text">לא ניתן לקבוע שיעורים לפני שבוחרים מורה נהיגה.</p>
+          <div className="modal-actions">
+            <button onClick={() => navigate(`/users/${user.id}/instructors`)}>לבחירת מורה לחץ כאן</button>
+            <button className="btn-secondary" onClick={() => navigate(`/users/${user.id}/homePage`)}>חזרה לדף הבית</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const Component = entry.component;
   return <Component user={user} />;
