@@ -1,14 +1,22 @@
 CREATE DATABASE IF NOT EXISTS revup;
 USE revup;
 
+CREATE TABLE roles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO roles (name) VALUES ('student'), ('instructor'), ('admin');
+
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL UNIQUE,
   email VARCHAR(100) UNIQUE NOT NULL,
   phone VARCHAR(20) NOT NULL,
   date_of_birth DATE NOT NULL,
-  role ENUM('student', 'instructor', 'admin') DEFAULT 'student',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  role_id INT NOT NULL DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
 CREATE TABLE passwords (
@@ -18,12 +26,20 @@ CREATE TABLE passwords (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE student_statuses (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO student_statuses (name) VALUES ('theory'), ('lessons'), ('test'), ('licensed');
+
 CREATE TABLE driving_students (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT UNIQUE NOT NULL,
-  status ENUM('theory', 'lessons', 'test', 'licensed') DEFAULT 'theory',
+  status_id INT NOT NULL DEFAULT 1,
   instructor_id INT DEFAULT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (status_id) REFERENCES student_statuses(id)
 );
 
 CREATE TABLE theory_progress (
@@ -49,22 +65,30 @@ CREATE TABLE instructor_availability (
     FOREIGN KEY (instructor_id) REFERENCES driving_instructor(id)
 );
 
+CREATE TABLE lesson_statuses (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO lesson_statuses (name) VALUES ('pending'), ('approved'), ('unapproved'), ('completed'), ('cancelled');
+
 CREATE TABLE driving_lessons (
   id INT AUTO_INCREMENT PRIMARY KEY,
   student_id INT NOT NULL,
   instructor_id INT NOT NULL,
   date DATE NOT NULL,
   time TIME NOT NULL,
-  status ENUM('pending', 'approved', 'unapproved', 'completed', 'cancelled') DEFAULT 'pending',
+  status_id INT NOT NULL DEFAULT 1,
   FOREIGN KEY (student_id) REFERENCES users(id),
-  FOREIGN KEY (instructor_id) REFERENCES driving_instructor(id)
+  FOREIGN KEY (instructor_id) REFERENCES driving_instructor(id),
+  FOREIGN KEY (status_id) REFERENCES lesson_statuses(id)
 );
 
 CREATE TABLE lessons_payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     lesson_id INT NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
-    status ENUM('pending','paid') DEFAULT 'pending',
+    is_paid BOOLEAN NOT NULL DEFAULT FALSE,
     payment_date DATETIME,
     FOREIGN KEY (lesson_id) REFERENCES driving_lessons(id)
 );
@@ -77,13 +101,21 @@ CREATE TABLE feedback (
   FOREIGN KEY (lesson_id) REFERENCES driving_lessons(id)
 );
 
+CREATE TABLE test_statuses (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO test_statuses (name) VALUES ('scheduled'), ('passed'), ('failed');
+
 CREATE TABLE tests (
   id INT AUTO_INCREMENT PRIMARY KEY,
   student_id INT NOT NULL,
   date DATE NOT NULL,
   time TIME NOT NULL,
-  status ENUM('scheduled', 'passed', 'failed') DEFAULT 'scheduled',
-  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+  status_id INT NOT NULL DEFAULT 1,
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (status_id) REFERENCES test_statuses(id)
 );
 
 CREATE TABLE appeals (
@@ -135,13 +167,14 @@ REFERENCES test_centers(id);
 CREATE VIEW student_progress_view AS
 SELECT
     s.user_id AS student_id,
-    s.status,
+    ss.name AS status,
     COUNT(l.id) AS total_lessons,
-    COALESCE(SUM(l.status = 'completed'), 0) AS completed_lessons
+    COALESCE(SUM(ls.name = 'completed'), 0) AS completed_lessons
 FROM driving_students s
-LEFT JOIN driving_lessons l
-    ON l.student_id = s.user_id
-GROUP BY s.user_id, s.status;
+JOIN student_statuses ss ON ss.id = s.status_id
+LEFT JOIN driving_lessons l ON l.student_id = s.user_id
+LEFT JOIN lesson_statuses ls ON ls.id = l.status_id
+GROUP BY s.user_id, ss.name;
 
 -- לקשר מורה למכון רישוי
 
@@ -166,7 +199,7 @@ CREATE TABLE instructor_review (
   instructor_id INT NOT NULL,
   rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
   comment TEXT,
-  reason ENUM('completed', 'transferred') NOT NULL,
+  is_completed BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE (student_id, instructor_id),
   FOREIGN KEY (student_id) REFERENCES driving_students(user_id),
