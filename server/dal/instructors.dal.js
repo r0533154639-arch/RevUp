@@ -3,7 +3,7 @@ import pool from '../config/db.js';
 export const getAllInstructors = async ({ area } = {}) => {
   const where = area ? 'WHERE di.area LIKE ?' : '';
   const [rows] = await pool.query(
-    `SELECT di.id, di.area, di.photo, u.name, u.phone
+    `SELECT di.id, di.area, u.name, u.phone
      FROM driving_instructor di
      JOIN users u ON u.id = di.user_id
      ${where}`,

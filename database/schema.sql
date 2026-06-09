@@ -132,6 +132,7 @@ ADD test_center_id INT DEFAULT NULL,
 ADD FOREIGN KEY (test_center_id)
 REFERENCES test_centers(id);
 
+ALTER TABLE DrivingInstructor ADD photo VARCHAR(255);
 CREATE VIEW student_progress_view AS
 SELECT
     s.user_id AS student_id,
