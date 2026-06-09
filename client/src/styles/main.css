@@ -86,3 +86,260 @@ button:hover { background: #1558b0; }
 @media (max-width: 600px) {
   .dashboard-cards-container { grid-template-columns: 1fr; }
 }
+
+.students-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* Student Card */
+.student-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  border: 2px solid transparent;
+}
+.student-card:hover {
+  transform: translateY(-2px);
+  border-color: #1a73e8;
+  box-shadow: 0 6px 16px rgba(26,115,232,0.13);
+}
+.student-card-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #1a73e8;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.student-card-name {
+  font-weight: 600;
+  font-size: 16px;
+  flex: 1;
+}
+.student-card-status {
+  font-size: 12px;
+  background: #e8f0fe;
+  color: #1a73e8;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* Student Modal */
+.student-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+.student-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 640px;
+  height: 90vh;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+  position: relative;
+  text-align: center;
+  animation: modalIn 0.2s ease;
+}
+@keyframes modalIn {
+  from { transform: scale(0.93); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.student-modal-close {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: #f1f3f4;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.student-modal-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #1a73e8;
+  color: white;
+  font-size: 30px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+.student-modal h2 {
+  font-size: 22px;
+  margin-bottom: 24px;
+  color: #1a1a1a;
+}
+.student-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  text-align: right;
+}
+.student-modal-item {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.student-modal-item .label {
+  font-size: 12px;
+  color: #888;
+}
+.student-modal-item span:last-child {
+  font-weight: 600;
+  font-size: 15px;
+  color: #1a1a1a;
+}
+.student-modal-notes {
+  margin-top: 16px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: right;
+}
+.student-modal-notes p {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+}
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 13px !important;
+}
+.status-theory    { background: #fff3cd; color: #856404; }
+.status-practical { background: #cfe2ff; color: #084298; }
+.status-test_ready { background: #d1e7dd; color: #0a5c36; }
+.status-licensed  { background: #d4edda; color: #155724; }
+
+/* Lesson Feedback */
+.feedback-toggle-btn {
+  margin-top: 20px;
+  width: 100%;
+  background: #f8f9fa;
+  color: #1a73e8;
+  border: 2px solid #1a73e8;
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 15px;
+}
+.feedback-toggle-btn:hover { background: #e8f0fe; }
+.feedback-toggle-btn:disabled { background: #f1f3f4; color: #aaa; border-color: #ddd; cursor: not-allowed; }
+.feedback-toggle-btn:disabled:hover { background: #f1f3f4; }
+.feedback-form {
+  margin-top: 12px;
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: right;
+}
+.feedback-rating { display: flex; flex-direction: column; gap: 6px; }
+.stars { display: flex; gap: 6px; font-size: 28px; cursor: pointer; }
+.star { color: #ddd; transition: color 0.15s; }
+.star.active { color: #f5a623; }
+.star:hover { color: #f5a623; }
+.feedback-textarea {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+  margin: 0;
+}
+.feedback-textarea:focus { border-color: #1a73e8; outline: none; }
+.feedback-send-btn {
+  background: #1a73e8;
+  color: white;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 15px;
+  width: 100%;
+  margin: 0;
+}
+.feedback-send-btn:disabled { background: #aaa; cursor: not-allowed; }
+.feedback-sent {
+  text-align: center;
+  color: #0a5c36;
+  font-weight: 600;
+  padding: 8px;
+}
+
+/* Achievements */
+.achievements-page h2 { font-size: 24px; margin-bottom: 4px; }
+.achievements-sub { color: #888; font-size: 14px; margin-bottom: 24px; }
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.achievement-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  text-align: center;
+}
+.achievement-icon { font-size: 32px; }
+.achievement-value { font-size: 28px; font-weight: 800; color: #1a73e8; }
+.achievement-label { font-size: 13px; color: #555; font-weight: 600; }
+.achievement-sub { font-size: 12px; color: #aaa; }
+.achievement-badge {
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  color: white;
+  border-radius: 16px;
+  padding: 18px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+@media (max-width: 600px) {
+  .achievements-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 500px) {
+  .student-modal-grid { grid-template-columns: 1fr; }
+  .student-modal { padding: 24px 16px; }
+}

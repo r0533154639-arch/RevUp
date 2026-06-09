@@ -41,10 +41,55 @@ export const createUser = async ({ name, email, phone, password, role, date_of_b
 };
 
 export const getStudentProgress = async (id) => {
-  const [rows] = await pool.query('SELECT * FROM student_progress WHERE student_id = ?', [id]);
+  const [rows] = await pool.query('SELECT * FROM student_progress_view WHERE student_id = ?', [id]);
   return rows[0];
 };
 
 export const setStudentStatus = async (id, status) => {
   await pool.query('UPDATE driving_students SET status = ? WHERE user_id = ?', [status, id]);
+};
+
+// TODO: להסיר כשיהיה תהליך בחירת מורה אמיתי
+export const chooseInstructor = async (studentId, instructorId) => {
+  await pool.query(
+    'UPDATE driving_students SET instructor_id = ? WHERE user_id = ?',
+    [instructorId, studentId]
+  );
+};
+
+export const getStudentsByInstructor = async (instructorId) => {
+  const [rows] = await pool.query(
+    `SELECT u.id, u.name, u.email, u.phone, u.date_of_birth,
+            ds.status, vt.name AS vehicle_type,
+            (SELECT dl.id FROM driving_lessons dl
+             WHERE dl.student_id = u.id AND dl.instructor_id = di.id
+             ORDER BY dl.date DESC LIMIT 1) AS last_lesson_id
+     FROM driving_students ds
+     JOIN users u ON u.id = ds.user_id
+     LEFT JOIN vehicle_types vt ON vt.id = ds.vehicle_type_id
+     JOIN driving_instructor di ON di.id = ds.instructor_id
+     WHERE di.user_id = ?`,
+    [instructorId]
+  );
+  return rows;
+};
+
+export const getInstructorAchievements = async (instructorId) => {
+  const [[stats]] = await pool.query(
+    `SELECT
+       COUNT(DISTINCT ds.user_id)                                        AS total_students,
+       SUM(ds.status = 'licensed')                                       AS licensed_students,
+       COUNT(dl.id)                                                      AS total_lessons,
+       SUM(dl.status = 'completed')                                      AS completed_lessons,
+       ROUND(SUM(dl.status = 'completed') / NULLIF(COUNT(dl.id),0)*100)  AS completion_rate,
+       ROUND(AVG(ir.rating),1)                                           AS avg_rating,
+       COUNT(DISTINCT ir.id)                                             AS total_reviews
+     FROM driving_instructor di
+     JOIN driving_students ds   ON ds.instructor_id = di.id
+     LEFT JOIN driving_lessons dl ON dl.instructor_id = di.id
+     LEFT JOIN instructor_review ir ON ir.instructor_id = di.id
+     WHERE di.user_id = ?`,
+    [instructorId]
+  );
+  return stats;
 };
