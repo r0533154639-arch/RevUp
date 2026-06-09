@@ -57,13 +57,15 @@ export const getDashboard = async (req, res) => {
       SELECT dl.id, dl.date, dl.time, dl.status,
              us.name AS student_name, us.id AS student_id,
              ui.name AS instructor_name, ui.id AS instructor_id,
-             vt.name AS vehicle_type
+             vt.name AS vehicle_type,
+             lf.id AS feedback_id, lf.notes AS feedback_notes, lf.progress_rating
       FROM driving_lessons dl
       JOIN users us ON us.id = dl.student_id
       JOIN driving_instructor di ON di.id = dl.instructor_id
       JOIN users ui ON ui.id = di.user_id
       LEFT JOIN driving_students ds ON ds.user_id = dl.student_id
       LEFT JOIN vehicle_types vt ON vt.id = ds.vehicle_type_id
+      LEFT JOIN lesson_feedback lf ON lf.lesson_id = dl.id
       ORDER BY dl.date DESC, dl.time DESC
     `);
 
@@ -91,6 +93,29 @@ export const blockUser = async (req, res) => {
     const { id } = req.params;
     const { block } = req.body;
     await pool.query('UPDATE users SET is_blocked = ? WHERE id = ?', [block ? 1 : 0, id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const ALLOWED_EDITS = {
+  users: ['name', 'email', 'phone'],
+  driving_students: ['status'],
+  driving_instructor: ['area'],
+  posts: ['title', 'content'],
+  post_comments: ['content'],
+  driving_lessons: ['status', 'date', 'time'],
+  lesson_feedback: ['notes', 'progress_rating'],
+};
+
+export const updateCell = async (req, res) => {
+  try {
+    const { table, id } = req.params;
+    const { field, value } = req.body;
+    if (!ALLOWED_EDITS[table]?.includes(field))
+      return res.status(400).json({ message: 'שדה לא מורשה לעריכה' });
+    await pool.query(`UPDATE ${table} SET ${field} = ? WHERE id = ?`, [value, id]);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -40,9 +40,37 @@ function ProfileModal({ user: u, onClose, onBlock }) {
   );
 }
 
+function EditCellModal({ cell, onClose, onSave }) {
+  const [value, setValue] = useState(cell.value ?? '');
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={e => e.stopPropagation()} style={{ textAlign: 'right', minWidth: 320 }}>
+        <p style={{ marginBottom: 8, fontWeight: 600 }}>עריכת: {cell.label}</p>
+        <textarea
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          rows={3}
+          style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, resize: 'vertical', boxSizing: 'border-box' }}
+          autoFocus
+        />
+        <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'center' }}>
+          <button
+            onClick={() => onSave(value)}
+            style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', cursor: 'pointer' }}
+          >
+            שמור
+          </button>
+          <button onClick={onClose} className="btn-secondary">ביטול</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const tStyle = { width: '100%', borderCollapse: 'collapse', fontSize: 14 };
 const thStyle = { background: '#f3f4f6', padding: '8px 12px', textAlign: 'right', borderBottom: '2px solid #e5e7eb' };
 const tdStyle = { padding: '7px 12px', borderBottom: '1px solid #e5e7eb' };
+const tdEditStyle = { ...tdStyle, cursor: 'pointer' };
 const linkBtn = { border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontSize: 13 };
 
 export default function AdminDashboard() {
@@ -51,6 +79,7 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState('students');
   const [selected, setSelected] = useState(null);
   const [lessonSort, setLessonSort] = useState('date');
+  const [editCell, setEditCell] = useState(null); // { table, id, field, value, label }
 
   const load = () => {
     setLoading(true);
@@ -62,6 +91,17 @@ export default function AdminDashboard() {
   const handleBlock = async (u) => {
     await api.put(`/admin/users/${u.id}/block`, { block: !u.is_blocked });
     setSelected(null);
+    load();
+  };
+
+  const openEdit = (table, id, field, value, label) => {
+    setEditCell({ table, id, field, value, label });
+  };
+
+  const handleSave = async (newValue) => {
+    const { table, id, field } = editCell;
+    await api.put(`/admin/table/${table}/${id}`, { field, value: newValue });
+    setEditCell(null);
     load();
   };
 
@@ -85,11 +125,13 @@ export default function AdminDashboard() {
   return (
     <div className="page-container" style={{ direction: 'rtl' }}>
       {selected && <ProfileModal user={selected} onClose={() => setSelected(null)} onBlock={handleBlock} />}
+      {editCell && <EditCellModal cell={editCell} onClose={() => setEditCell(null)} onSave={handleSave} />}
 
       <h2 style={{ marginBottom: 8 }}>ניהול האתר</h2>
-      <p style={{ color: '#888', marginBottom: 20 }}>
+      <p style={{ color: '#888', marginBottom: 4 }}>
         סה"כ משתמשים: {data.total_users} | תלמידים: {data.total_students} | מורים: {data.total_instructors}
       </p>
+      <p style={{ color: '#aaa', fontSize: 12, marginBottom: 20 }}>💡 לחיצה כפולה על תא כדי לערוך</p>
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
         {TABS.map(t => (
@@ -110,9 +152,9 @@ export default function AdminDashboard() {
           <tbody>
             {data.students.map(s => (
               <tr key={s.id}>
-                <td style={tdStyle}>{s.name}</td>
-                <td style={tdStyle}>{s.email}</td>
-                <td style={tdStyle}>{s.phone}</td>
+                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', s.id, 'name', s.name, 'שם')}>{s.name}</td>
+                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', s.id, 'email', s.email, 'אימייל')}>{s.email}</td>
+                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', s.id, 'phone', s.phone, 'טלפון')}>{s.phone}</td>
                 <td style={tdStyle}>{s.instructor_name || '—'}</td>
                 <td style={tdStyle}>{s.status}</td>
                 <td style={tdStyle}>{s.is_blocked ? '🚫' : '✅'}</td>
@@ -129,8 +171,8 @@ export default function AdminDashboard() {
           <tbody>
             {data.instructors.map(i => (
               <tr key={i.id}>
-                <td style={tdStyle}>{i.name}</td>
-                <td style={tdStyle}>{i.email}</td>
+                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', i.id, 'name', i.name, 'שם')}>{i.name}</td>
+                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', i.id, 'email', i.email, 'אימייל')}>{i.email}</td>
                 <td style={tdStyle}>{i.area || '—'}</td>
                 <td style={tdStyle}>{i.student_count}</td>
                 <td style={tdStyle}>{i.is_blocked ? '🚫' : '✅'}</td>
@@ -147,8 +189,8 @@ export default function AdminDashboard() {
           <tbody>
             {data.posts.map(p => (
               <tr key={p.id}>
-                <td style={tdStyle}>{p.title}</td>
-                <td style={{ ...tdStyle, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.content}</td>
+                <td style={tdEditStyle} onDoubleClick={() => openEdit('posts', p.id, 'title', p.title, 'כותרת')}>{p.title}</td>
+                <td style={{ ...tdEditStyle, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} onDoubleClick={() => openEdit('posts', p.id, 'content', p.content, 'תוכן')}>{p.content}</td>
                 <td style={tdStyle}>{p.author_name}</td>
                 <td style={tdStyle}>{new Date(p.created_at).toLocaleDateString('he-IL')}</td>
                 <td style={tdStyle}>
@@ -168,7 +210,7 @@ export default function AdminDashboard() {
           <tbody>
             {data.comments.map(c => (
               <tr key={c.id}>
-                <td style={{ ...tdStyle, maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.content}</td>
+                <td style={{ ...tdEditStyle, maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} onDoubleClick={() => openEdit('post_comments', c.id, 'content', c.content, 'תוכן תגובה')}>{c.content}</td>
                 <td style={tdStyle}>{c.author_name}</td>
                 <td style={tdStyle}>{c.post_title}</td>
                 <td style={tdStyle}>{new Date(c.created_at).toLocaleDateString('he-IL')}</td>
@@ -193,7 +235,7 @@ export default function AdminDashboard() {
             ))}
           </div>
           <table style={tStyle}>
-            <thead><tr>{['תאריך', 'שעה', 'תלמיד', 'מורה', 'סוג רכב', 'סטטוס'].map(h => <th key={h} style={thStyle}>{h}</th>)}</tr></thead>
+            <thead><tr>{['תאריך', 'שעה', 'תלמיד', 'מורה', 'סוג רכב', 'סטטוס', 'משוב מורה'].map(h => <th key={h} style={thStyle}>{h}</th>)}</tr></thead>
             <tbody>
               {sortedLessons.map(l => (
                 <tr key={l.id}>
@@ -202,7 +244,18 @@ export default function AdminDashboard() {
                   <td style={tdStyle}>{l.student_name}</td>
                   <td style={tdStyle}>{l.instructor_name}</td>
                   <td style={tdStyle}>{l.vehicle_type || '—'}</td>
-                  <td style={tdStyle}>{l.status}</td>
+                  <td style={tdEditStyle} onDoubleClick={() => openEdit('driving_lessons', l.id, 'status', l.status, 'סטטוס שיעור')}>{l.status}</td>
+                  <td
+                    style={{ ...tdEditStyle, maxWidth: 220, color: l.feedback_notes ? '#111' : '#aaa', fontStyle: l.feedback_notes ? 'normal' : 'italic' }}
+                    onDoubleClick={() => l.feedback_id && openEdit('lesson_feedback', l.feedback_id, 'notes', l.feedback_notes, 'משוב מורה')}
+                    title={l.feedback_id ? 'לחץ פעמיים לעריכה' : 'לא נכתב משוב עדיין'}
+                  >
+                    {l.feedback_notes
+                      ? l.feedback_notes
+                      : l.feedback_id
+                        ? '(ריק)'
+                        : 'לא נכתב משוב עדיין'}
+                  </td>
                 </tr>
               ))}
             </tbody>
