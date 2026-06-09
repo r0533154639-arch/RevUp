@@ -5,6 +5,7 @@ const STUDENT_CARDS = [
   { title: 'לימודי תאוריה', description: 'חומרי לימוד ותרגול למבחן התאוריה', icon: '📖', page: 'theory' },
   { title: 'שיעורי נהיגה', description: 'צפה וקבע את השיעורים הקרובים שלך', icon: '🚗', page: 'lessons' },
   { title: 'טסט נהיגה', description: 'קבע טסט ועקוב אחר הסטטוס שלו', icon: '📋', page: 'test' },
+  { title: 'פוסטים', description: 'קרא פוסטים ממורי נהיגה', icon: '✏️', page: 'posts' },
   { title: 'חפש מורה', description: 'מצא מורה נהיגה באזור שלך', icon: '🔍', page: 'instructors' },
 ];
 

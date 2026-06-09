@@ -28,6 +28,7 @@ export default function Navbar() {
     { label: 'תאוריה', page: 'theory' },
     { label: 'שיעורים', page: 'lessons' },
     { label: 'טסט', page: 'test' },
+    { label: 'פוסטים', page: 'posts' },
     ...(!user?.instructor_id ? [{ label: 'חפש מורה', page: 'instructors' }] : []),
   ];
 
