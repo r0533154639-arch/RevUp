@@ -115,7 +115,8 @@ export const updateCell = async (req, res) => {
     const { field, value } = req.body;
     if (!ALLOWED_EDITS[table]?.includes(field))
       return res.status(400).json({ message: 'שדה לא מורשה לעריכה' });
-    await pool.query(`UPDATE ${table} SET ${field} = ? WHERE id = ?`, [value, id]);
+    const pkCol = table === 'driving_students' ? 'user_id' : 'id';
+    await pool.query(`UPDATE ${table} SET ${field} = ? WHERE ${pkCol} = ?`, [value, id]);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ message: err.message });

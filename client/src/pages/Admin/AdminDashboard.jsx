@@ -46,13 +46,24 @@ function EditCellModal({ cell, onClose, onSave }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={e => e.stopPropagation()} style={{ textAlign: 'right', minWidth: 320 }}>
         <p style={{ marginBottom: 8, fontWeight: 600 }}>עריכת: {cell.label}</p>
-        <textarea
-          value={value}
-          onChange={e => setValue(e.target.value)}
-          rows={3}
-          style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, resize: 'vertical', boxSizing: 'border-box' }}
-          autoFocus
-        />
+        {cell.options ? (
+          <select
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            autoFocus
+            style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+          >
+            {cell.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        ) : (
+          <textarea
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            rows={3}
+            style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, resize: 'vertical', boxSizing: 'border-box' }}
+            autoFocus
+          />
+        )}
         <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'center' }}>
           <button
             onClick={() => onSave(value)}
@@ -66,6 +77,24 @@ function EditCellModal({ cell, onClose, onSave }) {
     </div>
   );
 }
+
+const STUDENT_STATUSES = [
+  { value: 'theory', label: 'תיאוריה' },
+  { value: 'lessons', label: 'שיעורים' },
+  { value: 'test', label: 'טסט' },
+  { value: 'licensed', label: 'מורשה' },
+];
+const LESSON_STATUSES = [
+  { value: 'pending', label: 'ממתין' },
+  { value: 'approved', label: 'מאושר' },
+  { value: 'unapproved', label: 'לא מאושר' },
+  { value: 'completed', label: 'הושלם' },
+  { value: 'cancelled', label: 'בוטל' },
+];
+const BLOCKED_OPTIONS = [
+  { value: '0', label: '✅ פעיל' },
+  { value: '1', label: '🚫 חסום' },
+];
 
 const tStyle = { width: '100%', borderCollapse: 'collapse', fontSize: 14 };
 const thStyle = { background: '#f3f4f6', padding: '8px 12px', textAlign: 'right', borderBottom: '2px solid #e5e7eb' };
@@ -94,13 +123,17 @@ export default function AdminDashboard() {
     load();
   };
 
-  const openEdit = (table, id, field, value, label) => {
-    setEditCell({ table, id, field, value, label });
+  const openEdit = (table, id, field, value, label, options = null) => {
+    setEditCell({ table, id, field, value, label, options });
   };
 
   const handleSave = async (newValue) => {
     const { table, id, field } = editCell;
-    await api.put(`/admin/table/${table}/${id}`, { field, value: newValue });
+    if (field === 'is_blocked') {
+      await api.put(`/admin/users/${id}/block`, { block: newValue === '1' });
+    } else {
+      await api.put(`/admin/table/${table}/${id}`, { field, value: newValue });
+    }
     setEditCell(null);
     load();
   };
@@ -156,8 +189,8 @@ export default function AdminDashboard() {
                 <td style={tdEditStyle} onDoubleClick={() => openEdit('users', s.id, 'email', s.email, 'אימייל')}>{s.email}</td>
                 <td style={tdEditStyle} onDoubleClick={() => openEdit('users', s.id, 'phone', s.phone, 'טלפון')}>{s.phone}</td>
                 <td style={tdStyle}>{s.instructor_name || '—'}</td>
-                <td style={tdStyle}>{s.status}</td>
-                <td style={tdStyle}>{s.is_blocked ? '🚫' : '✅'}</td>
+                <td style={tdEditStyle} onDoubleClick={() => openEdit('driving_students', s.id, 'status', s.status, 'סטטוס תלמיד', STUDENT_STATUSES)}>{s.status}</td>
+                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', s.id, 'is_blocked', String(s.is_blocked), 'חסימה', BLOCKED_OPTIONS)}>{s.is_blocked ? '🚫' : '✅'}</td>
                 <td style={tdStyle}><button style={{ ...linkBtn, background: '#e5e7eb' }} onClick={() => setSelected(s)}>צפה</button></td>
               </tr>
             ))}
@@ -175,7 +208,7 @@ export default function AdminDashboard() {
                 <td style={tdEditStyle} onDoubleClick={() => openEdit('users', i.id, 'email', i.email, 'אימייל')}>{i.email}</td>
                 <td style={tdStyle}>{i.area || '—'}</td>
                 <td style={tdStyle}>{i.student_count}</td>
-                <td style={tdStyle}>{i.is_blocked ? '🚫' : '✅'}</td>
+                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', i.id, 'is_blocked', String(i.is_blocked), 'חסימה', BLOCKED_OPTIONS)}>{i.is_blocked ? '🚫' : '✅'}</td>
                 <td style={tdStyle}><button style={{ ...linkBtn, background: '#e5e7eb' }} onClick={() => setSelected(i)}>צפה</button></td>
               </tr>
             ))}
