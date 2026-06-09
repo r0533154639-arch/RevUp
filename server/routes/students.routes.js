@@ -7,6 +7,6 @@ router.get('/progress', verifyToken, checkRole(['student']), getProgress);
 router.put('/status', verifyToken, checkRole(['student']), updateStatus);
 router.get('/my-instructor', verifyToken, checkRole(['student']), getMyInstructor);
 router.put('/choose-instructor', verifyToken, checkRole(['student']), selectInstructor);
-router.get('/my-students', verifyToken, checkRole(['instructor']), getMyStudents);
-router.get('/achievements', verifyToken, checkRole(['instructor']), getAchievements);
+router.get('/my-students', verifyToken, checkRole(['instructor', 'admin']), getMyStudents);
+router.get('/achievements', verifyToken, checkRole(['instructor', 'admin']), getAchievements);
 export default router;

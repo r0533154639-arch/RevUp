@@ -16,17 +16,24 @@ const INSTRUCTOR_CARDS = [
   { title: 'פוסטים', description: 'שתף תוכן מקצועי וצפה בפוסטים של מדריכים אחרים', icon: '✏️', page: 'posts' },
 ];
 
+const ROLE_LABEL = { student: 'פאנל תלמיד', instructor: 'פאנל מורה', admin: 'פאנל מנהל' };
+
 export default function HomePage({ user }) {
   const studentCards = user.role === 'student' && user.instructor_id
     ? STUDENT_CARDS.filter(c => c.page !== 'instructors')
     : STUDENT_CARDS;
-  const cards = user.role === 'instructor' ? INSTRUCTOR_CARDS : studentCards;
+  const adminCards = [
+    ...STUDENT_CARDS,
+    ...INSTRUCTOR_CARDS,
+    { title: 'ניהול האתר', description: 'רשימת משתמשים, פוסטים, שיעורים וניהול הרשאות', icon: '⚙️', page: 'admin' },
+  ];
+  const cards = user.role === 'instructor' ? INSTRUCTOR_CARDS : user.role === 'admin' ? adminCards : studentCards;
 
   return (
     <div className="page-container">
       <div>
         <h3>שלום, {user.name} 👋</h3>
-        <p>{user.role === 'instructor' ? 'פאנל מורה' : 'פאנל תלמיד'}</p>
+        <p>{ROLE_LABEL[user.role] || 'פאנל תלמיד'}</p>
       </div>
       <div className="dashboard-cards-container">
         {cards.map(card => (

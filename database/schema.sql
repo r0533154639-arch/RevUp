@@ -8,6 +8,8 @@ CREATE TABLE users (
   phone VARCHAR(20) NOT NULL,
   date_of_birth DATE NOT NULL,
   role ENUM('student', 'instructor', 'admin') DEFAULT 'student',
+  is_blocked TINYINT(1) DEFAULT 0,
+  profile_image VARCHAR(255) DEFAULT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

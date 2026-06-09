@@ -1,6 +1,10 @@
 import pool from '../config/db.js';
 
 export const getLessonsByUser = async (id, role) => {
+  if (role === 'admin') {
+    const [rows] = await pool.query('SELECT * FROM driving_lessons');
+    return rows;
+  }
   const col = role === 'instructor' ? 'instructor_id' : 'student_id';
   const [rows] = await pool.query(`SELECT * FROM driving_lessons WHERE ${col} = ?`, [id]);
   return rows;

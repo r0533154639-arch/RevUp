@@ -21,6 +21,7 @@ export default function Achievements() {
   }, []);
 
   if (loading) return <div className="page-container"><p>טוען...</p></div>;
+  if (!stats) return <div className="page-container"><p>שגיאה בטעינת הנתונים</p></div>;
 
   const licenseRate = stats?.total_students
     ? Math.round((stats.licensed_students / stats.total_students) * 100)

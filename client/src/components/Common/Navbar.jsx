@@ -32,7 +32,12 @@ export default function Navbar() {
     ...(!user?.instructor_id ? [{ label: 'חפש מורה', page: 'instructors' }] : []),
   ];
 
-  const links = user?.role === 'instructor' ? INSTRUCTOR_LINKS : studentLinks;
+  const adminLinks = [
+    ...studentLinks,
+    ...INSTRUCTOR_LINKS,
+  ];
+
+  const links = user?.role === 'instructor' ? INSTRUCTOR_LINKS : user?.role === 'admin' ? adminLinks : studentLinks;
 
   return (
     <nav>
@@ -42,6 +47,9 @@ export default function Navbar() {
           {links.map(({ label, page }) => (
             <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
           ))}
+          {user.role === 'admin' && (
+            <Link to={`/users/${user.id}/admin`}>ניהול האתר</Link>
+          )}
           <button onClick={handleLogout} style={{ marginRight: 'auto' }}>התנתקות</button>
         </>
       ) : (

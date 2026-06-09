@@ -11,7 +11,7 @@ export const updateStatus = async (req, res) => {
 };
 
 export const getMyStudents = async (req, res) => {
-  const data = await getStudentsByInstructor(req.user.id);
+  const data = await getStudentsByInstructor(req.user.id, req.user.role);
   res.json(data);
 };
 
@@ -21,8 +21,13 @@ export const selectInstructor = async (req, res) => {
 };
 
 export const getAchievements = async (req, res) => {
-  const data = await getInstructorAchievements(req.user.id);
-  res.json(data);
+  try {
+    const data = await getInstructorAchievements(req.user.id, req.user.role);
+    res.json(data);
+  } catch (err) {
+    console.error('getAchievements error:', err);
+    res.status(500).json({ message: err.message });
+  }
 };
 
 export const getMyInstructor = async (req, res) => {

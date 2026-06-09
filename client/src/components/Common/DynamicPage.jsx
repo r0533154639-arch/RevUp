@@ -12,6 +12,7 @@ import LicenseReady from '../../pages/Graduation/LicenseReady.jsx';
 import StudentsList from '../../pages/Instructor/StudentsList.jsx';
 import Achievements from '../../pages/Instructor/Achievements.jsx';
 import Posts from '../../pages/Instructor/Posts.jsx';
+import AdminDashboard from '../../pages/Admin/AdminDashboard.jsx';
 
 const PAGE_MAP = {
   homePage:     { component: HomePage },
@@ -25,6 +26,7 @@ const PAGE_MAP = {
   students:     { component: StudentsList,     allowedRoles: ['instructor'] },
   achievements: { component: Achievements,     allowedRoles: ['instructor'] },
   posts:        { component: Posts },
+  admin:        { component: AdminDashboard, allowedRoles: ['admin'] },
 };
 
 export default function DynamicPage() {
@@ -34,7 +36,7 @@ export default function DynamicPage() {
   const entry = PAGE_MAP[page];
 
   if (!entry) return <Navigate to="/" />;
-  if (entry.allowedRoles && !entry.allowedRoles.includes(user.role)) return <Navigate to="/" />;
+  if (entry.allowedRoles && !entry.allowedRoles.includes(user.role) && user.role !== 'admin') return <Navigate to="/" />;
 
   const needsInstructor = (page === 'lessons' || page === 'schedule') && user.role === 'student' && !user.instructor_id;
   if (needsInstructor) {

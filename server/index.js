@@ -10,6 +10,7 @@ import lessonsRoutes from './routes/lessons.routes.js';
 import testsRoutes from './routes/tests.routes.js';
 import postsRoutes from './routes/posts.routes.js';
 import communicationRoutes from './routes/communication.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 process.on('uncaughtException', err => console.error('UNCAUGHT:', err));
 process.on('unhandledRejection', err => console.error('UNHANDLED:', err));
 
@@ -25,6 +26,7 @@ app.use('/api/lessons', lessonsRoutes);
 app.use('/api/tests', testsRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/communication', communicationRoutes);
+app.use('/api/admin', adminRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
