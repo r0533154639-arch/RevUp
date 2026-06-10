@@ -1,11 +1,15 @@
 import pool from '../config/db.js';
 import { getAllStudents, updateStudentStatus, getAllInstructors, getInstructorAchievements, getAllPosts, getAllComments, toggleUserBlock, getAllUsers } from '../dal/admin.dal.js';
+import { approveInstructor, getPendingInstructors } from '../dal/instructors.dal.js';
 
 export const getDashboard = async (req, res) => {
   try {
     const [[{ total_users, total_students, total_instructors }]] = await pool.query(`
       SELECT COUNT(*) AS total_users, SUM(role = 'student') AS total_students, SUM(role = 'instructor') AS total_instructors FROM users
     `);
+    const [[{ pending_instructors_count }]] = await pool.query(
+      `SELECT COUNT(*) AS pending_instructors_count FROM driving_instructor WHERE profile_status = 'pending'`
+    );
     const [students] = await pool.query(`
       SELECT u.id, u.name, u.email, u.phone, u.date_of_birth, u.profile_image, u.is_blocked,
              ds.status, vt.name AS vehicle_type, ui.name AS instructor_name
@@ -17,7 +21,7 @@ export const getDashboard = async (req, res) => {
       WHERE u.role = 'student' ORDER BY u.name
     `);
     const [instructors] = await pool.query(`
-      SELECT u.id, u.name, u.email, u.phone, u.profile_image, u.is_blocked, di.area, COUNT(DISTINCT ds.user_id) AS student_count
+      SELECT u.id, u.name, u.email, u.phone, u.profile_image, u.is_blocked, di.area, di.profile_status, COUNT(DISTINCT ds.user_id) AS student_count
       FROM users u
       JOIN driving_instructor di ON di.user_id = u.id
       LEFT JOIN driving_students ds ON ds.instructor_id = di.id
@@ -45,7 +49,7 @@ export const getDashboard = async (req, res) => {
       LEFT JOIN lesson_feedback lf ON lf.lesson_id = dl.id
       ORDER BY dl.date DESC, dl.time DESC
     `);
-    res.json({ total_users, total_students, total_instructors, students, instructors, posts, comments, lessons });
+    res.json({ total_users, total_students, total_instructors, pending_instructors_count, students, instructors, posts, comments, lessons });
   } catch (err) {
     console.error('admin dashboard error:', err);
     res.status(500).json({ message: err.message });
@@ -118,4 +122,15 @@ export const getPosts = async (req, res) => {
 
 export const getComments = async (req, res) => {
   try { res.json(await getAllComments()); } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+export const getPendingInstructorsList = async (req, res) => {
+  try { res.json(await getPendingInstructors()); } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+export const approveInstructorById = async (req, res) => {
+  try {
+    await approveInstructor(req.params.userId);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ message: err.message }); }
 };

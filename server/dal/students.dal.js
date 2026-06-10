@@ -22,7 +22,10 @@ export const createUser = async ({ name, email, phone, password, role, date_of_b
     if (role === 'student') {
       await conn.query('INSERT INTO driving_students (user_id, status, vehicle_type_id) VALUES (?, ?, ?)', [userId, status || 'theory', vehicle_type_id]);
     } else if (role === 'instructor') {
-      const [instrResult] = await conn.query('INSERT INTO driving_instructor (user_id, area) VALUES (?, ?)', [userId, area]);
+      const [instrResult] = await conn.query(
+        'INSERT INTO driving_instructor (user_id, profile_status) VALUES (?, ?)',
+        [userId, 'draft']
+      );
       const instructorId = instrResult.insertId;
       if (vehicle_types?.length) {
         const values = vehicle_types.map(vtId => [instructorId, vtId]);

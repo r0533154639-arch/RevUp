@@ -1,17 +1,24 @@
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth.js';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      await login(form);
+      const res = await login(form);
+      const { user } = res;
+      if (user.role === 'instructor' && user.profile_status === 'draft') {
+        navigate(`/users/${user.id}/completeProfile`);
+      } else {
+        navigate(`/users/${user.id}/homePage`);
+      }
     } catch {
       setError('פרטי הכניסה שגויים, אנא נסה שנית');
     }

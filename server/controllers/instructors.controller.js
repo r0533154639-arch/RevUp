@@ -1,13 +1,10 @@
-import { getAllInstructors, getInstructorSchedule, approveLessonById, updateProfileImage } from '../dal/instructors.dal.js';
+import { getAllInstructors, getInstructorSchedule, approveLessonById, updateProfileImage, completeInstructorProfile, getInstructorProfileStatus } from '../dal/instructors.dal.js';
 
 export const getInstructors = async (req, res) => {
   try {
-    console.log('Getting instructors with query:', req.query);
     const data = await getAllInstructors(req.query);
-    console.log('Instructors found:', data.length);
     res.json(data);
   } catch (err) {
-    console.error('Error getting instructors:', err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -25,11 +22,22 @@ export const approveLesson = async (req, res) => {
 export const uploadPhoto = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-    const filename = req.file.filename;
-    await updateProfileImage(req.user.id, filename);
-    res.json({ success: true, filename });
+    await updateProfileImage(req.user.id, req.file.filename);
+    res.json({ success: true, filename: req.file.filename });
   } catch (err) {
-    console.error('Upload error:', err);
     res.status(500).json({ message: err.message });
   }
 };
+
+export const completeProfile = async (req, res) => {
+  try {
+    const { area, vehicle_types, years_experience } = req.body;
+    if (!area) return res.status(400).json({ message: 'אזור לימוד הוא שדה חובה' });
+    await completeInstructorProfile(req.user.id, { area, vehicle_types, years_experience });
+    const profile_status = await getInstructorProfileStatus(req.user.id);
+    res.json({ success: true, profile_status });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+

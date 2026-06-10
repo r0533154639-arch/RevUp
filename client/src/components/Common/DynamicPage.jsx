@@ -17,6 +17,7 @@ import AdminStudents from '../../pages/Admin/AdminStudents.jsx';
 import AdminInstructors from '../../pages/Admin/AdminInstructors.jsx';
 import AdminPosts from '../../pages/Admin/AdminPosts.jsx';
 import AdminComments from '../../pages/Admin/AdminComments.jsx';
+import InstructorStatusBanner from './InstructorStatusBanner.jsx';
 
 const PAGE_MAP = {
   homePage:            { component: HomePage },
@@ -45,6 +46,31 @@ export default function DynamicPage() {
   const entry = PAGE_MAP[page];
 
   if (!entry) return <Navigate to="/" />;
+
+  // מורה שעדיין לא מאושר - חוסמים גישה לדפים שדורשים instructor
+  const instructorOnlyPages = ['students', 'achievements', 'schedule', 'lessons'];
+  if (user.role === 'instructor' && user.profile_status !== 'active' && instructorOnlyPages.includes(page)) {
+    const isDraft = user.profile_status === 'draft';
+    return (
+      <div className="modal-overlay">
+        <div className="modal-box">
+          <p className="modal-title">{isDraft ? '⚠️ הפרופיל לא הושלם' : 'ℹ️ ממתין לאישור'}</p>
+          <p className="modal-text">
+            {isDraft
+              ? 'עליך להשלים את פרטי הפרופיל שלך לפני שתוכל להשתמש בתכונה זו.'
+              : 'הפרופיל שלך ממתין לאישור המנהל. לאחר האישור תקבל גישה מלאה לאתר.'}
+          </p>
+          <div className="modal-actions">
+            {isDraft && (
+              <button onClick={() => navigate(`/users/${user.id}/completeProfile`)}>השלם פרופיל</button>
+            )}
+            <button className="btn-secondary" onClick={() => navigate(`/users/${user.id}/homePage`)}>חזרה לדף הבית</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (entry.allowedRoles && !entry.allowedRoles.includes(user.role) && user.role !== 'admin') return <Navigate to="/" />;
 
   const needsInstructor = (page === 'lessons' || page === 'schedule') && user.role === 'student' && !user.instructor_id;
@@ -64,5 +90,10 @@ export default function DynamicPage() {
   }
 
   const Component = entry.component;
-  return <Component user={user} />;
+  return (
+    <>
+      <InstructorStatusBanner />
+      <Component user={user} />
+    </>
+  );
 }

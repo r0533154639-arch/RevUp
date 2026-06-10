@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth.js';
+import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 
 const VEHICLE_TYPES = [
@@ -29,35 +30,20 @@ const validate = (form) => {
     errors.password = 'סיסמה חייבת להכיל לפחות אות גדולה אחת';
   else if (!/[0-9]/.test(form.password))
     errors.password = 'סיסמה חייבת להכיל לפחות ספרה אחת';
-  if (form.role === 'instructor' && !form.area)
-    errors.area = 'יש לבחור עיר';
   return errors;
 };
 
 export default function Register() {
   const [form, setForm] = useState({
-    name: '', email: '', phone: '', password: '', role: 'student', date_of_birth: '',
-    status: 'theory', area: '', vehicle_types: [], vehicle_type_id: 1, test_center: '',
+    name: '', email: '', phone: '', password: '', role: 'student',
+    date_of_birth: '', status: 'theory', vehicle_type_id: 1,
   });
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const [cityOptions, setCityOptions] = useState([]);
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
-  const { register, updateUser, refreshUser } = useAuth();
-
-  useEffect(() => {
-    fetch('https://data.gov.il/api/3/action/datastore_search?resource_id=5c78e9fa-c2e2-4771-93ff-7f400a12f7ba&limit=2000')
-      .then(r => r.json())
-      .then(data => {
-        const opts = data.result.records
-          .map(r => r['שם_ישוב']?.trim())
-          .filter(Boolean)
-          .sort()
-          .map(name => ({ value: name, label: name }));
-        setCityOptions(opts);
-      });
-  }, []);
+  const { register, updateUser } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (field, value) => {
     const updated = { ...form, [field]: value };
@@ -92,17 +78,18 @@ export default function Register() {
         });
         const uploadData = await uploadRes.json();
         if (uploadRes.ok && uploadData.filename)
-          updateUser({ profile_image: uploadData.filename });
+          updateUser({ ...res.user, profile_image: uploadData.filename });
+      }
+      if (res?.user) {
+        if (res.user.role === 'instructor') {
+          navigate(`/users/${res.user.id}/completeProfile`);
+        } else {
+          navigate(`/users/${res.user.id}/homePage`);
+        }
       }
     } catch (error) {
       console.error('Registration error:', error);
     }
-  };
-
-  const toggleVehicleType = (id) => {
-    handleChange('vehicle_types', form.vehicle_types.includes(id)
-      ? form.vehicle_types.filter(v => v !== id)
-      : [...form.vehicle_types, id]);
   };
 
   const err = (field) => errors[field] && <span style={{ color: 'red', fontSize: '0.75rem' }}>{errors[field]}</span>;
@@ -173,42 +160,14 @@ export default function Register() {
       )}
 
       {form.role === 'instructor' && (
-        <>
-          <div>
-            <Select
-              options={cityOptions}
-              placeholder="בחר עיר"
-              value={form.area ? { value: form.area, label: form.area } : null}
-              onChange={(opt) => handleChange('area', opt?.value || '')}
-              noOptionsMessage={() => 'לא נמצאו תוצאות'}
-              classNamePrefix="city-select"
-            />
-            {err('area')}
-          </div>
-          <input
-            placeholder="מכון בחינה"
-            value={form.test_center}
-            onChange={(e) => handleChange('test_center', e.target.value)}
-          />
-          <fieldset className="vehicle-fieldset">
-            <legend>סוגי רכב</legend>
-            <div className="vehicle-grid">
-              {VEHICLE_TYPES.map(v => (
-                <label key={v.id} className="vehicle-label">
-                  <input type="checkbox" className="vehicle-checkbox" checked={form.vehicle_types.includes(v.id)} onChange={() => toggleVehicleType(v.id)} />
-                  {v.name}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <div style={{ margin: '8px 0' }}>
-            <label style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>תמונת פרופיל (אופציונלי)</label>
-            <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ padding: 0 }} />
-            {photoPreview && (
-              <img src={photoPreview} alt="preview" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', marginTop: 8 }} />
-            )}
-          </div>
-        </>
+        <div style={{ marginTop: 8 }}>
+          <label style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>תמונת פרופיל (אופציונלי)</label>
+          <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ padding: 0 }} />
+          {photoPreview && (
+            <img src={photoPreview} alt="preview" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', marginTop: 8 }} />
+          )}
+          <p style={{ fontSize: 13, color: '#666', marginTop: 8 }}>לאחר ההרשמה תועבר להשלמת פרטי הפרופיל שלך.</p>
+        </div>
       )}
 
       <button type="submit">הרשמה</button>

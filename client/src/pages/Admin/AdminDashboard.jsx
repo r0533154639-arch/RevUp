@@ -120,7 +120,19 @@ export default function AdminDashboard({ user }) {
     api.get('/admin/dashboard').then(setData).finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, []);
+  const [dismissPending, setDismissPending] = useState(false);
+  const [pendingInstructors, setPendingInstructors] = useState([]);
+  const [pendingModal, setPendingModal] = useState(false);
+
+  const loadPending = () => api.get('/admin/instructors/pending').then(setPendingInstructors);
+
+  useEffect(() => { load(); loadPending(); }, []);
+
+  const handleApprove = async (userId) => {
+    await api.put(`/admin/instructors/${userId}/approve`);
+    loadPending();
+    load();
+  };
 
   const handleBlock = async (u) => {
     await api.put(`/admin/users/${u.id}/block`, { block: !u.is_blocked });
@@ -171,6 +183,46 @@ export default function AdminDashboard({ user }) {
       </p>
       <p style={{ color: '#aaa', fontSize: 12, marginBottom: 20 }}>💡 לחיצה כפולה על תא כדי לערוך</p>
 
+      {/* באנר מורים ממתינים */}
+      {!dismissPending && pendingInstructors.length > 0 && (
+        <div style={{ background: '#fef9c3', border: '1px solid #fbbf24', borderRadius: 8, padding: '12px 16px', marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontWeight: 600 }}>⚠️ {pendingInstructors.length} מורים ממתינים לאישור מנהל מערכת</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={() => setPendingModal(true)} style={{ background: '#f59e0b', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontWeight: 600 }}>אשר עכשיו</button>
+            <button onClick={() => setDismissPending(true)} style={{ background: 'none', border: '1px solid #d97706', color: '#92400e', borderRadius: 6, padding: '6px 14px', cursor: 'pointer' }}>הזכר לי מאוחר יותר</button>
+          </div>
+        </div>
+      )}
+
+      {/* modal רשימת מורים ממתינים */}
+      {pendingModal && (
+        <div className="modal-overlay" onClick={() => setPendingModal(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ textAlign: 'right', minWidth: 380, maxHeight: '80vh', overflowY: 'auto' }}>
+            <p style={{ fontWeight: 700, fontSize: 16, marginBottom: 16 }}>מורים הממתינים לאישור</p>
+            {pendingInstructors.map(inst => (
+              <div key={inst.id} style={{ padding: '10px 0', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontWeight: 600 }}>{inst.name}</div>
+                  <div style={{ fontSize: 13, color: '#666' }}>{inst.email}</div>
+                  {inst.area && <div style={{ fontSize: 13, color: '#666' }}>אזור: {inst.area}</div>}
+                  {inst.years_experience != null && <div style={{ fontSize: 13, color: '#666' }}>ניסיון: {inst.years_experience} שנים</div>}
+                </div>
+                <button
+                  onClick={() => handleApprove(inst.id)}
+                  style={{ background: '#22c55e', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}
+                >
+                  אשר ✓
+                </button>
+              </div>
+            ))}
+            {pendingInstructors.length === 0 && <p style={{ color: '#888' }}>אין מורים ממתינים</p>}
+            <div style={{ marginTop: 16, textAlign: 'center' }}>
+              <button onClick={() => setPendingModal(false)} className="btn-secondary">סגור</button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
 
       {tab === 'students' && (
@@ -194,18 +246,41 @@ export default function AdminDashboard({ user }) {
 
       {tab === 'instructors' && (
         <table style={tStyle}>
-          <thead><tr>{['שם', 'אימייל', 'אזור', 'תלמידים', 'חסום', 'פרופיל'].map(h => <th key={h} style={thStyle}>{h}</th>)}</tr></thead>
+          <thead><tr>{['שם', 'אימייל', 'אזור', 'תלמידים', 'סטאטוס', 'פרופיל'].map(h => <th key={h} style={thStyle}>{h}</th>)}</tr></thead>
           <tbody>
-            {data.instructors.map(i => (
+            {data.instructors.map(i => {
+              const status = i.is_blocked ? 'חסום' : (i.profile_status === 'active' ? 'מאושר' : i.profile_status === 'pending' ? 'ממתין' : 'טיוטא');
+              const statusColor = i.is_blocked ? '#ef4444' : i.profile_status === 'active' ? '#22c55e' : '#f59e0b';
+              return (
               <tr key={i.id}>
                 <td style={tdEditStyle} onDoubleClick={() => openEdit('users', i.id, 'name', i.name, 'שם')}>{i.name}</td>
                 <td style={tdEditStyle} onDoubleClick={() => openEdit('users', i.id, 'email', i.email, 'אימייל')}>{i.email}</td>
                 <td style={tdStyle}>{i.area || '—'}</td>
                 <td style={tdStyle}>{i.student_count}</td>
-                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', i.id, 'is_blocked', String(i.is_blocked), 'חסימה', BLOCKED_OPTIONS)}>{i.is_blocked ? '🚫' : '✅'}</td>
+                <td style={tdStyle}>
+                  <span style={{ background: statusColor + '22', color: statusColor, borderRadius: 12, padding: '2px 10px', fontWeight: 600, fontSize: 13 }}>
+                    {status}
+                  </span>
+                  {!i.is_blocked && (
+                    <button
+                      onClick={() => api.put(`/admin/users/${i.id}/block`, { block: true }).then(load)}
+                      style={{ marginRight: 8, fontSize: 11, color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                    >
+                      חסום
+                    </button>
+                  )}
+                  {i.is_blocked && (
+                    <button
+                      onClick={() => api.put(`/admin/users/${i.id}/block`, { block: false }).then(load)}
+                      style={{ marginRight: 8, fontSize: 11, color: '#22c55e', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                    >
+                      בטל חסימה
+                    </button>
+                  )}
+                </td>
                 <td style={tdStyle}><button style={{ ...linkBtn, background: '#e5e7eb' }} onClick={() => setSelected(i)}>צפה</button></td>
               </tr>
-            ))}
+            )})}
           </tbody>
         </table>
       )}

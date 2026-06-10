@@ -53,6 +53,8 @@ CREATE TABLE driving_instructor (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT UNIQUE NOT NULL,
   area VARCHAR(100),
+  years_experience INT DEFAULT NULL,
+  profile_status ENUM('draft', 'pending', 'active') NOT NULL DEFAULT 'draft',
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
