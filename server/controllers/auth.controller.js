@@ -20,9 +20,10 @@ export const login = async (req, res) => {
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({
       token,
-      user: { id: user.id, name: user.name, role: user.role, profile_image: user.profile_image, profile_status }
+      user: { id: user.id, name: user.name, role: user.role, profile_image: user.profile_image, profile_status, instructor_user_id: user.instructor_user_id ?? null }
     });
   } catch (err) {
+    console.error('LOGIN ERROR:', err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -36,7 +37,7 @@ export const register = async (req, res) => {
     const token = jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.status(201).json({
       token,
-      user: { id, name, role, profile_image: null, profile_status }
+      user: { id, name, role, profile_image: null, profile_status, instructor_user_id: null }
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -50,7 +51,7 @@ export const getMe = async (req, res) => {
     let profile_status = null;
     if (user.role === 'instructor')
       profile_status = await getInstructorProfileStatus(user.id);
-    res.json({ id: user.id, name: user.name, role: user.role, profile_image: user.profile_image, profile_status });
+    res.json({ id: user.id, name: user.name, role: user.role, profile_image: user.profile_image, profile_status, instructor_user_id: user.instructor_user_id ?? null });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

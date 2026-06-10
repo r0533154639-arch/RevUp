@@ -2,8 +2,32 @@ import pool from '../config/db.js';
 
 export const findUserByEmail = async (email) => {
   const [rows] = await pool.query(
-    'SELECT u.*, p.password_hash AS password FROM users u JOIN passwords p ON p.user_id = u.id WHERE u.email = ?',
+    `SELECT u.id, u.name, u.email, u.phone, u.date_of_birth, u.profile_image, u.is_blocked,
+            u.role, p.password_hash AS password,
+            ds.instructor_id,
+            di.user_id AS instructor_user_id
+     FROM users u
+     JOIN passwords p ON p.user_id = u.id
+     LEFT JOIN driving_students ds ON ds.user_id = u.id
+     LEFT JOIN driving_instructor di ON di.id = ds.instructor_id
+     WHERE u.email = ?`,
     [email]
+  );
+  return rows[0];
+};
+
+export const findUserById = async (id) => {
+  const [rows] = await pool.query(
+    `SELECT u.id, u.name, u.email, u.phone, u.date_of_birth, u.profile_image, u.is_blocked,
+            u.role, p.password_hash AS password,
+            ds.instructor_id,
+            di.user_id AS instructor_user_id
+     FROM users u
+     JOIN passwords p ON p.user_id = u.id
+     LEFT JOIN driving_students ds ON ds.user_id = u.id
+     LEFT JOIN driving_instructor di ON di.id = ds.instructor_id
+     WHERE u.id = ?`,
+    [id]
   );
   return rows[0];
 };
@@ -50,14 +74,6 @@ export const getStudentProgress = async (id) => {
 
 export const setStudentStatus = async (id, status) => {
   await pool.query('UPDATE driving_students SET status_id = (SELECT id FROM student_statuses WHERE name = ?) WHERE user_id = ?', [status, id]);
-};
-
-export const findUserById = async (id) => {
-  const [rows] = await pool.query(
-    'SELECT u.*, p.password_hash AS password FROM users u JOIN passwords p ON p.user_id = u.id WHERE u.id = ?',
-    [id]
-  );
-  return rows[0];
 };
 
 export const updateProfileImage = async (userId, filename) => {

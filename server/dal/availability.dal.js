@@ -163,9 +163,5 @@ export const getLessonsConflictingWithTemplate = async (userId, newSlots) => {
 // ביטול שיעורים שאינם תואמים לתבנית החדשה
 export const cancelConflictingLessons = async (lessonIds) => {
   if (!lessonIds.length) return;
-  await pool.query(
-    `UPDATE driving_lessons SET status = 'cancelled', cancelled_by = 'instructor'
-     WHERE id IN (?)`,
-    [lessonIds]
-  );
+  await pool.query(`DELETE FROM driving_lessons WHERE id IN (?)`, [lessonIds]);
 };

@@ -103,11 +103,7 @@ export const cancelLesson = async (req, res) => {
       return res.status(403).json({ message: 'אין הרשאה' });
 
     if (lesson.days_until >= 2 || role === 'admin') {
-      // ביטול מיידי
-      await pool.query(
-        `UPDATE driving_lessons SET status = 'cancelled', cancelled_by = ? WHERE id = ?`,
-        [role, id]
-      );
+      await pool.query(`DELETE FROM driving_lessons WHERE id = ?`, [id]);
       return res.json({ success: true, cancelled: true });
     }
 
@@ -116,11 +112,7 @@ export const cancelLesson = async (req, res) => {
     const currentRequest = lesson.cancel_requested_by;
 
     if (currentRequest && currentRequest !== requestedBy) {
-      // הצד השני כבר ביקש → מאשרים ביטול
-      await pool.query(
-        `UPDATE driving_lessons SET status = 'cancelled', cancelled_by = 'admin', cancel_requested_by = NULL WHERE id = ?`,
-        [id]
-      );
+      await pool.query(`DELETE FROM driving_lessons WHERE id = ?`, [id]);
       return res.json({ success: true, cancelled: true });
     }
 
