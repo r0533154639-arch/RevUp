@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth.js';
 import HomePage from '../Home/HomePage.jsx';
 import TheoryMaterials from '../../pages/Theory/TheoryMaterials.jsx';
 import TheoryExam from '../../pages/Theory/TheoryExam.jsx';
+import TheorySchedule from '../../pages/Theory/TheorySchedule.jsx';
 import SearchInstructors from '../../pages/Instructors/SearchInstructors.jsx';
 import Dashboard from '../../pages/Lessons/Dashboard.jsx';
 import ScheduleLessons from '../../pages/Lessons/ScheduleLessons.jsx';
@@ -22,6 +23,7 @@ const PAGE_MAP = {
   homePage:            { component: HomePage },
   theory:              { component: TheoryMaterials,   allowedRoles: ['student', 'admin'] },
   theoryExam:          { component: TheoryExam,        allowedRoles: ['student', 'admin'] },
+  theorySchedule:      { component: TheorySchedule,    allowedRoles: ['student', 'admin'] },
   instructors:         { component: SearchInstructors },
   lessons:             { component: Dashboard,         allowedRoles: ['student', 'instructor', 'admin'] },
   schedule:            { component: ScheduleLessons,   allowedRoles: ['student', 'instructor', 'admin'] },

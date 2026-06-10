@@ -35,6 +35,10 @@ export default function InstructorCard({ instructor }) {
         <h3 style={{ margin: '0 0 4px' }}>{instructor.name}</h3>
         <p style={{ margin: '2px 0', color: '#555' }}>📍 {instructor.area}</p>
         <p style={{ margin: '2px 0', color: '#555' }}>📞 {instructor.phone}</p>
+        {instructor.vehicle_types && <p style={{ margin: '2px 0', color: '#555' }}>🚗 {instructor.vehicle_types}</p>}
+        {instructor.avg_rating ? (
+          <p style={{ margin: '2px 0', color: '#f5a623' }}>{'★'.repeat(Math.round(instructor.avg_rating))}{'☆'.repeat(5 - Math.round(instructor.avg_rating))} ({instructor.avg_rating})</p>
+        ) : <p style={{ margin: '2px 0', color: '#aaa', fontSize: 13 }}>אין דירוג עדיין</p>}
       </div>
       <button onClick={() => setStep('confirm')}>בחר כמורה שלי</button>
 

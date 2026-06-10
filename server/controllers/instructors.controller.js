@@ -2,12 +2,14 @@ import { getAllInstructors, getInstructorSchedule, approveLessonById, updateProf
 
 export const getInstructors = async (req, res) => {
   try {
-    console.log('Getting instructors with query:', req.query);
-    const data = await getAllInstructors(req.query);
-    console.log('Instructors found:', data.length);
+    const { areas, vehicle_types, min_rating } = req.query;
+    const data = await getAllInstructors({
+      areas: areas ? areas.split(',') : [],
+      vehicle_types: vehicle_types ? vehicle_types.split(',') : [],
+      min_rating: min_rating || null,
+    });
     res.json(data);
   } catch (err) {
-    console.error('Error getting instructors:', err);
     res.status(500).json({ message: err.message });
   }
 };

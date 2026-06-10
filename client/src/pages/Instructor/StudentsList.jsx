@@ -6,6 +6,7 @@ export default function StudentsList() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     getMyStudents()
@@ -14,14 +15,17 @@ export default function StudentsList() {
       .finally(() => setLoading(false));
   }, []);
 
+  const filtered = students.filter(s => s.name.includes(search));
+
   return (
     <div className="page-container">
       <h2>התלמידים שלי</h2>
+      <input placeholder="חיפוש לפי שם תלמיד" value={search} onChange={e => setSearch(e.target.value)} style={{ marginBottom: 12 }} />
       {loading && <p>טוען...</p>}
       {error && <p>{error}</p>}
-      {!loading && !error && students.length === 0 && <p>אין תלמידים עדיין</p>}
+      {!loading && !error && filtered.length === 0 && <p>אין תלמידים עדיין</p>}
       <div className="students-list">
-        {students.map(s => <StudentCard key={s.id} student={s} />)}
+        {filtered.map(s => <StudentCard key={s.id} student={s} />)}
       </div>
     </div>
   );
