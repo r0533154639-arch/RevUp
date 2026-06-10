@@ -74,7 +74,7 @@ export const getPendingLessonsCount = async (instructorUserId) => {
 export const getNotifications = async (userId, role) => {
   if (role === 'instructor') {
     const [[instr]] = await pool.query('SELECT id FROM driving_instructor WHERE user_id = ?', [userId]);
-    if (!instr) return { pending: [], cancelRequests: [] };
+    if (!instr) return { pending: [], cancelRequests: [], cancelRejections: [] };
     const [pending] = await pool.query(
       `SELECT dl.id, dl.date, dl.time, u.name AS student_name
        FROM driving_lessons dl JOIN users u ON u.id = dl.student_id
@@ -89,7 +89,14 @@ export const getNotifications = async (userId, role) => {
        ORDER BY dl.date, dl.time`,
       [instr.id]
     );
-    return { pending, cancelRequests };
+    const [cancelRejections] = await pool.query(
+      `SELECT dl.id, dl.date, dl.time, u.name AS student_name
+       FROM driving_lessons dl JOIN users u ON u.id = dl.student_id
+       WHERE dl.instructor_id = ? AND dl.cancel_rejected_by = 'student'
+       ORDER BY dl.date, dl.time`,
+      [instr.id]
+    );
+    return { pending, cancelRequests, cancelRejections };
   }
   // student
   const [cancelRequests] = await pool.query(
@@ -101,5 +108,5 @@ export const getNotifications = async (userId, role) => {
      ORDER BY dl.date, dl.time`,
     [userId]
   );
-  return { pending: [], cancelRequests };
+  return { pending: [], cancelRequests, cancelRejections: [] };
 };

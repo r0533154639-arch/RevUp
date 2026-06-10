@@ -80,6 +80,36 @@ export const getAvailableSlots = async (req, res) => {
   }
 };
 
+// דחיית בקשת ביטול
+export const rejectCancelRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role, id: userId } = req.user;
+
+    const [[lesson]] = await pool.query(
+      `SELECT dl.*, di.user_id AS instructor_user_id
+       FROM driving_lessons dl
+       JOIN driving_instructor di ON di.id = dl.instructor_id
+       WHERE dl.id = ?`,
+      [id]
+    );
+    if (!lesson) return res.status(404).json({ message: 'שיעור לא נמצא' });
+
+    const isStudent = role === 'student' && lesson.student_id === userId;
+    const isInstructor = role === 'instructor' && lesson.instructor_user_id === userId;
+    if (!isStudent && !isInstructor)
+      return res.status(403).json({ message: 'אין הרשאה' });
+
+    await pool.query(
+      `UPDATE driving_lessons SET cancel_requested_by = NULL, cancel_rejected_by = ? WHERE id = ?`,
+      [role, id]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // ביטול שיעור
 export const cancelLesson = async (req, res) => {
   try {

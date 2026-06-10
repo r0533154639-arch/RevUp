@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   getTemplate, updateTemplate,
   getDateOverrides, updateDateOverride,
-  getAvailableSlots, cancelLesson
+  getAvailableSlots, cancelLesson, rejectCancelRequest
 } from '../controllers/availability.controller.js';
 import { verifyToken, checkRole } from '../middleware/auth.middleware.js';
 
@@ -24,5 +24,6 @@ router.get('/:userId/template', verifyToken, getTemplate);
 
 // ביטול שיעור
 router.put('/lessons/:id/cancel', verifyToken, cancelLesson);
+router.put('/lessons/:id/reject-cancel', verifyToken, rejectCancelRequest);
 
 export default router;
