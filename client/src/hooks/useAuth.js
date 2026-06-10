@@ -13,11 +13,14 @@ export const AuthProvider = ({ children }) => {
     } catch { return null; }
   });
 
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
+
   const login = async (data) => {
     const res = await loginService(data);
     localStorage.setItem('token', res.token);
     localStorage.setItem('user', JSON.stringify(res.user));
     setUser(res.user);
+    setToken(res.token);
     return res;
   };
 
@@ -26,6 +29,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', res.token);
     localStorage.setItem('user', JSON.stringify(res.user));
     setUser(res.user);
+    setToken(res.token);
     return res;
   };
 
@@ -33,15 +37,33 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
+    setToken(null);
   };
 
-  const setInstructorId = (instructorId) => {
-    const updated = { ...user, instructor_id: instructorId };
-    localStorage.setItem('user', JSON.stringify(updated));
-    setUser(updated);
+  const updateUser = (userData) => {
+    const updatedUser = { ...user, ...userData };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
   };
 
-  return React.createElement(AuthContext.Provider, { value: { user, login, register, logout, setInstructorId } }, children);
+  const refreshUser = async () => {
+    try {
+      const currentToken = localStorage.getItem('token');
+      if (!currentToken) return;
+      const response = await fetch('http://localhost:3000/api/auth/me', {
+        headers: { Authorization: `Bearer ${currentToken}` }
+      });
+      if (response.ok) {
+        const userData = await response.json();
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Error refreshing user:', error);
+    }
+  };
+
+  return React.createElement(AuthContext.Provider, { value: { user, token, login, register, logout, updateUser, refreshUser } }, children);
 };
 
 export const useAuth = () => useContext(AuthContext);

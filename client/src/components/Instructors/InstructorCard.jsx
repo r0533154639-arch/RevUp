@@ -7,7 +7,7 @@ const SERVER = 'http://localhost:3000';
 
 export default function InstructorCard({ instructor }) {
   const navigate = useNavigate();
-  const { user, setInstructorId } = useAuth();
+  const { user, updateUser } = useAuth();
   const [step, setStep] = useState(null); // null | 'confirm' | 'success'
   const [loading, setLoading] = useState(false);
 
@@ -15,7 +15,7 @@ export default function InstructorCard({ instructor }) {
     setLoading(true);
     try {
       await chooseInstructor(instructor.id);
-      setInstructorId(instructor.id);
+      updateUser({ instructor_id: instructor.id });
       setStep('success');
     } catch {
       alert('שגיאה בבחירת המורה');
@@ -25,20 +25,18 @@ export default function InstructorCard({ instructor }) {
   };
 
   return (
-    <>
-      <div style={{ display: 'flex', gap: 16, padding: 16, border: '1px solid #ddd', borderRadius: 8, alignItems: 'center' }}>
-        <img
-          src={instructor.photo ? `${SERVER}${instructor.photo}` : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(instructor.name)}
-          alt={instructor.name}
-          style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
-        />
-        <div style={{ flex: 1 }}>
-          <h3 style={{ margin: '0 0 4px' }}>{instructor.name}</h3>
-          <p style={{ margin: '2px 0', color: '#555' }}>📍 {instructor.area}</p>
-          <p style={{ margin: '2px 0', color: '#555' }}>📞 {instructor.phone}</p>
-        </div>
-        <button onClick={() => setStep('confirm')}>בחר כמורה שלי</button>
+    <div style={{ display: 'flex', gap: 16, padding: 16, border: '1px solid #ddd', borderRadius: 8, alignItems: 'center' }}>
+      <img
+        src={instructor.profile_image ? `${SERVER}/uploads/${instructor.profile_image}` : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(instructor.name)}
+        alt={instructor.name}
+        style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+      />
+      <div style={{ flex: 1 }}>
+        <h3 style={{ margin: '0 0 4px' }}>{instructor.name}</h3>
+        <p style={{ margin: '2px 0', color: '#555' }}>📍 {instructor.area}</p>
+        <p style={{ margin: '2px 0', color: '#555' }}>📞 {instructor.phone}</p>
       </div>
+      <button onClick={() => setStep('confirm')}>בחר כמורה שלי</button>
 
       {step === 'confirm' && (
         <div className="modal-overlay" onClick={() => setStep(null)}>
@@ -69,6 +67,6 @@ export default function InstructorCard({ instructor }) {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

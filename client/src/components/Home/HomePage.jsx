@@ -24,7 +24,7 @@ export default function HomePage({ user }) {
     : STUDENT_CARDS;
   const adminCards = [
     ...STUDENT_CARDS,
-    ...INSTRUCTOR_CARDS,
+    ...INSTRUCTOR_CARDS.filter(c => !STUDENT_CARDS.find(s => s.page === c.page)),
     { title: 'ניהול האתר', description: 'רשימת משתמשים, פוסטים, שיעורים וניהול הרשאות', icon: '⚙️', page: 'admin' },
   ];
   const cards = user.role === 'instructor' ? INSTRUCTOR_CARDS : user.role === 'admin' ? adminCards : studentCards;

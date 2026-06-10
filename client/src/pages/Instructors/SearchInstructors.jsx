@@ -8,16 +8,24 @@ export default function SearchInstructors() {
   const { user } = useAuth();
   const [area, setArea] = useState('');
   const [instructors, setInstructors] = useState([]);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
-    getInstructors(area)
-      .then(data => setInstructors(Array.isArray(data) ? data : []))
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
+    const fetchInstructors = async () => {
+      try {
+        setLoading(true);
+        const data = await getInstructors(area);
+        setInstructors(Array.isArray(data) ? data : []);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        setInstructors([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInstructors();
   }, [area]);
 
   if (user?.instructor_id) return <Navigate to={`/users/${user.id}/homePage`} />;

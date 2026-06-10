@@ -4,6 +4,7 @@ import { api } from '../../services/api.js';
 const SERVER = 'http://localhost:3000';
 
 function ProfileModal({ user: u, onClose, onBlock }) {
+  console.log('ProfileModal user:', u);
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={e => e.stopPropagation()} style={{ textAlign: 'right', minWidth: 300 }}>

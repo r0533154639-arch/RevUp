@@ -12,7 +12,7 @@ function App() {
 
   return (
     <div className="bg-image">
-      <Navbar username={username} />
+      <Navbar />
       <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to={`/users/${username}/homePage`} />} />
         <Route path="/register" element={!user ? <Register /> : <Navigate to={`/users/${username}/homePage`} />} />

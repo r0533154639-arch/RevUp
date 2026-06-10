@@ -44,7 +44,7 @@ export default function Register() {
   const [cityOptions, setCityOptions] = useState([]);
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
-  const { register } = useAuth();
+  const { register, updateUser, refreshUser } = useAuth();
 
   useEffect(() => {
     fetch('https://data.gov.il/api/3/action/datastore_search?resource_id=5c78e9fa-c2e2-4771-93ff-7f400a12f7ba&limit=2000')
@@ -77,16 +77,25 @@ export default function Register() {
     setSubmitted(true);
     const errs = validate(form);
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    const res = await register(form);
-    if (res?.token && photo) {
-      const fd = new FormData();
-      fd.append('photo', photo);
-      const endpoint = form.role === 'instructor' ? '/api/instructors/upload-photo' : '/api/students/upload-photo';
-      await fetch(`http://localhost:3000${endpoint}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${res.token}` },
-        body: fd,
-      });
+    try {
+      const res = await register(form);
+      if (res?.token && photo) {
+        const fd = new FormData();
+        fd.append('photo', photo);
+        const endpoint = form.role === 'instructor'
+          ? 'http://localhost:3000/api/instructors/upload-photo'
+          : 'http://localhost:3000/api/students/upload-photo';
+        const uploadRes = await fetch(endpoint, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${res.token}` },
+          body: fd,
+        });
+        const uploadData = await uploadRes.json();
+        if (uploadRes.ok && uploadData.filename)
+          updateUser({ profile_image: uploadData.filename });
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
     }
   };
 
@@ -133,6 +142,13 @@ export default function Register() {
 
       {form.role === 'student' && (
         <>
+          <div>
+            <label style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>תמונת פרופיל (אופציונלי)</label>
+            <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ padding: 0 }} />
+            {photoPreview && (
+              <img src={photoPreview} alt="preview" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', marginTop: 8 }} />
+            )}
+          </div>
           <Select
             options={[
               { value: 'theory', label: 'תאוריה' },
