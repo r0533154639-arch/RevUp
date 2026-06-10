@@ -41,12 +41,12 @@ export const createUser = async ({ name, email, phone, password, role, date_of_b
 };
 
 export const getStudentProgress = async (id) => {
-  const [rows] = await pool.query('SELECT * FROM student_progress WHERE student_id = ?', [id]);
+  const [rows] = await pool.query('SELECT * FROM student_progress_view WHERE student_id = ?', [id]);
   return rows[0];
 };
 
 export const setStudentStatus = async (id, status) => {
-  await pool.query('UPDATE driving_students SET status = ? WHERE user_id = ?', [status, id]);
+  await pool.query('UPDATE driving_students SET status_id = (SELECT id FROM student_statuses WHERE name = ?) WHERE user_id = ?', [status, id]);
 };
 
 export const findUserById = async (id) => {

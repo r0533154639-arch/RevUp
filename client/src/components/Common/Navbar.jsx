@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 
@@ -16,49 +17,51 @@ const INSTRUCTOR_LINKS = [
 ];
 
 const ADMIN_LINKS = [
-  { label: 'תלמידים', page: 'admin-students' },
-  { label: 'מורי נהיגה', page: 'admin-instructors' },
-  { label: 'פוסטים', page: 'admin-posts' },
-  { label: 'תגובות', page: 'admin-comments' },
+  { label: 'תלמידים', page: 'students' },
+  { label: 'שיעורים', page: 'lessons' },
+  { label: 'לוח זמנים', page: 'schedule' },
+  { label: 'מורים', page: 'instructors' },
+  { label: 'פוסטים', page: 'posts' },
+  { label: 'טסטים', page: 'test' },
+  { label: 'הישגים', page: 'achievements' },
 ];
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
   const links = user?.role === 'admin' ? ADMIN_LINKS : user?.role === 'instructor' ? INSTRUCTOR_LINKS : STUDENT_LINKS;
 
   return (
-    <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <Link to={user ? `/users/${user.id}/homePage` : '/'}>RevUp</Link>
+    <nav>
+      <Link to={user ? `/users/${user.id}/homePage` : '/'}>RevUp</Link>
+
+      <div className="nav-links">
         {user && links.map(({ label, page }) => (
           <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
         ))}
       </div>
-      
+
       {user ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          {user.profile_image && (
-            <img 
-              src={`http://localhost:3000/uploads/${user.profile_image}`} 
-              alt="פרופיל" 
-              style={{ 
-                width: '40px', 
-                height: '40px', 
-                borderRadius: '50%', 
-                objectFit: 'cover',
-                border: '2px solid #ddd'
-              }} 
-            />
+        <div className="nav-profile">
+          <div className="nav-profile-trigger" onClick={() => setMenuOpen(o => !o)}>
+            {user.profile_image
+              ? <img src={`http://localhost:3000/uploads/${user.profile_image}`} alt="פרופיל" className="nav-avatar" />
+              : <div className="nav-avatar-placeholder">{user.name?.[0]}</div>
+            }
+            <span className="nav-username">{user.name}</span>
+          </div>
+          {menuOpen && (
+            <div className="nav-dropdown">
+              <button onClick={handleLogout}>התנתקות</button>
+            </div>
           )}
-          <span>שלום, {user.name}</span>
-          <button onClick={handleLogout}>התנתקות</button>
         </div>
       ) : (
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="nav-auth-links">
           <Link to="/login">כניסה</Link>
           <Link to="/register">הרשמה</Link>
         </div>
