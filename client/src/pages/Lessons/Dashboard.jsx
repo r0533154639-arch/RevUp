@@ -19,7 +19,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div>
+    <div className="lessons-dashboard">
       <h2>התקדמות שלי</h2>
       {progress && <ProgressBar completed={progress.completed_lessons} total={20} />}
       <button onClick={handleScheduleClick}>קבע שיעור</button>

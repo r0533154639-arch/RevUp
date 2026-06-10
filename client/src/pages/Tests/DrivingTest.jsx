@@ -14,14 +14,14 @@ export default function DrivingTest() {
   };
 
   return (
-    <div>
+    <div className="test-page">
       <h2>טסט נהיגה</h2>
       <form onSubmit={handleSubmit}>
         <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
         <input placeholder="מיקום" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} required />
         <button type="submit">קבע טסט</button>
       </form>
-      <ul>{tests.map(t => <li key={t.id}>{t.date} - {t.status}</li>)}</ul>
+      <ul className="test-list">{tests.map(t => <li key={t.id} className="test-item">{t.date} - {t.status}</li>)}</ul>
     </div>
   );
 }

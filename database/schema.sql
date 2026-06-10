@@ -226,3 +226,12 @@ CREATE TABLE instructor_review (
   FOREIGN KEY (student_id) REFERENCES driving_students(user_id),
   FOREIGN KEY (instructor_id) REFERENCES driving_instructor(id)
 );
+
+CREATE TABLE contact_messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  subject VARCHAR(200) NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

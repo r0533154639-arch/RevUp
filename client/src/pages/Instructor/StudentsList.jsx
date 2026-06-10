@@ -20,7 +20,7 @@ export default function StudentsList() {
   return (
     <div className="page-container">
       <h2>התלמידים שלי</h2>
-      <input placeholder="חיפוש לפי שם תלמיד" value={search} onChange={e => setSearch(e.target.value)} style={{ marginBottom: 12 }} />
+      <input placeholder="חיפוש לפי שם תלמיד" value={search} onChange={e => setSearch(e.target.value)} />
       {loading && <p>טוען...</p>}
       {error && <p>{error}</p>}
       {!loading && !error && filtered.length === 0 && <p>אין תלמידים עדיין</p>}

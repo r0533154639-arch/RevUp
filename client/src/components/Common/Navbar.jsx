@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { getMyInstructor } from '../../services/stats.service.js';
+import ContactModal from './ContactModal.jsx';
 
 const SERVER = 'http://localhost:3000';
 
@@ -18,6 +19,7 @@ const ADMIN_TABS = [
   { label: 'פוסטים', page: 'adminPosts' },
   { label: 'תגובות', page: 'adminComments' },
   { label: 'שיעורים', page: 'adminLessons' },
+  { label: 'פניות', page: 'adminContacts' },
 ];
 
 function ProfileDropdown({ user, onLogout, onClose }) {
@@ -109,52 +111,47 @@ function ProfileDropdown({ user, onLogout, onClose }) {
   const avatar = imagePreview || (displayUser.profile_image ? `${SERVER}/uploads/${displayUser.profile_image}` : null);
 
   return (
-    <div ref={ref} style={{
-      position: 'absolute', left: 0, top: 'calc(100% + 10px)',
-      background: '#fff', borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-      border: '1px solid #e5e7eb', minWidth: 260, zIndex: 100, padding: 20,
-      direction: 'rtl', textAlign: 'right',
-    }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+    <div ref={ref} className="profile-dropdown">
+      <div className="profile-dropdown-header">
         {avatar
-          ? <img src={avatar} alt="" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb' }} />
-          : <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 700 }}>{displayUser.name?.[0]}</div>
+          ? <img src={avatar} alt="" className="profile-dropdown-avatar-img" />
+          : <div className="profile-dropdown-avatar">{displayUser.name?.[0]}</div>
         }
-        <span style={{ fontWeight: 700, fontSize: 15 }}>{displayUser.name}</span>
-        <span style={{ fontSize: 12, color: '#6b7280' }}>{displayUser.email}</span>
+        <span className="profile-dropdown-name">{displayUser.name}</span>
+        <span className="profile-dropdown-email">{displayUser.email}</span>
       </div>
 
       {mode === 'info' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, color: '#374151' }}>
+        <div className="profile-dropdown-info">
           {displayUser.phone && <span>📞 {displayUser.phone}</span>}
           {displayUser.date_of_birth && <span>🎂 {new Date(displayUser.date_of_birth).toLocaleDateString('he-IL')}</span>}
           {displayUser.area && <span>📍 {displayUser.area}</span>}
           {user.role === 'instructor' && fullUser?.vehicle_types?.length > 0 && (
             <span>🚗 {vehicleTypeOptions.filter(v => fullUser.vehicle_types.includes(v.id)).map(v => v.name).join(', ')}</span>
           )}
-          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-            <button onClick={() => setMode('edit')} style={{ flex: 1, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 13, cursor: 'pointer' }}>עריכה</button>
-            <button onClick={onLogout} style={{ flex: 1, background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>התנתקות</button>
+          <div className="profile-dropdown-actions">
+            <button className="btn-edit" onClick={() => setMode('edit')}>עריכה</button>
+            <button className="btn-logout" onClick={onLogout}>התנתקות</button>
           </div>
         </div>
       )}
 
       {mode === 'edit' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <label style={{ fontSize: 12, color: '#6b7280' }}>תמונה</label>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {avatar && <img src={avatar} alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />}
+        <div className="profile-dropdown-edit">
+          <label>תמונה</label>
+          <div className="profile-preview-row">
+            {avatar && <img src={avatar} alt="" className="profile-preview-thumb" />}
             <input type="file" accept="image/*" onChange={handleImageChange} style={{ fontSize: 12, margin: 0, padding: '3px 0' }} />
           </div>
-          <input placeholder="טלפון" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} style={{ fontSize: 13, padding: '6px 10px', margin: 0 }} />
-          <input type="date" value={form.date_of_birth} onChange={e => setForm(f => ({ ...f, date_of_birth: e.target.value }))} style={{ fontSize: 13, padding: '6px 10px', margin: 0 }} />
+          <input placeholder="טלפון" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
+          <input type="date" value={form.date_of_birth} onChange={e => setForm(f => ({ ...f, date_of_birth: e.target.value }))} />
           {user.role === 'instructor' && (
             <>
-              <input placeholder="אזור" value={form.area} onChange={e => setForm(f => ({ ...f, area: e.target.value }))} style={{ fontSize: 13, padding: '6px 10px', margin: 0 }} />
-              <label style={{ fontSize: 12, color: '#6b7280' }}>סוגי רכב</label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              <input placeholder="אזור" value={form.area} onChange={e => setForm(f => ({ ...f, area: e.target.value }))} />
+              <label>סוגי רכב</label>
+              <div className="vehicle-chips">
                 {vehicleTypeOptions.map(vt => (
-                  <label key={vt.id} style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+                  <label key={vt.id}>
                     <input type="checkbox" checked={form.vehicle_types.includes(vt.id)} onChange={() => toggleVehicleType(vt.id)} />
                     {vt.name}
                   </label>
@@ -162,9 +159,9 @@ function ProfileDropdown({ user, onLogout, onClose }) {
               </div>
             </>
           )}
-          <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-            <button onClick={handleSave} disabled={saving} style={{ flex: 1, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 13, cursor: 'pointer' }}>{saving ? 'שומר...' : 'שמור'}</button>
-            <button onClick={() => setMode('info')} style={{ flex: 1, background: '#f3f4f6', color: '#333', border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 13, cursor: 'pointer' }}>ביטול</button>
+          <div className="profile-dropdown-actions">
+            <button onClick={handleSave} disabled={saving}>{saving ? 'שומר...' : 'שמור'}</button>
+            <button className="btn-secondary" onClick={() => setMode('info')}>ביטול</button>
           </div>
         </div>
       )}
@@ -176,6 +173,7 @@ export default function Navbar() {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
 
   useEffect(() => {
     if (user?.role === 'student' && user.instructor_id === undefined) {
@@ -210,6 +208,7 @@ export default function Navbar() {
               <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
             ))
         )}
+        {user && user.role !== 'admin' && <button className="nav-contact-btn" onClick={() => setContactOpen(true)}>צור קשר</button>}
       </div>
 
       {user ? (
@@ -235,6 +234,7 @@ export default function Navbar() {
           <Link to="/register">הרשמה</Link>
         </div>
       )}
+      {contactOpen && <ContactModal onClose={() => setContactOpen(false)} />}
     </nav>
   );
 }

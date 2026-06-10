@@ -17,7 +17,7 @@ import AdminDashboard from '../../pages/Admin/AdminDashboard.jsx';
 import AdminStudents from '../../pages/Admin/AdminStudents.jsx';
 import AdminInstructors from '../../pages/Admin/AdminInstructors.jsx';
 import AdminPosts from '../../pages/Admin/AdminPosts.jsx';
-import AdminComments from '../../pages/Admin/AdminComments.jsx';
+import AdminContacts from '../../pages/Admin/AdminContacts.jsx';
 
 const PAGE_MAP = {
   homePage:            { component: HomePage },
@@ -38,6 +38,7 @@ const PAGE_MAP = {
   adminPosts:          { component: AdminDashboard,    allowedRoles: ['admin'] },
   adminComments:       { component: AdminDashboard,    allowedRoles: ['admin'] },
   adminLessons:        { component: AdminDashboard,    allowedRoles: ['admin'] },
+  adminContacts:       { component: AdminContacts,     allowedRoles: ['admin'] },
 };
 
 export default function DynamicPage() {

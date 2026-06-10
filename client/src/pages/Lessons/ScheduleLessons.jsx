@@ -17,7 +17,7 @@ export default function ScheduleLessons() {
   if (user?.role === 'student' && !user?.instructor_id) {
     return (
       <div className="page-container" style={{ textAlign: 'center', paddingTop: 60 }}>
-        <p style={{ fontSize: 18, marginBottom: 16 }}>עליך לבחור מורה לפני קביעת שיעורים</p>
+        <p>עליך לבחור מורה לפני קביעת שיעורים</p>
         <button onClick={() => navigate(`/users/${user.id}/instructors`)}>חפש מורה</button>
       </div>
     );
@@ -29,7 +29,7 @@ export default function ScheduleLessons() {
   };
 
   return (
-    <div>
+    <div className="page-container">
       <h2>קביעת שיעור</h2>
       <CalendarView lessons={lessons} onSelectDate={handleDate} />
       {lessons[0] && <FeedbackForm lessonId={lessons[0].id} onSubmit={submitFeedback} />}
