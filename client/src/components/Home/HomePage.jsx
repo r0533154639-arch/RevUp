@@ -16,18 +16,22 @@ const INSTRUCTOR_CARDS = [
   { title: 'פוסטים', description: 'שתף תוכן מקצועי וצפה בפוסטים של מדריכים אחרים', icon: '✏️', page: 'posts' },
 ];
 
+const ADMIN_CARDS = [
+  { title: 'תלמידים', description: 'ניהול תלמידים', icon: '👨‍🎓', page: 'adminStudents' },
+  { title: 'מורים', description: 'ניהול מורים', icon: '👨‍🏫', page: 'adminInstructors' },
+  { title: 'פוסטים', description: 'ניהול פוסטים', icon: '✏️', page: 'adminPosts' },
+  { title: 'תגובות', description: 'ניהול תגובות', icon: '💬', page: 'adminComments' },
+  { title: 'שיעורים', description: 'ניהול שיעורים', icon: '🚗', page: 'adminLessons' },
+];
+
 const ROLE_LABEL = { student: 'פאנל תלמיד', instructor: 'פאנל מורה', admin: 'פאנל מנהל' };
 
 export default function HomePage({ user }) {
   const studentCards = user.role === 'student' && user.instructor_id
     ? STUDENT_CARDS.filter(c => c.page !== 'instructors')
     : STUDENT_CARDS;
-  const adminCards = [
-    ...STUDENT_CARDS,
-    ...INSTRUCTOR_CARDS.filter(c => !STUDENT_CARDS.find(s => s.page === c.page)),
-    { title: 'ניהול האתר', description: 'רשימת משתמשים, פוסטים, שיעורים וניהול הרשאות', icon: '⚙️', page: 'admin' },
-  ];
-  const cards = user.role === 'instructor' ? INSTRUCTOR_CARDS : user.role === 'admin' ? adminCards : studentCards;
+
+  const cards = user.role === 'instructor' ? INSTRUCTOR_CARDS : user.role === 'admin' ? ADMIN_CARDS : studentCards;
 
   return (
     <div className="page-container">

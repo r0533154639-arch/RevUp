@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { login, register, getMe } from '../controllers/auth.controller.js';
+import { login, register, getMe, updateProfile } from '../controllers/auth.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
+import { upload } from '../middleware/upload.middleware.js';
 
 const router = Router();
 
@@ -9,6 +10,7 @@ console.log('Auth routes loaded');
 router.post('/login', login);
 router.post('/register', register);
 router.get('/me', authenticate, getMe);
+router.put('/me', authenticate, upload.single('profile_image'), updateProfile);
 
 console.log('Auth routes configured:', router.stack.length, 'routes');
 

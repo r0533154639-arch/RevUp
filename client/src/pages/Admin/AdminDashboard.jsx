@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 
 const SERVER = 'http://localhost:3000';
@@ -103,10 +104,13 @@ const tdStyle = { padding: '7px 12px', borderBottom: '1px solid #e5e7eb' };
 const tdEditStyle = { ...tdStyle, cursor: 'pointer' };
 const linkBtn = { border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontSize: 13 };
 
-export default function AdminDashboard() {
+export default function AdminDashboard({ user }) {
+  const { page } = useParams();
+  const navigate = useNavigate();
+  const PAGE_TAB_MAP = { adminStudents: 'students', adminInstructors: 'instructors', adminPosts: 'posts', adminComments: 'comments', adminLessons: 'lessons' };
+  const tab = PAGE_TAB_MAP[page] || 'students';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState('students');
   const [selected, setSelected] = useState(null);
   const [lessonSort, setLessonSort] = useState('date');
   const [editCell, setEditCell] = useState(null); // { table, id, field, value, label }
@@ -149,11 +153,11 @@ export default function AdminDashboard() {
   );
 
   const TABS = [
-    { key: 'students', label: `תלמידים (${data.students?.length ?? 0})` },
-    { key: 'instructors', label: `מורים (${data.instructors?.length ?? 0})` },
-    { key: 'posts', label: `פוסטים (${data.posts?.length ?? 0})` },
-    { key: 'comments', label: `תגובות (${data.comments?.length ?? 0})` },
-    { key: 'lessons', label: `שיעורים (${data.lessons?.length ?? 0})` },
+    { key: 'students', page: 'adminStudents', label: `תלמידים (${data.students?.length ?? 0})` },
+    { key: 'instructors', page: 'adminInstructors', label: `מורים (${data.instructors?.length ?? 0})` },
+    { key: 'posts', page: 'adminPosts', label: `פוסטים (${data.posts?.length ?? 0})` },
+    { key: 'comments', page: 'adminComments', label: `תגובות (${data.comments?.length ?? 0})` },
+    { key: 'lessons', page: 'adminLessons', label: `שיעורים (${data.lessons?.length ?? 0})` },
   ];
 
   return (
@@ -167,18 +171,7 @@ export default function AdminDashboard() {
       </p>
       <p style={{ color: '#aaa', fontSize: 12, marginBottom: 20 }}>💡 לחיצה כפולה על תא כדי לערוך</p>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
-        {TABS.map(t => (
-          <button key={t.key} onClick={() => setTab(t.key)} style={{
-            ...linkBtn, padding: '8px 16px',
-            background: tab === t.key ? '#3b82f6' : '#e5e7eb',
-            color: tab === t.key ? '#fff' : '#111',
-            fontWeight: tab === t.key ? 700 : 400,
-          }}>
-            {t.label}
-          </button>
-        ))}
-      </div>
+
 
       {tab === 'students' && (
         <table style={tStyle}>

@@ -1,4 +1,5 @@
-import { findUserByEmail, createUser, findUserById } from '../dal/students.dal.js';
+import { findUserByEmail, createUser, findUserById, updateProfileImage } from '../dal/students.dal.js';
+import pool from '../config/db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -67,6 +68,26 @@ export const getMe = async (req, res) => {
     res.json(response);
   } catch (err) {
     console.error('GetMe error:', err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { phone, date_of_birth, area } = req.body;
+    const fields = [];
+    const values = [];
+    if (phone)         { fields.push('phone = ?');         values.push(phone); }
+    if (date_of_birth) { fields.push('date_of_birth = ?'); values.push(date_of_birth); }
+    if (area)          { fields.push('area = ?');          values.push(area); }
+    if (fields.length) {
+      values.push(req.user.id);
+      await pool.query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, values);
+    }
+    if (req.file) await updateProfileImage(req.user.id, req.file.filename);
+    const user = await findUserById(req.user.id);
+    res.json({ id: user.id, name: user.name, role: user.role, profile_image: user.profile_image, phone: user.phone, date_of_birth: user.date_of_birth, area: user.area });
+  } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };

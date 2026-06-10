@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { getMyInstructor } from '../../services/stats.service.js';
+
+const SERVER = 'http://localhost:3000';
 
 const INSTRUCTOR_LINKS = [
   { label: 'לוח זמנים', page: 'schedule' },
@@ -10,15 +12,112 @@ const INSTRUCTOR_LINKS = [
   { label: 'פוסטים', page: 'posts' },
 ];
 
-const ADMIN_LINKS = [
-  { label: 'תלמידים', page: 'students' },
-  { label: 'שיעורים', page: 'lessons' },
-  { label: 'לוח זמנים', page: 'schedule' },
-  { label: 'מורים', page: 'instructors' },
-  { label: 'פוסטים', page: 'posts' },
-  { label: 'טסטים', page: 'test' },
-  { label: 'הישגים', page: 'achievements' },
+const ADMIN_TABS = [
+  { label: 'תלמידים', page: 'adminStudents' },
+  { label: 'מורים', page: 'adminInstructors' },
+  { label: 'פוסטים', page: 'adminPosts' },
+  { label: 'תגובות', page: 'adminComments' },
+  { label: 'שיעורים', page: 'adminLessons' },
 ];
+
+function ProfileDropdown({ user, onLogout, onClose }) {
+  const [mode, setMode] = useState('info'); // 'info' | 'edit'
+  const [form, setForm] = useState({ phone: user.phone || '', date_of_birth: user.date_of_birth || '', area: user.area || '' });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const { updateUser } = useAuth();
+  const ref = useRef();
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [onClose]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const formData = new FormData();
+      formData.append('phone', form.phone);
+      formData.append('date_of_birth', form.date_of_birth);
+      formData.append('area', form.area);
+      if (imageFile) formData.append('profile_image', imageFile);
+
+      const res = await fetch('/api/auth/me', {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        body: formData,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      updateUser(data);
+      setMode('info');
+      setImageFile(null);
+      setImagePreview(null);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const avatar = imagePreview || (user.profile_image ? `${SERVER}/uploads/${user.profile_image}` : null);
+
+  return (
+    <div ref={ref} style={{
+      position: 'absolute', left: 0, top: 'calc(100% + 10px)',
+      background: '#fff', borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+      border: '1px solid #e5e7eb', minWidth: 260, zIndex: 100, padding: 20,
+      direction: 'rtl', textAlign: 'right',
+    }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+        {avatar
+          ? <img src={avatar} alt="" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb' }} />
+          : <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 700 }}>{user.name?.[0]}</div>
+        }
+        <span style={{ fontWeight: 700, fontSize: 15 }}>{user.name}</span>
+        <span style={{ fontSize: 12, color: '#6b7280' }}>{user.email}</span>
+      </div>
+
+      {mode === 'info' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, color: '#374151' }}>
+          {user.phone && <span>📞 {user.phone}</span>}
+          {user.date_of_birth && <span>🎂 {new Date(user.date_of_birth).toLocaleDateString('he-IL')}</span>}
+          {user.area && <span>📍 {user.area}</span>}
+          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+            <button onClick={() => setMode('edit')} style={{ flex: 1, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 13, cursor: 'pointer' }}>עריכה</button>
+            <button onClick={onLogout} style={{ flex: 1, background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>התנתקות</button>
+          </div>
+        </div>
+      )}
+
+      {mode === 'edit' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <label style={{ fontSize: 12, color: '#6b7280' }}>תמונה</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {avatar && <img src={avatar} alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />}
+            <input type="file" accept="image/*" onChange={handleImageChange} style={{ fontSize: 12, margin: 0, padding: '3px 0' }} />
+          </div>
+          <input placeholder="טלפון" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} style={{ fontSize: 13, padding: '6px 10px', margin: 0 }} />
+          <input type="date" value={form.date_of_birth ? form.date_of_birth.slice(0, 10) : ''} onChange={e => setForm(f => ({ ...f, date_of_birth: e.target.value }))} style={{ fontSize: 13, padding: '6px 10px', margin: 0 }} />
+          <input placeholder="אזור" value={form.area} onChange={e => setForm(f => ({ ...f, area: e.target.value }))} style={{ fontSize: 13, padding: '6px 10px', margin: 0 }} />
+          <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+            <button onClick={handleSave} disabled={saving} style={{ flex: 1, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 13, cursor: 'pointer' }}>{saving ? 'שומר...' : 'שמור'}</button>
+            <button onClick={() => setMode('info')} style={{ flex: 1, background: '#f3f4f6', color: '#333', border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 13, cursor: 'pointer' }}>ביטול</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Navbar() {
   const { user, logout, updateUser } = useAuth();
@@ -43,36 +142,38 @@ export default function Navbar() {
     ...(!user?.instructor_id ? [{ label: 'חפש מורה', page: 'instructors' }] : []),
   ];
 
-  const adminLinks = [
-    ...studentLinks,
-    ...INSTRUCTOR_LINKS.filter(l => !studentLinks.find(s => s.page === l.page)),
-  ];
-
-  const links = user?.role === 'instructor' ? INSTRUCTOR_LINKS : user?.role === 'admin' ? adminLinks : studentLinks;
+  const links = user?.role === 'instructor' ? INSTRUCTOR_LINKS : studentLinks;
 
   return (
     <nav>
       <Link to={user ? `/users/${user.id}/homePage` : '/'}>RevUp</Link>
 
       <div className="nav-links">
-        {user && links.map(({ label, page }) => (
-          <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
-        ))}
+        {user && (user.role === 'admin'
+          ? ADMIN_TABS.map(({ label, page }) => (
+              <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
+            ))
+          : links.map(({ label, page }) => (
+              <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
+            ))
+        )}
       </div>
 
       {user ? (
         <div className="nav-profile">
           <div className="nav-profile-trigger" onClick={() => setMenuOpen(o => !o)}>
             {user.profile_image
-              ? <img src={`http://localhost:3000/uploads/${user.profile_image}`} alt="פרופיל" className="nav-avatar" />
+              ? <img src={`${SERVER}/uploads/${user.profile_image}`} alt="פרופיל" className="nav-avatar" />
               : <div className="nav-avatar-placeholder">{user.name?.[0]}</div>
             }
             <span className="nav-username">{user.name}</span>
           </div>
           {menuOpen && (
-            <div className="nav-dropdown">
-              <button onClick={handleLogout}>התנתקות</button>
-            </div>
+            <ProfileDropdown
+              user={user}
+              onLogout={handleLogout}
+              onClose={() => setMenuOpen(false)}
+            />
           )}
         </div>
       ) : (

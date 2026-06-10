@@ -31,10 +31,11 @@ const PAGE_MAP = {
   achievements:        { component: Achievements,      allowedRoles: ['instructor', 'admin'] },
   posts:               { component: Posts },
   admin:               { component: AdminDashboard,    allowedRoles: ['admin'] },
-  'admin-students':    { component: AdminStudents,     allowedRoles: ['admin'] },
-  'admin-instructors': { component: AdminInstructors,  allowedRoles: ['admin'] },
-  'admin-posts':       { component: AdminPosts,        allowedRoles: ['admin'] },
-  'admin-comments':    { component: AdminComments,     allowedRoles: ['admin'] },
+  adminStudents:       { component: AdminDashboard,    allowedRoles: ['admin'] },
+  adminInstructors:    { component: AdminDashboard,    allowedRoles: ['admin'] },
+  adminPosts:          { component: AdminDashboard,    allowedRoles: ['admin'] },
+  adminComments:       { component: AdminDashboard,    allowedRoles: ['admin'] },
+  adminLessons:        { component: AdminDashboard,    allowedRoles: ['admin'] },
 };
 
 export default function DynamicPage() {
