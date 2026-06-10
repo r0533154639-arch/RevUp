@@ -61,6 +61,17 @@ export const approveLessonById = async (lessonId, instructorUserId) => {
   );
 };
 
+export const getLessonWithStudent = async (lessonId) => {
+  const [[row]] = await pool.query(
+    `SELECT dl.date, dl.time, u.name AS student_name, u.email AS student_email
+     FROM driving_lessons dl
+     JOIN users u ON u.id = dl.student_id
+     WHERE dl.id = ?`,
+    [lessonId]
+  );
+  return row || null;
+};
+
 export const getPendingLessonsCount = async (instructorUserId) => {
   const [[instr]] = await pool.query('SELECT id FROM driving_instructor WHERE user_id = ?', [instructorUserId]);
   if (!instr) return 0;

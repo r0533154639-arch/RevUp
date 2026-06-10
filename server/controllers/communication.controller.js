@@ -1,4 +1,4 @@
-import { saveLessonFeedback, getFeedbackForStudent, saveContactMessage, getAllContactMessages } from '../dal/communication.dal.js';
+import { saveLessonFeedback, getFeedbackForStudent, getFeedbackForLesson, saveContactMessage, getAllContactMessages } from '../dal/communication.dal.js';
 
 export const submitLessonFeedback = async (req, res) => {
   try {

@@ -1,4 +1,6 @@
 import { getStudentProgress, setStudentStatus, getStudentsByInstructor, chooseInstructor, getInstructorAchievements, getStudentInstructor, updateProfileImage } from '../dal/students.dal.js';
+import { findUserById } from '../dal/students.dal.js';
+import { sendLicensedEmail } from '../services/mailer.js';
 
 export const getProgress = async (req, res) => {
   const data = await getStudentProgress(req.user.id);
@@ -7,6 +9,10 @@ export const getProgress = async (req, res) => {
 
 export const updateStatus = async (req, res) => {
   await setStudentStatus(req.user.id, req.body.status);
+  if (req.body.status === 'licensed') {
+    const user = await findUserById(req.user.id);
+    if (user) sendLicensedEmail(user.email, user.name).catch(console.error);
+  }
   res.json({ success: true });
 };
 
