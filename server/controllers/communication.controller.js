@@ -1,4 +1,4 @@
-import { saveLessonFeedback, getFeedbackForStudent, getFeedbackForLesson } from '../dal/communication.dal.js';
+import { saveLessonFeedback, getFeedbackForStudent, saveContactMessage, getAllContactMessages } from '../dal/communication.dal.js';
 
 export const submitLessonFeedback = async (req, res) => {
   try {
@@ -26,4 +26,16 @@ export const getLessonFeedback = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+};
+
+export const submitContact = async (req, res) => {
+  const { subject, message } = req.body;
+  if (!subject?.trim() || !message?.trim()) return res.status(400).json({ message: 'חסרים שדות' });
+  await saveContactMessage(req.user.id, subject, message);
+  res.json({ success: true });
+};
+
+export const getContacts = async (req, res) => {
+  const data = await getAllContactMessages();
+  res.json(data);
 };

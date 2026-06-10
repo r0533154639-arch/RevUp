@@ -16,10 +16,10 @@ export default function TheoryExam() {
   };
 
   return (
-    <div>
+    <div className="theory-page">
       <h2>מבחן תאוריה</h2>
       {questions.map((q, i) => <QuestionCard key={i} {...q} onAnswer={handleAnswer} />)}
-      {done === questions.length && <p>ציון: {score}/{questions.length}</p>}
+      {done === questions.length && <p className="theory-score">ציון: {score}/{questions.length}</p>}
     </div>
   );
 }

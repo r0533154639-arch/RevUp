@@ -1,6 +1,6 @@
 export default function LicenseReady() {
   return (
-    <div>
+    <div className="license-page">
       <h2>🎉 קיבלת רישיון!</h2>
       <p>המלצות לרכב ראשון:</p>
       <ul>

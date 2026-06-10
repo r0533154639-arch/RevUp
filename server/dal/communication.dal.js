@@ -31,3 +31,21 @@ export const getFeedbackForStudent = async (studentId) => {
   );
   return rows;
 };
+
+export const saveContactMessage = async (userId, subject, message) => {
+  await pool.query(
+    `INSERT INTO contact_messages (user_id, subject, message) VALUES (?, ?, ?)`,
+    [userId, subject, message]
+  );
+};
+
+export const getAllContactMessages = async () => {
+  const [rows] = await pool.query(
+    `SELECT cm.id, cm.subject, cm.message, cm.created_at,
+            u.name AS user_name, u.email AS user_email
+     FROM contact_messages cm
+     JOIN users u ON u.id = cm.user_id
+     ORDER BY cm.created_at DESC`
+  );
+  return rows;
+};

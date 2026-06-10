@@ -2,7 +2,12 @@ import { getAllInstructors, getInstructorSchedule, approveLessonById, updateProf
 
 export const getInstructors = async (req, res) => {
   try {
-    const data = await getAllInstructors(req.query);
+    const { areas, vehicle_types, min_rating } = req.query;
+    const data = await getAllInstructors({
+      areas: areas ? areas.split(',') : [],
+      vehicle_types: vehicle_types ? vehicle_types.split(',') : [],
+      min_rating: min_rating || null,
+    });
     res.json(data);
   } catch (err) {
     res.status(500).json({ message: err.message });

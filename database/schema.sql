@@ -521,3 +521,12 @@ WHERE dl.status_id IS NULL;
 -- הוסף foreign key אם לא קיים (אופציונלי)
 -- ALTER TABLE driving_lessons ADD FOREIGN KEY (status_id) REFERENCES lesson_statuses(id);
 ALTER TABLE driving_lessons ADD COLUMN  cancel_rejected_by ENUM('student', 'instructor') DEFAULT NULL;
+
+CREATE TABLE contact_messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  subject VARCHAR(200) NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
