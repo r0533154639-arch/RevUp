@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { getMyInstructor } from '../../services/stats.service.js';
 import ContactModal from './ContactModal.jsx';
+import Select from 'react-select';
 
 const SERVER = 'http://localhost:3000';
 
@@ -23,10 +24,11 @@ const ADMIN_TABS = [
 ];
 
 function ProfileDropdown({ user, onLogout, onClose }) {
-  const [mode, setMode] = useState('info'); // 'info' | 'edit'
+  const [mode, setMode] = useState('info');
   const [form, setForm] = useState({ phone: '', date_of_birth: '', area: '', vehicle_types: [] });
   const [fullUser, setFullUser] = useState(null);
   const [vehicleTypeOptions, setVehicleTypeOptions] = useState([]);
+  const [cityOptions, setCityOptions] = useState([]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -52,10 +54,23 @@ function ProfileDropdown({ user, onLogout, onClose }) {
         });
       })
       .catch(() => {});
+
     if (user.role === 'instructor') {
       fetch('/api/auth/vehicle-types')
         .then(r => r.json())
         .then(setVehicleTypeOptions)
+        .catch(() => {});
+
+      fetch('https://data.gov.il/api/3/action/datastore_search?resource_id=5c78e9fa-c2e2-4771-93ff-7f400a12f7ba&limit=2000')
+        .then(r => r.json())
+        .then(data => {
+          const opts = data.result.records
+            .map(r => r['שם_ישוב']?.trim())
+            .filter(Boolean)
+            .sort()
+            .map(name => ({ value: name, label: name }));
+          setCityOptions(opts);
+        })
         .catch(() => {});
     }
   }, [user.id]);
@@ -147,7 +162,20 @@ function ProfileDropdown({ user, onLogout, onClose }) {
           <input type="date" value={form.date_of_birth} onChange={e => setForm(f => ({ ...f, date_of_birth: e.target.value }))} />
           {user.role === 'instructor' && (
             <>
-              <input placeholder="אזור" value={form.area} onChange={e => setForm(f => ({ ...f, area: e.target.value }))} />
+              <label>עיר</label>
+              <Select
+                options={cityOptions}
+                placeholder="חפש עיר..."
+                value={form.area ? { value: form.area, label: form.area } : null}
+                onChange={opt => setForm(f => ({ ...f, area: opt?.value || '' }))}
+                noOptionsMessage={() => 'לא נמצאו תוצאות'}
+                loadingMessage={() => 'טוען...'}
+                isLoading={cityOptions.length === 0}
+                classNamePrefix="city-select"
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+              />
               <label>סוגי רכב</label>
               <div className="vehicle-chips">
                 {vehicleTypeOptions.map(vt => (
