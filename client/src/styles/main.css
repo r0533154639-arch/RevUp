@@ -672,10 +672,24 @@ button[type="submit"] {
 .theory-page a:hover { text-decoration: underline; }
 
 .theory-score {
-  margin-top: 16px;
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: var(--radius-lg);
   font-weight: 700;
   font-size: 16px;
-  color: var(--primary);
+  text-align: center;
+}
+
+.theory-score.pass {
+  background: rgba(16,185,129,0.12);
+  color: var(--success);
+  border: 1px solid rgba(16,185,129,0.3);
+}
+
+.theory-score.fail {
+  background: rgba(239,68,68,0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239,68,68,0.3);
 }
 
 /* ─── Driving Test ─── */
