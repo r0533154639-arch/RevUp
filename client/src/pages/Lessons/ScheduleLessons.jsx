@@ -12,6 +12,9 @@ const STATUS_COLOR = { pending: '#f59e0b', approved: '#3b82f6', completed: '#22c
 export default function ScheduleLessons() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const isInstructor = user?.role === 'instructor';
+  const instructorUserId = user?.instructor_user_id;
+
   const [lessons, setLessons] = useState([]);
   const [availableSlots, setAvailableSlots] = useState({});
   const [template, setTemplate] = useState({});
@@ -23,11 +26,15 @@ export default function ScheduleLessons() {
   const [cancelModal, setCancelModal] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(() => ({ year: new Date().getFullYear(), month: new Date().getMonth() }));
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [pendingRequests, setPendingRequests] = useState([]);
   const [notifications, setNotifications] = useState({ pending: [], cancelRequests: [], cancelRejections: [] });
-  const [actionModal, setActionModal] = useState(null); // { type: 'approve'|'cancel'|'reject-cancel', lesson }
+  const [actionModal, setActionModal] = useState(null);
 
-  const isInstructor = user?.role === 'instructor';
-  const instructorUserId = user?.instructor_user_id;
+  const fetchPendingRequests = useCallback(async () => {
+    if (!isInstructor) return;
+    api.get('/student-requests/pending').then(setPendingRequests).catch(() => {});
+  }, [isInstructor]);
+
 
   const fetchLessons = useCallback(async () => {
     const data = await getLessons();
@@ -66,7 +73,7 @@ export default function ScheduleLessons() {
   useEffect(() => {
     fetchLessons();
     fetchNotifications();
-    if (isInstructor) fetchTemplate();
+    if (isInstructor) { fetchTemplate(); fetchPendingRequests(); }
   }, []);
 
   useEffect(() => {
@@ -149,13 +156,19 @@ export default function ScheduleLessons() {
           ⏳ יש <strong>{notifications.pending.length}</strong> שיעורים הממתינים לאישורך:
           <ul style={{ margin: '6px 0 0', paddingRight: 20 }}>
             {notifications.pending.map(l => (
-              <li key={l.id} style={{ marginBottom: 4 }}>
-                {new Date(l.date).toLocaleDateString('he-IL')} {l.time?.slice(0, 5)} — {l.student_name}
+              <li key={l.id} style={{ marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span>{new Date(l.date).toLocaleDateString('he-IL')} {l.time?.slice(0, 5)} — {l.student_name}</span>
                 <button
                   onClick={() => setActionModal({ type: 'approve', lesson: l })}
-                  style={{ marginRight: 10, fontSize: 12, color: '#d97706', background: 'none', border: '1px solid #fcd34d', borderRadius: 4, padding: '2px 8px', cursor: 'pointer' }}
+                  style={{ fontSize: 12, color: '#fff', background: '#22c55e', border: 'none', borderRadius: 4, padding: '2px 8px', cursor: 'pointer' }}
                 >
-                  אשר שיעור
+                  אשר ✓
+                </button>
+                <button
+                  onClick={() => setActionModal({ type: 'reject-lesson', lesson: l })}
+                  style={{ fontSize: 12, color: '#ef4444', background: 'none', border: '1px solid #fca5a5', borderRadius: 4, padding: '2px 8px', cursor: 'pointer' }}
+                >
+                  דחה ✕
                 </button>
               </li>
             ))}
@@ -220,6 +233,41 @@ export default function ScheduleLessons() {
       {/* תצוגת שיעורים */}
       {view === 'lessons' && (
         <div>
+          {isInstructor && pendingRequests.length > 0 && (
+            <div style={{ background: '#f0f9ff', border: '1px solid #7dd3fc', borderRadius: 8, padding: '14px 16px', marginBottom: 20 }}>
+              <p style={{ fontWeight: 700, color: '#0369a1', marginBottom: 10, fontSize: 15 }}>
+                👤 {pendingRequests.length} תלמידים מבקשים להצטרף אליך:
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {pendingRequests.map(req => (
+                  <div key={req.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', borderRadius: 6, padding: '10px 14px', border: '1px solid #bae6fd' }}>
+                    <div>
+                      <div style={{ fontWeight: 600 }}>{req.student_name}</div>
+                      <div style={{ fontSize: 13, color: '#666' }}>
+                        {req.student_phone && <span>📞 {req.student_phone} | </span>}
+                        {req.vehicle_type && <span>🚗 {req.vehicle_type}</span>}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button
+                        onClick={async () => { await api.put(`/student-requests/${req.id}/approve`); fetchPendingRequests(); fetchLessons(); }}
+                        style={{ background: '#22c55e', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+                      >
+                        אשר ✓
+                      </button>
+                      <button
+                        onClick={async () => { await api.put(`/student-requests/${req.id}/reject`); fetchPendingRequests(); }}
+                        style={{ background: 'none', color: '#ef4444', border: '1px solid #fca5a5', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontSize: 13 }}
+                      >
+                        דחה ✕
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* בקשות תלמידים ממתינות — למורה בלבד */}
           {!isInstructor && (
             <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, padding: '12px 16px', marginBottom: 20, display: 'flex', gap: 24 }}>
               <span style={{ fontSize: 14, color: '#0369a1' }}>📚 סה"כ שיעורים: <strong>{lessons.length}</strong></span>
@@ -316,7 +364,7 @@ export default function ScheduleLessons() {
         <div className="modal-overlay" onClick={() => setActionModal(null)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <p className="modal-title">
-              {actionModal.type === 'approve' ? '✅ אישור שיעור' : actionModal.type === 'cancel' ? '⚠️ אישור ביטול שיעור' : '🚫 דחיית בקשת ביטול'}
+              {actionModal.type === 'approve' ? '✅ אישור שיעור' : actionModal.type === 'reject-lesson' ? '❌ דחיית שיעור' : actionModal.type === 'cancel' ? '⚠️ אישור ביטול שיעור' : '🚫 דחיית בקשת ביטול'}
             </p>
             <p className="modal-text">
               {actionModal.lesson.student_name
@@ -330,6 +378,8 @@ export default function ScheduleLessons() {
                 onClick={async () => {
                   if (actionModal.type === 'approve') {
                     await api.put(`/lessons/${actionModal.lesson.id}/approve`);
+                  } else if (actionModal.type === 'reject-lesson') {
+                    await api.put(`/lessons/${actionModal.lesson.id}/reject`);
                   } else if (actionModal.type === 'cancel') {
                     await handleCancelLesson(actionModal.lesson.id);
                   } else {
@@ -340,11 +390,11 @@ export default function ScheduleLessons() {
                   fetchNotifications();
                 }}
                 style={{
-                  background: actionModal.type === 'approve' ? '#22c55e' : actionModal.type === 'cancel' ? '#ef4444' : '#6b7280',
+                  background: actionModal.type === 'approve' ? '#22c55e' : actionModal.type === 'reject-lesson' ? '#ef4444' : actionModal.type === 'cancel' ? '#ef4444' : '#6b7280',
                   color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', cursor: 'pointer', fontWeight: 600
                 }}
               >
-                {actionModal.type === 'approve' ? 'אשר' : actionModal.type === 'cancel' ? 'אשר ביטול' : 'דחה ביטול'}
+                {actionModal.type === 'approve' ? 'אשר' : actionModal.type === 'reject-lesson' ? 'דחה שיעור' : actionModal.type === 'cancel' ? 'אשר ביטול' : 'דחה ביטול'}
               </button>
               <button className="btn-secondary" onClick={() => setActionModal(null)}>סגור</button>
             </div>
@@ -441,7 +491,17 @@ function LessonCard({ lesson: l, isInstructor, onCancel, past, onFeedbackSaved }
               )}
             </>
           )}
-          {/* כפתור משוב למורה — על כל שיעור שאושר */}
+          {!isInstructor && l.status === 'cancelled' && l.cancelled_by === 'instructor' && (
+            <button
+              onClick={async () => {
+                await api.delete(`/lessons/${l.id}`);
+                onFeedbackSaved?.();
+              }}
+              style={{ fontSize: 12, color: '#6b7280', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: 6, padding: '3px 10px', cursor: 'pointer' }}
+            >
+              הבנתי, הסר מהרשימה
+            </button>
+          )}
           {isInstructor && new Date(l.date).toISOString().slice(0, 10) < new Date().toISOString().slice(0, 10) && (
             <button
               onClick={() => setShowFeedbackForm(v => !v)}

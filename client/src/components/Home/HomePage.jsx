@@ -1,5 +1,8 @@
 import { useAuth } from '../../hooks/useAuth.js';
+import { useEffect, useState } from 'react';
 import DashboardCard from "./DashboardCards/DashboardCard.jsx";
+import { api } from '../../services/api.js';
+import NotificationBadge from '../Common/NotificationBadge.jsx';
 
 const STUDENT_CARDS = [
   { title: 'לימודי תאוריה', description: 'חומרי לימוד ותרגול למבחן התאוריה', icon: '📖', page: 'theory' },
@@ -17,8 +20,8 @@ const INSTRUCTOR_CARDS = [
 ];
 
 const ADMIN_CARDS = [
-  { title: 'תלמידים', description: 'ניהול תלמידים', icon: '👨‍🎓', page: 'adminStudents' },
-  { title: 'מורים', description: 'ניהול מורים', icon: '👨‍🏫', page: 'adminInstructors' },
+  { title: 'תלמידים', description: 'ניהול תלמידים', icon: '👨🎓', page: 'adminStudents' },
+  { title: 'מורים', description: 'ניהול מורים', icon: '👨🏫', page: 'adminInstructors' },
   { title: 'פוסטים', description: 'ניהול פוסטים', icon: '✏️', page: 'adminPosts' },
   { title: 'תגובות', description: 'ניהול תגובות', icon: '💬', page: 'adminComments' },
   { title: 'שיעורים', description: 'ניהול שיעורים', icon: '🚗', page: 'adminLessons' },
@@ -27,6 +30,14 @@ const ADMIN_CARDS = [
 const ROLE_LABEL = { student: 'פאנל תלמיד', instructor: 'פאנל מורה', admin: 'פאנל מנהל' };
 
 export default function HomePage({ user }) {
+  const [notifications, setNotifications] = useState({});
+
+  useEffect(() => {
+    if (user.role !== 'admin') {
+      api.get('/notifications/summary').then(setNotifications).catch(() => {});
+    }
+  }, [user.role]);
+
   const studentCards = user.role === 'student' && user.instructor_id
     ? STUDENT_CARDS.filter(c => c.page !== 'instructors')
     : STUDENT_CARDS;
@@ -40,15 +51,24 @@ export default function HomePage({ user }) {
         <p>{ROLE_LABEL[user.role] || 'פאנל תלמיד'}</p>
       </div>
       <div className="dashboard-cards-container">
-        {cards.map(card => (
-          <DashboardCard
-            key={card.page}
-            title={card.title}
-            description={card.description}
-            icon={card.icon}
-            linkTo={`/users/${user.id}/${card.page}`}
-          />
-        ))}
+        {cards.map(card => {
+          const notif = notifications[card.page];
+          return (
+            <div key={card.page} style={{ position: 'relative' }}>
+              {notif && (
+                <div style={{ position: 'absolute', top: 8, left: 8, zIndex: 1 }}>
+                  <NotificationBadge count={notif.count} tooltips={notif.tooltips} />
+                </div>
+              )}
+              <DashboardCard
+                title={card.title}
+                description={card.description}
+                icon={card.icon}
+                linkTo={`/users/${user.id}/${card.page}`}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ export const getAllInstructors = async ({ area } = {}) => {
     ? 'WHERE di.area LIKE ? AND di.profile_status = \'active\''
     : 'WHERE di.profile_status = \'active\'';
   const [rows] = await pool.query(
-    `SELECT di.id, di.area, u.name, u.phone, COALESCE(u.profile_image, NULL) as profile_image
+    `SELECT di.id, di.area, u.id AS user_id, u.name, u.phone, COALESCE(u.profile_image, NULL) as profile_image
      FROM driving_instructor di
      JOIN users u ON u.id = di.user_id
      ${where}`,

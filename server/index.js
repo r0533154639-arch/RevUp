@@ -12,6 +12,8 @@ import postsRoutes from './routes/posts.routes.js';
 import communicationRoutes from './routes/communication.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import availabilityRoutes from './routes/availability.routes.js';
+import studentRequestsRoutes from './routes/studentRequests.routes.js';
+import notificationsRoutes from './routes/notifications.routes.js';
 process.on('uncaughtException', err => console.error('UNCAUGHT:', err));
 process.on('unhandledRejection', err => console.error('UNHANDLED:', err));
 
@@ -29,6 +31,8 @@ app.use('/api/posts', postsRoutes);
 app.use('/api/communication', communicationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/availability', availabilityRoutes);
+app.use('/api/student-requests', studentRequestsRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

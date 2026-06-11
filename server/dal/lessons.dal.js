@@ -61,6 +61,15 @@ export const approveLessonById = async (lessonId, instructorUserId) => {
   );
 };
 
+export const rejectLessonById = async (lessonId, instructorUserId) => {
+  const [[instr]] = await pool.query('SELECT id FROM driving_instructor WHERE user_id = ?', [instructorUserId]);
+  if (!instr) throw new Error('Instructor not found');
+  await pool.query(
+    `UPDATE driving_lessons SET status = 'cancelled', cancelled_by = 'instructor' WHERE id = ? AND instructor_id = ? AND status = 'pending'`,
+    [lessonId, instr.id]
+  );
+};
+
 export const getPendingLessonsCount = async (instructorUserId) => {
   const [[instr]] = await pool.query('SELECT id FROM driving_instructor WHERE user_id = ?', [instructorUserId]);
   if (!instr) return 0;
