@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
+import '../../styles/tests.css';
 
 const STATUS_LABELS = {
   scheduled: 'ממתין לתשובה',
@@ -61,6 +62,7 @@ export default function DrivingTest() {
       {phase === 'result' && test && (
         <p>סטטוס הטסט: {STATUS_LABELS[test.status] ?? test.status}</p>
       )}
+      <br /><p>בהצלחה!!!</p>
     </div>
   );
 }

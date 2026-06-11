@@ -19,7 +19,7 @@ export const createAppeal = async (testId, { reason }) => {
 
 export const getCompletedLessonsCount = async (studentId) => {
   const [[row]] = await pool.query(
-    `SELECT COUNT(*) AS count FROM driving_lessons dl JOIN lesson_statuses ls ON ls.id = dl.status WHERE dl.student_id = ? AND ls.name = 'completed'`,
+    `SELECT COUNT(*) AS count FROM driving_lessons dl JOIN lesson_statuses ls ON ls.id = dl.status_id WHERE dl.student_id = ? AND ls.name = 'completed'`,
     [studentId]
   );
   return row.count;
@@ -41,13 +41,43 @@ export const createTestRequest = async (studentId, instructorId) => {
   );
 };
 
+export const scheduleTestByInstructor = async (testRequestId, { date, time }) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    
+    // Get student_id from test_request
+    const [[request]] = await conn.query(
+      'SELECT student_id FROM test_requests WHERE id = ?',
+      [testRequestId]
+    );
+    if (!request) throw new Error('Test request not found');
+    
+    // Create test
+    const [result] = await conn.query(
+      'INSERT INTO tests (student_id, date, time) VALUES (?, ?, ?)',
+      [request.student_id, date, time]
+    );
+    
+    // Update test request status
+    await conn.query(
+      'UPDATE test_requests SET status = "scheduled" WHERE id = ?',
+      [testRequestId]
+    );
+    
+    await conn.commit();
+    return result.insertId;
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
+};
+
 export const getLatestTest = async (studentId) => {
   const [[row]] = await pool.query(
-    `SELECT t.id, t.date, t.time, ts.name AS status
-     FROM tests t
-     JOIN test_statuses ts ON ts.id = t.status
-     WHERE t.student_id = ?
-     ORDER BY t.date DESC LIMIT 1`,
+    `SELECT id, date, time, status FROM tests WHERE student_id = ? ORDER BY date DESC LIMIT 1`,
     [studentId]
   );
   return row || null;
@@ -59,7 +89,8 @@ export const getTestRequestsForInstructor = async (instructorId) => {
     `SELECT tr.id, tr.student_id, tr.status, tr.created_at, u.name AS student_name
      FROM test_requests tr
      JOIN users u ON u.id = tr.student_id
-     WHERE tr.instructor_id = ? AND tr.status = 'pending'`,
+     WHERE tr.instructor_id = ? AND tr.status = 'pending'
+     ORDER BY tr.created_at DESC`,
     [instructorId]
   );
   return rows;

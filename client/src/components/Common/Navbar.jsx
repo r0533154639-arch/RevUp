@@ -53,13 +53,13 @@ function ProfileDropdown({ user, onLogout, onClose }) {
           vehicle_types: data.vehicle_types || [],
         });
       })
-      .catch(() => {});
+      .catch(() => { });
 
     if (user.role === 'instructor') {
       fetch('/api/auth/vehicle-types')
         .then(r => r.json())
         .then(setVehicleTypeOptions)
-        .catch(() => {});
+        .catch(() => { });
 
       fetch('https://data.gov.il/api/3/action/datastore_search?resource_id=5c78e9fa-c2e2-4771-93ff-7f400a12f7ba&limit=2000')
         .then(r => r.json())
@@ -71,7 +71,7 @@ function ProfileDropdown({ user, onLogout, onClose }) {
             .map(name => ({ value: name, label: name }));
           setCityOptions(opts);
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [user.id]);
 
@@ -200,14 +200,14 @@ function ProfileDropdown({ user, onLogout, onClose }) {
 export default function Navbar() {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(true);
   const [contactOpen, setContactOpen] = useState(false);
 
   useEffect(() => {
     if (user?.role === 'student' && user.instructor_id === undefined) {
       getMyInstructor()
         .then(({ instructor_id }) => updateUser({ instructor_id }))
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [user?.id]);
 
@@ -230,11 +230,11 @@ export default function Navbar() {
       <div className="nav-links">
         {user && (user.role === 'admin'
           ? ADMIN_TABS.map(({ label, page }) => (
-              <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
-            ))
+            <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
+          ))
           : links.map(({ label, page }) => (
-              <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
-            ))
+            <Link key={page} to={`/users/${user.id}/${page}`}>{label}</Link>
+          ))
         )}
         {user && user.role !== 'admin' && <button className="nav-contact-btn" onClick={() => setContactOpen(true)}>צור קשר</button>}
       </div>
