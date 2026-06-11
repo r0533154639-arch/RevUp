@@ -1,6 +1,7 @@
 import pool from '../config/db.js';
 import { getAllStudents, updateStudentStatus, getAllInstructors, getInstructorAchievements, getAllPosts, getAllComments, toggleUserBlock, getAllUsers } from '../dal/admin.dal.js';
 import { approveInstructor, getPendingInstructors } from '../dal/instructors.dal.js';
+import { sendLicensedEmail } from '../services/mailer.js';
 
 export const getDashboard = async (req, res) => {
   try {
@@ -87,6 +88,10 @@ export const updateCell = async (req, res) => {
       return res.status(400).json({ message: 'שדה לא מורשה לעריכה' });
     const pkCol = table === 'driving_students' ? 'user_id' : 'id';
     await pool.query(`UPDATE ${table} SET ${field} = ? WHERE ${pkCol} = ?`, [value, id]);
+    if (table === 'driving_students' && field === 'status' && value === 'licensed') {
+      const [[user]] = await pool.query('SELECT name, email FROM users WHERE id = ?', [id]);
+      if (user) sendLicensedEmail(user.email, user.name).catch(console.error);
+    }
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ message: err.message });

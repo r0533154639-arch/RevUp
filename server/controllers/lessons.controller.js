@@ -1,4 +1,5 @@
-import { getLessonsByUser, createLesson, addFeedback, approveLessonById, rejectLessonById, getPendingLessonsCount, getNotifications } from '../dal/lessons.dal.js';
+import { getLessonsByUser, createLesson, addFeedback, approveLessonById, getPendingLessonsCount, getNotifications, getLessonWithStudent, getLessonWithInstructor } from '../dal/lessons.dal.js';
+import { sendLessonApprovedEmail, sendLessonScheduledEmail } from '../services/mailer.js';
 import pool from '../config/db.js';
 
 export const getLessons = async (req, res) => {
@@ -13,6 +14,8 @@ export const getLessons = async (req, res) => {
 export const scheduleLesson = async (req, res) => {
   try {
     const id = await createLesson({ ...req.body, studentId: req.user.id });
+    const lesson = await getLessonWithInstructor(id);
+    if (lesson) sendLessonScheduledEmail(lesson.instructor_email, lesson.instructor_name, lesson.student_name, lesson.date, lesson.time).catch(console.error);
     res.status(201).json({ id });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -31,6 +34,8 @@ export const submitFeedback = async (req, res) => {
 export const approveLesson = async (req, res) => {
   try {
     await approveLessonById(req.params.id, req.user.id);
+    const lesson = await getLessonWithStudent(req.params.id);
+    if (lesson) sendLessonApprovedEmail(lesson.student_email, lesson.student_name, lesson.date, lesson.time).catch(console.error);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -6,7 +6,7 @@ const SERVER = 'http://localhost:3000';
 
 export default function InstructorCard({ instructor, requestStatus }) {
   const { user } = useAuth();
-  const [step, setStep] = useState(null); // null | 'confirm' | 'sent'
+  const [step, setStep] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleSendRequest = async () => {
@@ -25,18 +25,24 @@ export default function InstructorCard({ instructor, requestStatus }) {
   const alreadyApproved = requestStatus === 'approved';
 
   return (
-    <div style={{ display: 'flex', gap: 16, padding: 16, border: '1px solid #ddd', borderRadius: 8, alignItems: 'center' }}>
+    <div className="instructor-card">
       <img
         src={instructor.profile_image
           ? `${SERVER}/uploads/${instructor.profile_image}`
           : `https://ui-avatars.com/api/?name=${encodeURIComponent(instructor.name)}`}
         alt={instructor.name}
-        style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+        className="avatar"
+        style={{ width: 72, height: 72 }}
       />
-      <div style={{ flex: 1 }}>
-        <h3 style={{ margin: '0 0 4px' }}>{instructor.name}</h3>
-        <p style={{ margin: '2px 0', color: '#555' }}>📍 {instructor.area}</p>
-        <p style={{ margin: '2px 0', color: '#555' }}>📞 {instructor.phone}</p>
+      <div className="instructor-info">
+        <h3>{instructor.name}</h3>
+        <p>📍 {instructor.area}</p>
+        <p>📞 {instructor.phone}</p>
+        {instructor.vehicle_types && <p>🚗 {instructor.vehicle_types}</p>}
+        {instructor.avg_rating
+          ? <p className="instructor-rating">{'★'.repeat(Math.round(instructor.avg_rating))}{'☆'.repeat(5 - Math.round(instructor.avg_rating))} ({instructor.avg_rating})</p>
+          : <p className="instructor-no-rating">אין דירוג עדיין</p>
+        }
       </div>
 
       {alreadyApproved ? (

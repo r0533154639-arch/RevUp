@@ -124,7 +124,7 @@ export default function ScheduleLessons() {
   if (!isInstructor && !instructorUserId) {
     return (
       <div className="page-container" style={{ textAlign: 'center', paddingTop: 60 }}>
-        <p style={{ fontSize: 18, marginBottom: 16 }}>עליך לבחור מורה לפני קביעת שיעורים</p>
+        <p>עליך לבחור מורה לפני קביעת שיעורים</p>
         <button onClick={() => navigate(`/users/${user.id}/instructors`)}>חפש מורה</button>
       </div>
     );

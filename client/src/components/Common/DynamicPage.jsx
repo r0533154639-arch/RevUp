@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth.js';
 import HomePage from '../Home/HomePage.jsx';
 import TheoryMaterials from '../../pages/Theory/TheoryMaterials.jsx';
 import TheoryExam from '../../pages/Theory/TheoryExam.jsx';
+import TheorySchedule from '../../pages/Theory/TheorySchedule.jsx';
 import SearchInstructors from '../../pages/Instructors/SearchInstructors.jsx';
 import Dashboard from '../../pages/Lessons/Dashboard.jsx';
 import ScheduleLessons from '../../pages/Lessons/ScheduleLessons.jsx';
@@ -16,13 +17,14 @@ import AdminDashboard from '../../pages/Admin/AdminDashboard.jsx';
 import AdminStudents from '../../pages/Admin/AdminStudents.jsx';
 import AdminInstructors from '../../pages/Admin/AdminInstructors.jsx';
 import AdminPosts from '../../pages/Admin/AdminPosts.jsx';
-import AdminComments from '../../pages/Admin/AdminComments.jsx';
+import AdminContacts from '../../pages/Admin/AdminContacts.jsx';
 import InstructorStatusBanner from './InstructorStatusBanner.jsx';
 
 const PAGE_MAP = {
   homePage:            { component: HomePage },
   theory:              { component: TheoryMaterials,   allowedRoles: ['student', 'admin'] },
   theoryExam:          { component: TheoryExam,        allowedRoles: ['student', 'admin'] },
+  theorySchedule:      { component: TheorySchedule,    allowedRoles: ['student', 'admin'] },
   instructors:         { component: SearchInstructors },
   lessons:             { component: Dashboard,         allowedRoles: ['student', 'instructor', 'admin'] },
   schedule:            { component: ScheduleLessons,   allowedRoles: ['student', 'instructor', 'admin'] },
@@ -37,6 +39,7 @@ const PAGE_MAP = {
   adminPosts:          { component: AdminDashboard,    allowedRoles: ['admin'] },
   adminComments:       { component: AdminDashboard,    allowedRoles: ['admin'] },
   adminLessons:        { component: AdminDashboard,    allowedRoles: ['admin'] },
+  adminContacts:       { component: AdminContacts,     allowedRoles: ['admin'] },
 };
 
 export default function DynamicPage() {

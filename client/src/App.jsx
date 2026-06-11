@@ -12,7 +12,7 @@ function App() {
   const username = user?.id;
 
   return (
-    <div className="bg-image">
+    <div className="app-shell">
       <Navbar />
       <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to={`/users/${username}/homePage`} />} />
