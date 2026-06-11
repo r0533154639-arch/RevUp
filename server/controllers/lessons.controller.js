@@ -1,5 +1,5 @@
-import { getLessonsByUser, createLesson, addFeedback, approveLessonById, getPendingLessonsCount, getNotifications, getLessonWithStudent } from '../dal/lessons.dal.js';
-import { sendLessonApprovedEmail } from '../services/mailer.js';
+import { getLessonsByUser, createLesson, addFeedback, approveLessonById, getPendingLessonsCount, getNotifications, getLessonWithStudent, getLessonWithInstructor } from '../dal/lessons.dal.js';
+import { sendLessonApprovedEmail, sendLessonScheduledEmail } from '../services/mailer.js';
 
 export const getLessons = async (req, res) => {
   try {
@@ -13,6 +13,8 @@ export const getLessons = async (req, res) => {
 export const scheduleLesson = async (req, res) => {
   try {
     const id = await createLesson({ ...req.body, studentId: req.user.id });
+    const lesson = await getLessonWithInstructor(id);
+    if (lesson) sendLessonScheduledEmail(lesson.instructor_email, lesson.instructor_name, lesson.student_name, lesson.date, lesson.time).catch(console.error);
     res.status(201).json({ id });
   } catch (err) {
     res.status(500).json({ message: err.message });

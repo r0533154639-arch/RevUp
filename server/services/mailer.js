@@ -40,6 +40,26 @@ export const sendLessonApprovedEmail = (to, studentName, date, time) =>
     </div>
   `);
 
+export const sendStudentEnrolledEmail = (to, instructorName, studentName) =>
+  send(to, `תלמיד חדש נרשם אצלך 🎓`, `
+    <div dir="rtl" style="font-family:Arial,sans-serif">
+      <h2>שלום ${instructorName}!</h2>
+      <p>התלמיד <strong>${studentName}</strong> נרשם אצלך כתלמיד.</p>
+      <p>תוכל לצפות בפרטיו בלוח הבקרה שלך.</p>
+    </div>
+  `);
+
+export const sendLessonScheduledEmail = (to, instructorName, studentName, date, time) =>
+  send(to, 'שיעור חדש ממתין לאישורך 📅', `
+    <div dir="rtl" style="font-family:Arial,sans-serif">
+      <h2>שלום ${instructorName}!</h2>
+      <p>התלמיד <strong>${studentName}</strong> קבע שיעור וממתין לאישורך:</p>
+      <p><strong>תאריך:</strong> ${new Date(date).toLocaleDateString('he-IL')}</p>
+      <p><strong>שעה:</strong> ${time}</p>
+      <p>אנא היכנס למערכת כדי לאשר או לדחות את השיעור.</p>
+    </div>
+  `);
+
 export const sendLicensedEmail = (to, name) =>
   send(to, 'מזל טוב! עברת את הטסט 🏆', `
     <div dir="rtl" style="font-family:Arial,sans-serif">

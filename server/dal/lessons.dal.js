@@ -61,6 +61,20 @@ export const approveLessonById = async (lessonId, instructorUserId) => {
   );
 };
 
+export const getLessonWithInstructor = async (lessonId) => {
+  const [[row]] = await pool.query(
+    `SELECT dl.date, dl.time, us.name AS student_name,
+            ui.name AS instructor_name, ui.email AS instructor_email
+     FROM driving_lessons dl
+     JOIN users us ON us.id = dl.student_id
+     JOIN driving_instructor di ON di.id = dl.instructor_id
+     JOIN users ui ON ui.id = di.user_id
+     WHERE dl.id = ?`,
+    [lessonId]
+  );
+  return row || null;
+};
+
 export const getLessonWithStudent = async (lessonId) => {
   const [[row]] = await pool.query(
     `SELECT dl.date, dl.time, u.name AS student_name, u.email AS student_email

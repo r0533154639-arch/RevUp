@@ -1,6 +1,6 @@
-import { getStudentProgress, setStudentStatus, getStudentsByInstructor, chooseInstructor, getInstructorAchievements, getStudentInstructor, updateProfileImage } from '../dal/students.dal.js';
-import { findUserById } from '../dal/students.dal.js';
-import { sendLicensedEmail } from '../services/mailer.js';
+import { getStudentProgress, setStudentStatus, getStudentsByInstructor, chooseInstructor, getInstructorAchievements, getStudentInstructor, updateProfileImage, findUserById } from '../dal/students.dal.js';
+import { sendLicensedEmail, sendStudentEnrolledEmail } from '../services/mailer.js';
+import pool from '../config/db.js';
 
 export const getProgress = async (req, res) => {
   const data = await getStudentProgress(req.user.id);
@@ -23,6 +23,15 @@ export const getMyStudents = async (req, res) => {
 
 export const selectInstructor = async (req, res) => {
   await chooseInstructor(req.user.id, req.body.instructorId);
+  try {
+    const student = await findUserById(req.user.id);
+    const [[instrUser]] = await pool.query(
+      'SELECT u.email, u.name FROM users u JOIN driving_instructor di ON di.user_id = u.id WHERE di.user_id = ?',
+      [req.body.instructorId]
+    );
+    if (student && instrUser)
+      sendStudentEnrolledEmail(instrUser.email, instrUser.name, student.name).catch(console.error);
+  } catch {}
   res.json({ success: true });
 };
 
