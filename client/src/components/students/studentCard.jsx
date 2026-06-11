@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { submitLessonFeedback } from '../../services/stats.service.js';
 
-export default function StudentCard({ student }) {
+export default function StudentCard({ student, onStatusChange }) {
   const [open, setOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [form, setForm] = useState({ rating: 5, notes: '' });
@@ -90,8 +90,16 @@ export default function StudentCard({ student }) {
               </div>
             )}
 
+            {student.status === 'theory' && onStatusChange && (
+              <button
+                className="feedback-toggle-btn"
+                onClick={() => onStatusChange(student.id, 'lessons')}
+              >
+                ✅ עבר תאוריה
+              </button>
+            )}
+
             <button
-              className="feedback-toggle-btn"
               onClick={() => { if (student.last_lesson_id) { setFeedbackOpen(p => !p); setSent(false); } }}
               disabled={!student.last_lesson_id}
               title={!student.last_lesson_id ? 'אין שיעור קודם עם תלמיד זה' : ''}

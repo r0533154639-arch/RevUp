@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import StudentCard from '../../components/students/studentCard.jsx';
-import { getMyStudents } from '../../services/stats.service.js';
+import { getMyStudents, updateStudentStatus } from '../../services/stats.service.js';
 
 export default function StudentsList() {
   const [students, setStudents] = useState([]);
@@ -8,12 +8,19 @@ export default function StudentsList() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
+  const loadStudents = () => {
     getMyStudents()
       .then(setStudents)
       .catch(() => setError('שגיאה בטעינת התלמידים'))
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { loadStudents(); }, []);
+
+  const handleStatusChange = async (studentId, status) => {
+    await updateStudentStatus(studentId, status);
+    loadStudents();
+  };
 
   const filtered = students.filter(s => s.name.includes(search));
 
@@ -25,7 +32,7 @@ export default function StudentsList() {
       {error && <p>{error}</p>}
       {!loading && !error && filtered.length === 0 && <p>אין תלמידים עדיין</p>}
       <div className="students-list">
-        {filtered.map(s => <StudentCard key={s.id} student={s} />)}
+        {filtered.map(s => <StudentCard key={s.id} student={s} onStatusChange={handleStatusChange} />)}
       </div>
     </div>
   );

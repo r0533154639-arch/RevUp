@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import QuestionCard from '../../components/Theory/QuestionCard.jsx';
 import { api } from '../../services/api.js';
 
@@ -9,6 +10,8 @@ export default function TheoryExam() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const { username } = useParams();
 
   useEffect(() => {
     api.get('/theory/questions')
@@ -54,6 +57,11 @@ export default function TheoryExam() {
 
   return (
     <div className="theory-page">
+      <div style={{ textAlign: 'left', marginBottom: 12 }}>
+        <button className="btn-secondary" onClick={() => navigate(`/users/${username}/theory`)}>
+          עצור וחזור לחומרי הלימוד
+        </button>
+      </div>
       <h2>שאלה {current + 1} מתוך {questions.length}</h2>
       <QuestionCard
         number={current + 1}
@@ -62,20 +70,29 @@ export default function TheoryExam() {
         revealed={answered}
         onAnswer={handleAnswer}
       />
-      <div className="btn-row" style={{ marginTop: 12 }}>
-        {!isLast && (
-          <button onClick={() => setCurrent(c => c + 1)} disabled={!answered}>
-            שאלה הבאה
-          </button>
-        )}
-        {isLast && allAnswered && (
-          <button onClick={handleSubmit}>סיים מבחן</button>
-        )}
-        {current > 0 && (
-          <button className="btn-secondary" onClick={() => setCurrent(c => c - 1)}>
-            שאלה קודמת
-          </button>
-        )}
+      <div className="btn-row" style={{ marginTop: 12, justifyContent: 'space-between' }}>
+        <div>
+          {current > 0 && (
+            <button className="btn-secondary" onClick={() => setCurrent(c => c - 1)}>
+              → שאלה קודמת
+            </button>
+          )}
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {answered && (
+            <button className="btn-secondary" onClick={() => setAnswers(prev => { const n = {...prev}; delete n[current]; return n; })}>
+              נקה בחירה
+            </button>
+          )}
+          {!isLast && (
+            <button onClick={() => setCurrent(c => c + 1)} disabled={!answered}>
+              שאלה הבאה ←
+            </button>
+          )}
+          {isLast && allAnswered && (
+            <button onClick={handleSubmit}>סיים מבחן</button>
+          )}
+        </div>
       </div>
     </div>
   );

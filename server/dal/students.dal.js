@@ -73,7 +73,7 @@ export const getStudentProgress = async (id) => {
 };
 
 export const setStudentStatus = async (id, status) => {
-  await pool.query('UPDATE driving_students SET status_id = (SELECT id FROM student_statuses WHERE name = ?) WHERE user_id = ?', [status, id]);
+  await pool.query('UPDATE driving_students SET status = ? WHERE user_id = ?', [status, id]);
 };
 
 export const updateProfileImage = async (userId, filename) => {

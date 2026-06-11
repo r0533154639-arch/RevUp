@@ -1,4 +1,4 @@
-import { getLessonsByUser, createLesson, addFeedback, approveLessonById, getPendingLessonsCount, getNotifications, getLessonWithStudent, getLessonWithInstructor } from '../dal/lessons.dal.js';
+import { getLessonsByUser, createLesson, addFeedback, approveLessonById, rejectLessonById, getPendingLessonsCount, getNotifications, getLessonWithStudent, getLessonWithInstructor } from '../dal/lessons.dal.js';
 import { sendLessonApprovedEmail, sendLessonScheduledEmail } from '../services/mailer.js';
 import pool from '../config/db.js';
 

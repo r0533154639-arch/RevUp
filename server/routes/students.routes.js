@@ -5,7 +5,7 @@ import { upload } from '../middleware/upload.middleware.js';
 
 const router = Router();
 router.get('/progress', verifyToken, checkRole(['student', 'admin']), getProgress);
-router.put('/status', verifyToken, checkRole(['student', 'admin']), updateStatus);
+router.put('/status', verifyToken, checkRole(['student', 'admin', 'instructor']), updateStatus);
 router.get('/my-instructor', verifyToken, checkRole(['student']), getMyInstructor);
 router.put('/choose-instructor', verifyToken, checkRole(['student']), selectInstructor);
 router.get('/my-students', verifyToken, checkRole(['instructor', 'admin']), getMyStudents);

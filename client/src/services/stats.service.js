@@ -10,6 +10,7 @@ export const getInstructors = ({ areas, vehicleTypes, minRating } = {}) => {
   return api.get(`/instructors${qs ? `?${qs}` : ''}`);
 };
 export const getMyStudents = () => api.get('/students/my-students');
+export const updateStudentStatus = (studentId, status) => api.put('/students/status', { studentId, status });
 export const getAchievements = () => api.get('/students/achievements');
 // TODO: להסיר כשיהיה תהליך בחירת מורה אמיתי
 export const getMyInstructor = () => api.get('/students/my-instructor');

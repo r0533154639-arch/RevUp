@@ -8,9 +8,10 @@ export const getProgress = async (req, res) => {
 };
 
 export const updateStatus = async (req, res) => {
-  await setStudentStatus(req.user.id, req.body.status);
+  const targetId = req.body.studentId ?? req.user.id;
+  await setStudentStatus(targetId, req.body.status);
   if (req.body.status === 'licensed') {
-    const user = await findUserById(req.user.id);
+    const user = await findUserById(targetId);
     if (user) sendLicensedEmail(user.email, user.name).catch(console.error);
   }
   res.json({ success: true });

@@ -23,7 +23,7 @@ export const getAllInstructors = async ({ areas, vehicle_types, min_rating } = {
   const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
   const [rows] = await pool.query(
-    `SELECT di.id, di.area, u.name, u.phone, COALESCE(u.profile_image, NULL) AS profile_image,
+    `SELECT di.id, u.id AS user_id, di.area, u.name, u.phone, COALESCE(u.profile_image, NULL) AS profile_image,
             ROUND(AVG(ir.rating), 1) AS avg_rating, COUNT(DISTINCT ir.id) AS review_count,
             GROUP_CONCAT(DISTINCT vt.name ORDER BY vt.name SEPARATOR ', ') AS vehicle_types
      FROM driving_instructor di
@@ -32,7 +32,7 @@ export const getAllInstructors = async ({ areas, vehicle_types, min_rating } = {
      LEFT JOIN instructor_vehicle_types ivt ON ivt.instructor_id = di.id
      LEFT JOIN vehicle_types vt ON vt.id = ivt.vehicle_type_id
      ${whereClause}
-     GROUP BY di.id, di.area, u.name, u.phone, u.profile_image`,
+     GROUP BY di.id, u.id, di.area, u.name, u.phone, u.profile_image`,
     params
   );
 
