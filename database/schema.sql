@@ -530,3 +530,14 @@ CREATE TABLE contact_messages (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS test_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT NOT NULL,
+  instructor_id INT NOT NULL,
+  status ENUM('pending', 'scheduled') NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_student_request (student_id),
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (instructor_id) REFERENCES driving_instructor(id) ON DELETE CASCADE
+);
