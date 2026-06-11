@@ -10,3 +10,4 @@ CREATE TABLE IF NOT EXISTS instructor_student_requests (
   FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (instructor_id) REFERENCES driving_instructor(id) ON DELETE CASCADE
 );
+--בעקרון העברתי תוכן קובץ זה לדאטה בייס שלי
