@@ -1,27 +1,66 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
 
+const STATUS_LABELS = {
+  scheduled: 'ממתין לתשובה',
+  passed: 'עבר',
+  failed: 'לא עבר',
+};
+
 export default function DrivingTest() {
-  const [tests, setTests] = useState([]);
-  const [form, setForm] = useState({ date: '', location: '' });
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
 
-  useEffect(() => { api.get('/tests').then(setTests); }, []);
+  useEffect(() => {
+    api.get('/tests/status')
+      .then(setStatus)
+      .finally(() => setLoading(false));
+  }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await api.post('/tests', form);
-    api.get('/tests').then(setTests);
+  const handleRequest = async () => {
+    setSending(true);
+    try {
+      await api.post('/tests/request');
+      setSent(true);
+      setStatus({ phase: 'requested' });
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSending(false);
+    }
   };
+
+  if (loading) return <div className="test-page">טוען...</div>;
+
+  const { phase, test, completedLessons } = status || {};
 
   return (
     <div className="test-page">
       <h2>טסט נהיגה</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
-        <input placeholder="מיקום" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} required />
-        <button type="submit">קבע טסט</button>
-      </form>
-      <ul className="test-list">{tests.map(t => <li key={t.id} className="test-item">{t.date} - {t.status}</li>)}</ul>
+
+      {phase === 'not_eligible' && (
+        <p>לא יכול עדיין לקבוע טסט ({completedLessons}/28 שיעורים הושלמו)</p>
+      )}
+
+      {phase === 'eligible' && (
+        <button onClick={handleRequest} disabled={sending}>
+          {sending ? 'שולח...' : 'שלח בקשה למורה לקביעת טסט'}
+        </button>
+      )}
+
+      {phase === 'requested' && (
+        <p>הבקשה נשלחה למורה, ממתין לתאריך טסט</p>
+      )}
+
+      {phase === 'scheduled' && test && (
+        <p>מועד הטסט: {new Date(test.date).toLocaleDateString('he-IL')}{test.time ? ` בשעה ${test.time}` : ''}</p>
+      )}
+
+      {phase === 'result' && test && (
+        <p>סטטוס הטסט: {STATUS_LABELS[test.status] ?? test.status}</p>
+      )}
     </div>
   );
 }
