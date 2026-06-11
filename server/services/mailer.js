@@ -68,3 +68,24 @@ export const sendLicensedEmail = (to, name) =>
       <p>ברוך הבא לעולם הנהגים המורשים 🚗</p>
     </div>
   `);
+
+export const sendTestRequestEmail = (to, instructorName, studentName) =>
+  send(to, 'בקשה לקביעת טסט נהיגה 📋', `
+    <div dir="rtl" style="font-family:Arial,sans-serif">
+      <h2>שלום ${instructorName}!</h2>
+      <p>התלמיד <strong>${studentName}</strong> ביקש לקבוע טסט נהיגה.</p>
+      <p>אנא היכנס למערכת כדי לקבוע מועד לטסט.</p>
+      <p>התלמיד השלים את השיעורים הנדרשים ומוכן לטסט.</p>
+    </div>
+  `);
+
+export const sendTestScheduledEmail = (to, studentName, date, time) =>
+  send(to, 'מועד הטסט נקבע! 📅', `
+    <div dir="rtl" style="font-family:Arial,sans-serif">
+      <h2>שלום ${studentName}!</h2>
+      <p>המורה שלך קבע לך מועד לטסט נהיגה:</p>
+      <p><strong>תאריך:</strong> ${new Date(date).toLocaleDateString('he-IL')}</p>
+      <p><strong>שעה:</strong> ${time}</p>
+      <p>בהצלחה!</p>
+    </div>
+  `);
