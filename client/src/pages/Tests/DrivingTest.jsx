@@ -47,6 +47,17 @@ export default function DrivingTest() {
     </div>
   );
 
+  if (phase === 'result' && test?.status === 'failed') return (
+    <div className="test-page" style={{ textAlign: 'center', padding: '60px 20px' }}>
+      <div style={{ fontSize: 80 }}>😔</div>
+      <h2 style={{ fontSize: 28, color: '#ef4444', margin: '16px 0 8px' }}>לא עברת את הטסט הפעם</h2>
+      <p style={{ fontSize: 16, color: '#555', marginTop: 8 }}>אל תתייאש! אפשר לנסות שוב.</p>
+      <button style={{ marginTop: 24 }} onClick={handleRequest} disabled={sending}>
+        {sending ? 'שולח...' : 'שלח בקשה למורה שיקבע טסט עבורי'}
+      </button>
+    </div>
+  );
+
   return (
     <div className="test-page">
       <h2>טסט נהיגה</h2>

@@ -104,6 +104,42 @@
 
 .block-btn:hover { opacity: 0.75; }
 
+/* ─── Modal ─── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #1e293b;
+  border: 1px solid #2d3748;
+  border-radius: 16px;
+  padding: 28px 24px;
+  min-width: 280px;
+  color: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+
+.modal h3 { margin: 0 0 8px; font-size: 18px; }
+
+.modal button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+}
+
 /* ─── Admin Instructors ─── */
 .admin-instructors .instructors-list {
   display: grid;

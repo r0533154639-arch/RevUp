@@ -1,7 +1,7 @@
 import pool from '../config/db.js';
 import { getAllStudents, updateStudentStatus, getAllInstructors, getInstructorAchievements, getAllPosts, getAllComments, toggleUserBlock, getAllUsers } from '../dal/admin.dal.js';
 import { approveInstructor, getPendingInstructors } from '../dal/instructors.dal.js';
-import { sendLicensedEmail } from '../services/mailer.js';
+import { sendLicensedEmail, sendTestFailedEmail } from '../services/mailer.js';
 
 export const getDashboard = async (req, res) => {
   try {
@@ -108,7 +108,37 @@ export const getStudents = async (req, res) => {
 
 export const updateStatus = async (req, res) => {
   try {
-    await updateStudentStatus(req.params.studentId, req.body.status);
+    const { studentId } = req.params;
+    const { status } = req.body;
+    if (status === 'test') {
+      const [[hasTest]] = await pool.query(
+        'SELECT id FROM tests WHERE student_id = ? LIMIT 1', [studentId]
+      );
+      if (!hasTest) return res.status(400).json({ message: 'לא ניתן לשנות לסטטוס טסט ללא טסט קיים' });
+    }
+    await updateStudentStatus(studentId, status);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+export const updateTestResult = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const { result } = req.body; // 'passed' or 'failed'
+    const statusVal = result === 'passed' ? 'passed' : 'failed';
+    await pool.query(
+      `UPDATE tests SET status = ? WHERE student_id = ? ORDER BY id DESC LIMIT 1`,
+      [statusVal, studentId]
+    );
+    if (result === 'passed') {
+      await updateStudentStatus(studentId, 'licensed');
+      const [[user]] = await pool.query('SELECT name, email FROM users WHERE id = ?', [studentId]);
+      if (user) sendLicensedEmail(user.email, user.name).catch(console.error);
+    } else {
+      await updateStudentStatus(studentId, 'lessons');
+      const [[user]] = await pool.query('SELECT name, email FROM users WHERE id = ?', [studentId]);
+      if (user) sendTestFailedEmail(user.email, user.name).catch(console.error);
+    }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };

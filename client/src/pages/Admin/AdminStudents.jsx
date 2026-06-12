@@ -4,76 +4,48 @@ import '../../styles/admin.css';
 
 export default function AdminStudents() {
   const [students, setStudents] = useState([]);
+  const [testResultModal, setTestResultModal] = useState(null);
   const { token } = useAuth();
 
-  useEffect(() => {
-    fetchStudents();
-  }, []);
+  useEffect(() => { fetchStudents(); }, []);
 
   const fetchStudents = async () => {
     try {
-      console.log('Fetching students with token:', token ? 'exists' : 'missing');
       const res = await fetch('http://localhost:3000/api/admin/students', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      console.log('Response status:', res.status);
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error('Error response:', errorText);
-        return;
-      }
-      const data = await res.json();
-      console.log('Students data:', data);
-      setStudents(data);
+      if (!res.ok) return;
+      setStudents(await res.json());
     } catch (err) {
       console.error('Error fetching students:', err);
     }
   };
 
-  const updateStudentStatus = async (studentId) => {
+  const updateTestResult = async (studentId, result) => {
     try {
-      await fetch(`http://localhost:3000/api/admin/students/${studentId}/status`, {
+      await fetch(`http://localhost:3000/api/admin/students/${studentId}/test-result`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ status: 'licensed' })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ result })
       });
+      setTestResultModal(null);
       fetchStudents();
     } catch (err) {
-      console.error('Error updating status:', err);
+      alert('שגיאה: ' + err.message);
     }
   };
 
   const toggleUserBlock = async (userId, currentlyBlocked) => {
     try {
-      const newBlockStatus = !currentlyBlocked;
-      console.log('Blocking user:', userId, 'new status:', newBlockStatus);
-      
       const res = await fetch(`http://localhost:3000/api/admin/users/${userId}/block`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ isBlocked: newBlockStatus })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ isBlocked: !currentlyBlocked })
       });
-
-      console.log('Response status:', res.status);
-      const responseText = await res.text();
-      console.log('Response:', responseText);
-
-      if (res.ok) {
-        fetchStudents();
-        alert(newBlockStatus ? 'התלמיד נחסם בהצלחה' : 'החסימה הוסרה בהצלחה');
-      } else {
-        console.error('Server error:', responseText);
-        alert('שגיאה בעדכון סטטוס התלמיד: ' + responseText);
-      }
+      if (res.ok) fetchStudents();
+      else alert('שגיאה בעדכון סטטוס התלמיד');
     } catch (err) {
-      console.error('Error toggling user block:', err);
-      alert('שגיאה בעדכון סטטוס התלמיד: ' + err.message);
+      alert('שגיאה: ' + err.message);
     }
   };
 
@@ -102,12 +74,10 @@ export default function AdminStudents() {
                 </span>
               </td>
               <td>
-                {student.status === 'test' && !student.is_blocked && (
-                  <button onClick={() => updateStudentStatus(student.id)}>
-                    סמן כ-Licensed
-                  </button>
+                {student.status === 'test' && (
+                  <button onClick={() => setTestResultModal(student)}>עדכן תוצאות טסט</button>
                 )}
-                <button 
+                <button
                   className={`block-btn ${student.is_blocked ? 'unblock' : 'block'}`}
                   onClick={() => toggleUserBlock(student.id, student.is_blocked)}
                 >
@@ -117,12 +87,21 @@ export default function AdminStudents() {
             </tr>
           ))}
           {(!Array.isArray(students) || students.length === 0) && (
-            <tr>
-              <td colSpan="5">לא נמצאו תלמידים</td>
-            </tr>
+            <tr><td colSpan="5">לא נמצאו תלמידים</td></tr>
           )}
         </tbody>
       </table>
+
+      {testResultModal && (
+        <div className="modal-overlay" onClick={() => setTestResultModal(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>עדכון תוצאות טסט - {testResultModal.name}</h3>
+            <button onClick={() => updateTestResult(testResultModal.id, 'passed')}>✅ עבר</button>
+            <button onClick={() => updateTestResult(testResultModal.id, 'failed')}>❌ לא עבר</button>
+            <button onClick={() => setTestResultModal(null)}>ביטול</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

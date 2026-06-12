@@ -120,6 +120,13 @@ export default function AdminDashboard({ user }) {
     api.get('/admin/dashboard').then(setData).finally(() => setLoading(false));
   };
 
+  const [testResultModal, setTestResultModal] = useState(null);
+
+  const handleTestResult = async (studentId, result) => {
+    await api.put(`/admin/students/${studentId}/test-result`, { result });
+    setTestResultModal(null);
+    load();
+  };
   const [dismissPending, setDismissPending] = useState(false);
   const [pendingInstructors, setPendingInstructors] = useState([]);
   const [pendingModal, setPendingModal] = useState(false);
@@ -175,6 +182,18 @@ export default function AdminDashboard({ user }) {
   return (
     <div className="page-container" style={{ direction: 'rtl' }}>
       {selected && <ProfileModal user={selected} onClose={() => setSelected(null)} onBlock={handleBlock} />}
+      {testResultModal && (
+        <div className="modal-overlay" onClick={() => setTestResultModal(null)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ textAlign: 'center', minWidth: 300 }}>
+            <p style={{ fontWeight: 700, fontSize: 16, marginBottom: 16 }}>עדכון תוצאת טסט - {testResultModal.name}</p>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+              <button onClick={() => handleTestResult(testResultModal.id, 'passed')} style={{ background: '#22c55e', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', cursor: 'pointer', fontWeight: 600 }}>✅ עבר</button>
+              <button onClick={() => handleTestResult(testResultModal.id, 'failed')} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', cursor: 'pointer', fontWeight: 600 }}>❌ לא עבר</button>
+              <button onClick={() => setTestResultModal(null)} style={{ background: '#e5e7eb', border: 'none', borderRadius: 6, padding: '8px 16px', cursor: 'pointer' }}>ביטול</button>
+            </div>
+          </div>
+        </div>
+      )}
       {editCell && <EditCellModal cell={editCell} onClose={() => setEditCell(null)} onSave={handleSave} />}
 
       <h2 style={{ marginBottom: 8 }}>ניהול האתר</h2>
@@ -237,7 +256,12 @@ export default function AdminDashboard({ user }) {
                 <td style={tdStyle}>{s.instructor_name || '—'}</td>
                 <td style={tdEditStyle} onDoubleClick={() => openEdit('driving_students', s.id, 'status', s.status, 'סטטוס תלמיד', STUDENT_STATUSES)}>{s.status}</td>
                 <td style={tdEditStyle} onDoubleClick={() => openEdit('users', s.id, 'is_blocked', String(s.is_blocked), 'חסימה', BLOCKED_OPTIONS)}>{s.is_blocked ? '🚫' : '✅'}</td>
-                <td style={tdStyle}><button style={{ ...linkBtn, background: '#e5e7eb' }} onClick={() => setSelected(s)}>צפה</button></td>
+                <td style={tdStyle}>
+                  {s.status === 'test' && (
+                    <button style={{ ...linkBtn, background: '#f59e0b', color: '#fff', marginLeft: 4 }} onClick={() => setTestResultModal(s)}>עדכן תוצאת טסט</button>
+                  )}
+                  <button style={{ ...linkBtn, background: '#e5e7eb' }} onClick={() => setSelected(s)}>צפה</button>
+                </td>
               </tr>
             ))}
           </tbody>

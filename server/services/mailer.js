@@ -69,6 +69,16 @@ export const sendLicensedEmail = (to, name) =>
     </div>
   `);
 
+export const sendTestFailedEmail = (to, name) =>
+  send(to, 'תוצאות טסט הנהיגה', `
+    <div dir="rtl" style="font-family:Arial,sans-serif">
+      <h2>שלום ${name},</h2>
+      <p>הפעם לא עברת את טסט הנהיגה.</p>
+      <p>אל תתייאש! תוכל לבקש מהמורה לקבוע טסט חוזר.</p>
+      <p>בהצלחה בפעם הבאה 💪</p>
+    </div>
+  `);
+
 export const sendTestRequestEmail = (to, instructorName, studentName) =>
   send(to, 'בקשה לקביעת טסט נהיגה 📋', `
     <div dir="rtl" style="font-family:Arial,sans-serif">

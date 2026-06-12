@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getDashboard, blockUser, updateCell, getStudents, updateStatus, getInstructors, getAchievements, getPosts, getComments, getUsers, getPendingInstructorsList, approveInstructorById } from '../controllers/admin.controller.js';
+import { getDashboard, blockUser, updateCell, getStudents, updateStatus, updateTestResult, getInstructors, getAchievements, getPosts, getComments, getUsers, getPendingInstructorsList, approveInstructorById } from '../controllers/admin.controller.js';
 import { verifyToken, checkRole } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -7,6 +7,7 @@ router.get('/dashboard', verifyToken, checkRole(['admin']), getDashboard);
 router.get('/users', verifyToken, checkRole(['admin']), getUsers);
 router.get('/students', verifyToken, checkRole(['admin']), getStudents);
 router.put('/students/:studentId/status', verifyToken, checkRole(['admin']), updateStatus);
+router.put('/students/:studentId/test-result', verifyToken, checkRole(['admin']), updateTestResult);
 router.put('/users/:id/block', verifyToken, checkRole(['admin']), blockUser);
 router.put('/table/:table/:id', verifyToken, checkRole(['admin']), updateCell);
 router.get('/instructors', verifyToken, checkRole(['admin']), getInstructors);

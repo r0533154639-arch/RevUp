@@ -48,7 +48,10 @@ export const getTestStatus = async (req, res) => {
         return res.json({ phase: 'scheduled', test: latestTest });
       }
 
-      if (testDate < today) {
+      if (testDate < today || latestTest.status === 'passed' || latestTest.status === 'failed') {
+        if (latestTest.status === 'passed') {
+          return res.json({ phase: 'licensed' });
+        }
         return res.json({ phase: 'result', test: latestTest });
       }
     }
