@@ -26,14 +26,8 @@ export default function ScheduleLessons() {
   const [cancelModal, setCancelModal] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(() => ({ year: new Date().getFullYear(), month: new Date().getMonth() }));
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [pendingRequests, setPendingRequests] = useState([]);
   const [notifications, setNotifications] = useState({ pending: [], cancelRequests: [], cancelRejections: [] });
   const [actionModal, setActionModal] = useState(null);
-
-  const fetchPendingRequests = useCallback(async () => {
-    if (!isInstructor) return;
-    api.get('/student-requests/pending').then(setPendingRequests).catch(() => {});
-  }, [isInstructor]);
 
 
   const fetchLessons = useCallback(async () => {
@@ -73,7 +67,7 @@ export default function ScheduleLessons() {
   useEffect(() => {
     fetchLessons();
     fetchNotifications();
-    if (isInstructor) { fetchTemplate(); fetchPendingRequests(); }
+    if (isInstructor) { fetchTemplate(); }
   }, []);
 
   useEffect(() => {
@@ -233,41 +227,6 @@ export default function ScheduleLessons() {
       {/* תצוגת שיעורים */}
       {view === 'lessons' && (
         <div>
-          {isInstructor && pendingRequests.length > 0 && (
-            <div style={{ background: '#f0f9ff', border: '1px solid #7dd3fc', borderRadius: 8, padding: '14px 16px', marginBottom: 20 }}>
-              <p style={{ fontWeight: 700, color: '#0369a1', marginBottom: 10, fontSize: 15 }}>
-                👤 {pendingRequests.length} תלמידים מבקשים להצטרף אליך:
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {pendingRequests.map(req => (
-                  <div key={req.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', borderRadius: 6, padding: '10px 14px', border: '1px solid #bae6fd' }}>
-                    <div>
-                      <div style={{ fontWeight: 600 }}>{req.student_name}</div>
-                      <div style={{ fontSize: 13, color: '#666' }}>
-                        {req.student_phone && <span>📞 {req.student_phone} | </span>}
-                        {req.vehicle_type && <span>🚗 {req.vehicle_type}</span>}
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <button
-                        onClick={async () => { await api.put(`/student-requests/${req.id}/approve`); fetchPendingRequests(); fetchLessons(); }}
-                        style={{ background: '#22c55e', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
-                      >
-                        אשר ✓
-                      </button>
-                      <button
-                        onClick={async () => { await api.put(`/student-requests/${req.id}/reject`); fetchPendingRequests(); }}
-                        style={{ background: 'none', color: '#ef4444', border: '1px solid #fca5a5', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontSize: 13 }}
-                      >
-                        דחה ✕
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {/* בקשות תלמידים ממתינות — למורה בלבד */}
           {!isInstructor && (
             <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, padding: '12px 16px', marginBottom: 20, display: 'flex', gap: 24 }}>
               <span style={{ fontSize: 14, color: '#0369a1' }}>📚 סה"כ שיעורים: <strong>{lessons.length}</strong></span>

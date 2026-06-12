@@ -1,4 +1,4 @@
-const BASE = '/api';
+const BASE = 'http://localhost:3000/api';
 
 const getHeaders = () => ({
   'Content-Type': 'application/json',
