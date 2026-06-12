@@ -27,6 +27,8 @@ export default function TheoryMaterials() {
     }
   };
 
+  const alreadyPassed = user?.status !== 'theory';
+
   return (
     <div className="theory-page">
       <h2>חומרי לימוד - תאוריה</h2>
@@ -34,7 +36,7 @@ export default function TheoryMaterials() {
       <div className="btn-row" style={{ marginTop: 16 }}>
         <button onClick={() => navigate(`/users/${username}/theoryExam`)}>לתרגול מבחן</button>
         <button className="btn-secondary" onClick={() => navigate(`/users/${username}/theorySchedule`)}>קביעת מועד לתאוריה</button>
-        <button onClick={handlePassedTheory} disabled={loading}>
+        <button onClick={handlePassedTheory} disabled={loading || alreadyPassed} style={alreadyPassed ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>
           {loading ? '...' : '✅ עברתי תאוריה'}
         </button>
       </div>
