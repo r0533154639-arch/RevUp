@@ -12,8 +12,6 @@ const REGIONS = [
   { value: 'sharon',    label: 'שרון' },
 ];
 
-const VEHICLE_TYPES = ['רכב פרטי', 'אופנוע', 'משאית', 'אוטובוס'];
-
 const REGION_CITIES = {
   north:     ['חיפה','נצרת','עכו','כרמיאל','טבריה','צפת','קריות','נהריה','יוקנעם','עפולה','בית שאן','מגדל העמק','שפרעם','אום אל פחם'],
   center:    ['תל אביב','רמת גן','פתח תקווה','ראשון לציון','חולון','בת ים','גבעתיים','בני ברק','הרצליה','רעננה','כפר סבא','רמת השרון','אור יהודה','לוד','רמלה','מודיעין','אזור','יהוד','קריית אונו','גבעת שמואל','ראש העין'],
@@ -30,7 +28,6 @@ export default function SearchInstructors() {
   const [myRequest, setMyRequest] = useState(null);
   const [nameSearch, setNameSearch] = useState('');
   const [areas, setAreas] = useState([]);
-  const [vehicleTypes, setVehicleTypes] = useState([]);
   const [minRating, setMinRating] = useState(0);
 
   useEffect(() => {
@@ -48,18 +45,13 @@ export default function SearchInstructors() {
         const cities = areas.flatMap(a => REGION_CITIES[a] || []);
         if (!cities.some(c => i.area?.includes(c))) return false;
       }
-      if (vehicleTypes.length > 0) {
-        const instructorTypes = (i.vehicle_types || '').split(', ').map(s => s.trim());
-        if (!vehicleTypes.some(vt => instructorTypes.includes(vt))) return false;
-      }
       if (minRating > 0 && (!i.avg_rating || i.avg_rating < minRating)) return false;
       return true;
     });
-  }, [allInstructors, nameSearch, areas, vehicleTypes, minRating]);
+  }, [allInstructors, nameSearch, areas, minRating]);
 
   const toggleArea = (v) => setAreas(a => a.includes(v) ? a.filter(x => x !== v) : [...a, v]);
-  const toggleVehicle = (v) => setVehicleTypes(t => t.includes(v) ? t.filter(x => x !== v) : [...t, v]);
-  const hasFilters = areas.length > 0 || vehicleTypes.length > 0 || minRating > 0;
+  const hasFilters = areas.length > 0 || minRating > 0;
 
   return (
     <div className="page-container" style={{ maxWidth: 1000 }}>
@@ -93,16 +85,6 @@ export default function SearchInstructors() {
 
           <hr className="filter-divider" />
 
-          <p className="filter-title">סוג רישיון</p>
-          {VEHICLE_TYPES.map(v => (
-            <label key={v} className="filter-label">
-              <input type="checkbox" checked={vehicleTypes.includes(v)} onChange={() => toggleVehicle(v)} />
-              {v}
-            </label>
-          ))}
-
-          <hr className="filter-divider" />
-
           <p className="filter-title">דירוג מינימלי</p>
           <input type="range" min={0} max={5} step={0.5} value={minRating} onChange={e => setMinRating(parseFloat(e.target.value))} />
           <p className="filter-rating-value">
@@ -111,7 +93,7 @@ export default function SearchInstructors() {
 
           {hasFilters && (
             <button
-              onClick={() => { setAreas([]); setVehicleTypes([]); setMinRating(0); }}
+              onClick={() => { setAreas([]); setMinRating(0); }}
               className="btn-secondary"
               style={{ marginTop: 14, width: '100%', fontSize: 13, padding: '6px 0' }}
             >
