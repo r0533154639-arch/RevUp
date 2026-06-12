@@ -45,6 +45,10 @@ export default function SearchInstructors() {
         const cities = areas.flatMap(a => REGION_CITIES[a] || []);
         if (!cities.some(c => i.area?.includes(c))) return false;
       }
+      if (user?.vehicle_type_name && i.vehicle_types) {
+        const types = i.vehicle_types.split(', ').map(s => s.trim());
+        if (!types.includes(user.vehicle_type_name)) return false;
+      }
       if (minRating > 0 && (!i.avg_rating || i.avg_rating < minRating)) return false;
       return true;
     });

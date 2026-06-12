@@ -13,15 +13,24 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     if (user.is_blocked)
       return res.status(403).json({ message: 'חשבונך נחסם. צור קשר עם המנהל.' });
-    
+
     let profile_status = null;
     if (user.role === 'instructor')
       profile_status = await getInstructorProfileStatus(user.id);
 
+    let vehicle_type_name = null;
+    if (user.role === 'student') {
+      const [[vtRow]] = await pool.query(
+        `SELECT vt.name FROM vehicle_types vt JOIN driving_students ds ON ds.vehicle_type_id = vt.id WHERE ds.user_id = ?`,
+        [user.id]
+      );
+      vehicle_type_name = vtRow?.name || null;
+    }
+
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({
       token,
-      user: { id: user.id, name: user.name, role: user.role, profile_image: user.profile_image, profile_status, status: user.status ?? null, instructor_user_id: user.instructor_user_id ?? null }
+      user: { id: user.id, name: user.name, role: user.role, profile_image: user.profile_image, profile_status, status: user.status ?? null, vehicle_type_name, instructor_user_id: user.instructor_user_id ?? null }
     });
   } catch (err) {
     console.error('LOGIN ERROR:', err);
@@ -98,9 +107,8 @@ export const updateProfile = async (req, res) => {
     if (req.file) await updateProfileImage(req.user.id, req.file.filename);
 
     if (req.user.role === 'instructor') {
-      if (area !== undefined) {
+      if (area !== undefined)
         await pool.query('UPDATE driving_instructor SET area = ? WHERE user_id = ?', [area, req.user.id]);
-      }
       if (vehicle_types !== undefined) {
         const vtIds = typeof vehicle_types === 'string' ? JSON.parse(vehicle_types) : vehicle_types;
         const [[instr]] = await pool.query('SELECT id FROM driving_instructor WHERE user_id = ?', [req.user.id]);
@@ -142,4 +150,3 @@ export const getVehicleTypes = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
