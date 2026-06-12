@@ -59,7 +59,7 @@ export default function TheoryExam() {
     <div className="theory-page">
       <div style={{ textAlign: 'left', marginBottom: 12 }}>
         <button className="btn-secondary" onClick={() => navigate(`/users/${username}/theory`)}>
-          עצור וחזור לחומרי הלימוד
+          חזור לעמוד התאוריה
         </button>
       </div>
       <h2>שאלה {current + 1} מתוך {questions.length}</h2>
