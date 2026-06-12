@@ -149,7 +149,7 @@ export default function ScheduleLessons() {
     : [
         { key: 'lessons', label: 'השיעורים שלי' },
         { key: 'calendar', label: 'קבע שיעור' },
-        { key: 'feedback', label: 'משובים' },
+        { key: 'feedback', label: 'עדכונים מהמורה' },
       ];
 
   return (
@@ -290,7 +290,7 @@ export default function ScheduleLessons() {
 
       {view === 'feedback' && !isInstructor && (
         <div>
-          <h3 style={{ marginBottom: 12 }}>משובים מהמורה</h3>
+          <h3 style={{ marginBottom: 12 }}>עדכונים מהמורה</h3>
           {generalFeedback.length === 0
             ? <p style={{ color: '#aaa' }}>אין משובים עדיין</p>
             : <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
