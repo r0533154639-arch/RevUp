@@ -135,18 +135,19 @@ export const getInstructorAchievements = async (instructorId, role) => {
   const [[stats]] = await pool.query(
     `SELECT
        COUNT(DISTINCT ds.user_id)                                        AS total_students,
-       COALESCE(SUM(ds.status = 'licensed'), 0)                          AS licensed_students,
+       COUNT(DISTINCT CASE WHEN ds.status = 'licensed' THEN ds.user_id END) AS tests_passed,
        COUNT(dl.id)                                                      AS total_lessons,
-       COALESCE(SUM(dl.status = 'completed'), 0)                         AS completed_lessons,
-       ROUND(SUM(dl.status = 'completed') / NULLIF(COUNT(dl.id),0)*100)  AS completion_rate,
+       COALESCE(SUM(ls.name = 'completed'), 0)                           AS completed_lessons,
+       ROUND(SUM(ls.name = 'completed') / NULLIF(COUNT(dl.id),0)*100)    AS completion_rate,
        ROUND(AVG(ir.rating),1)                                           AS avg_rating,
        COUNT(DISTINCT ir.id)                                             AS total_reviews
      FROM driving_instructor di
      LEFT JOIN driving_students ds   ON ds.instructor_id = di.id
      LEFT JOIN driving_lessons dl    ON dl.instructor_id = di.id
+     LEFT JOIN lesson_statuses ls    ON ls.id = dl.status_id
      LEFT JOIN instructor_review ir  ON ir.instructor_id = di.id
      ${where}`,
     params
   );
-  return stats ?? { total_students: 0, licensed_students: 0, total_lessons: 0, completed_lessons: 0, completion_rate: null, avg_rating: null, total_reviews: 0 };
+  return stats ?? { total_students: 0, tests_passed: 0, total_lessons: 0, completed_lessons: 0, completion_rate: null, avg_rating: null, total_reviews: 0 };
 };
