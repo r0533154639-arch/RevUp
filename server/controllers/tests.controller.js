@@ -25,6 +25,11 @@ export const getTestStatus = async (req, res) => {
   try {
     const studentId = req.user.id;
 
+    const [[ds]] = await pool.query('SELECT status FROM driving_students WHERE user_id = ?', [studentId]);
+    if (ds?.status === 'licensed') {
+      return res.json({ phase: 'licensed' });
+    }
+
     const completedLessons = await getCompletedLessonsCount(studentId);
 
     if (completedLessons < 28) {

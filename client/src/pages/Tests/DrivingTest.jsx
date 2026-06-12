@@ -37,6 +37,16 @@ export default function DrivingTest() {
 
   const { phase, test, completedLessons } = status || {};
 
+  if (phase === 'licensed') return (
+    <div className="test-page" style={{ textAlign: 'center', padding: '60px 20px' }}>
+      <div style={{ fontSize: 80 }}>🏆</div>
+      <h2 style={{ fontSize: 32, color: '#22c55e', margin: '16px 0 8px' }}>מזל טוב!</h2>
+      <p style={{ fontSize: 20, color: '#166534', fontWeight: 600 }}>עברת את טסט הנהיגה בהצלחה!</p>
+      <p style={{ fontSize: 16, color: '#555', marginTop: 12 }}>ברוך הבא לעולם הנהגים המורשים 🚗</p>
+      <div style={{ marginTop: 24, fontSize: 40 }}>🎉🎊🎉</div>
+    </div>
+  );
+
   return (
     <div className="test-page">
       <h2>טסט נהיגה</h2>
