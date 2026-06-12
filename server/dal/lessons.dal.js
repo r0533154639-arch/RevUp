@@ -53,7 +53,12 @@ export const createLesson = async ({ studentId, instructorId, date, time }) => {
 };
 
 export const addFeedback = async (lessonId, { rating, comment }) => {
-  await pool.query('INSERT INTO lesson_feedback (lesson_id, progress_rating, notes) VALUES (?, ?, ?)', [lessonId, rating, comment]);
+  const [[lesson]] = await pool.query('SELECT instructor_id, student_id FROM driving_lessons WHERE id = ?', [lessonId]);
+  if (!lesson) throw new Error('Lesson not found');
+  await pool.query(
+    'INSERT INTO lesson_feedback (lesson_id, instructor_id, student_id, progress_rating, notes) VALUES (?, ?, ?, ?, ?)',
+    [lessonId, lesson.instructor_id, lesson.student_id, rating, comment]
+  );
 };
 
 export const approveLessonById = async (lessonId, instructorUserId) => {

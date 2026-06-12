@@ -49,3 +49,27 @@ export const getAllContactMessages = async () => {
   );
   return rows;
 };
+
+// משובים כלליים ממורה לתלמיד
+export const saveGeneralFeedback = async (instructorUserId, studentId, rating, notes) => {
+  const [[instr]] = await pool.query('SELECT id FROM driving_instructor WHERE user_id = ?', [instructorUserId]);
+  if (!instr) throw new Error('Instructor not found');
+  await pool.query(
+    `INSERT INTO general_feedback (instructor_id, student_id, rating, notes) VALUES (?, ?, ?, ?)`,
+    [instr.id, studentId, rating, notes]
+  );
+};
+
+export const getGeneralFeedbackForStudent = async (studentId) => {
+  const [rows] = await pool.query(
+    `SELECT gf.id, gf.rating, gf.notes, gf.created_at,
+            u.name AS instructor_name
+     FROM general_feedback gf
+     JOIN driving_instructor di ON di.id = gf.instructor_id
+     JOIN users u ON u.id = di.user_id
+     WHERE gf.student_id = ?
+     ORDER BY gf.created_at DESC`,
+    [studentId]
+  );
+  return rows;
+};

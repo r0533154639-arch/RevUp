@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { getLessons, scheduleLesson } from '../../services/lessons.service.js';
+import { getMyGeneralFeedback } from '../../services/stats.service.js';
 import { api } from '../../services/api.js';
 import CalendarView from '../../components/Lessons/CalendarView.jsx';
 import WeeklyTemplateEditor from '../../components/Lessons/WeeklyTemplateEditor.jsx';
@@ -28,6 +29,7 @@ export default function ScheduleLessons() {
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [notifications, setNotifications] = useState({ pending: [], cancelRequests: [], cancelRejections: [] });
   const [actionModal, setActionModal] = useState(null);
+  const [generalFeedback, setGeneralFeedback] = useState([]);
 
 
   const fetchLessons = useCallback(async () => {
@@ -39,6 +41,13 @@ export default function ScheduleLessons() {
     try {
       const data = await api.get('/lessons/notifications');
       setNotifications(data);
+    } catch {}
+  }, []);
+
+  const fetchGeneralFeedback = useCallback(async () => {
+    try {
+      const data = await getMyGeneralFeedback();
+      setGeneralFeedback(data);
     } catch {}
   }, []);
 
@@ -67,6 +76,7 @@ export default function ScheduleLessons() {
   useEffect(() => {
     fetchLessons();
     fetchNotifications();
+    if (!isInstructor) { fetchGeneralFeedback(); }
     if (isInstructor) { fetchTemplate(); }
   }, []);
 
@@ -139,6 +149,7 @@ export default function ScheduleLessons() {
     : [
         { key: 'lessons', label: 'השיעורים שלי' },
         { key: 'calendar', label: 'קבע שיעור' },
+        { key: 'feedback', label: 'משובים' },
       ];
 
   return (
@@ -275,6 +286,26 @@ export default function ScheduleLessons() {
           }}
         />
         </>
+      )}
+
+      {view === 'feedback' && !isInstructor && (
+        <div>
+          <h3 style={{ marginBottom: 12 }}>משובים מהמורה</h3>
+          {generalFeedback.length === 0
+            ? <p style={{ color: '#aaa' }}>אין משובים עדיין</p>
+            : <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {generalFeedback.map(f => (
+                  <div key={f.id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontWeight: 600 }}>דירוג: {f.rating}/5</span>
+                      <span style={{ color: '#666', fontSize: 13 }}>{new Date(f.created_at).toLocaleDateString('he-IL')}</span>
+                    </div>
+                    <p style={{ margin: 0, color: '#333' }}>{f.notes}</p>
+                  </div>
+                ))}
+              </div>
+          }
+        </div>
       )}
 
       {view === 'template' && isInstructor && (
