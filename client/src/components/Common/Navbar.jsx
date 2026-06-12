@@ -219,6 +219,7 @@ export default function Navbar() {
     { label: 'טסט', page: 'test' },
     { label: 'פוסטים', page: 'posts' },
     ...(!user?.instructor_id ? [{ label: 'חפש מורה', page: 'instructors' }] : []),
+    ...(user?.status === 'licensed' ? [{ label: '🎉 נהג חדש', page: 'newDriver' }] : []),
   ];
 
   const links = user?.role === 'instructor' ? INSTRUCTOR_LINKS : studentLinks;

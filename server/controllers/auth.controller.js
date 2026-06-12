@@ -21,7 +21,7 @@ export const login = async (req, res) => {
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({
       token,
-      user: { id: user.id, name: user.name, role: user.role, profile_image: user.profile_image, profile_status, instructor_user_id: user.instructor_user_id ?? null }
+      user: { id: user.id, name: user.name, role: user.role, profile_image: user.profile_image, profile_status, status: user.status ?? null, instructor_user_id: user.instructor_user_id ?? null }
     });
   } catch (err) {
     console.error('LOGIN ERROR:', err);
@@ -57,6 +57,7 @@ export const getMe = async (req, res) => {
       profile_image: user.profile_image,
       phone: user.phone,
       date_of_birth: user.date_of_birth,
+      status: user.status ?? null,
     };
     if (user.role === 'instructor') {
       const [instrRows] = await pool.query('SELECT area FROM driving_instructor WHERE user_id = ?', [user.id]);
@@ -107,7 +108,7 @@ export const updateProfile = async (req, res) => {
     }
 
     const user = await findUserById(req.user.id);
-    const response = { id: user.id, name: user.name, role: user.role, profile_image: user.profile_image, phone: user.phone, date_of_birth: user.date_of_birth };
+    const response = { id: user.id, name: user.name, role: user.role, profile_image: user.profile_image, phone: user.phone, date_of_birth: user.date_of_birth, status: user.status ?? null };
     if (user.role === 'instructor') {
       const [instrRows] = await pool.query('SELECT area FROM driving_instructor WHERE user_id = ?', [user.id]);
       response.area = instrRows[0]?.area || '';

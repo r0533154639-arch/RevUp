@@ -1513,3 +1513,82 @@ button[type="submit"] {
 @media (max-width: 400px) {
   .dashboard-cards-container { grid-template-columns: 1fr; }
 }
+
+/* ─── New Driver Dashboard ─── */
+.nd-page { max-width: 700px; }
+
+.nd-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.nd-hero-icon { font-size: 44px; flex-shrink: 0; }
+.nd-hero h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+
+.nd-sections { display: flex; flex-direction: column; gap: 10px; }
+
+.nd-section {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+
+.nd-section-open { border-color: var(--primary); }
+
+.nd-section-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--bg-soft);
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: right;
+  transition: background var(--transition);
+}
+
+.nd-section-header:hover { background: var(--bg); }
+.nd-section-header:active { transform: none; }
+
+.nd-section-icon { font-size: 20px; flex-shrink: 0; }
+.nd-section-title { flex: 1; }
+.nd-section-chevron { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+
+.nd-section-body {
+  list-style: none;
+  padding: 14px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+}
+
+.nd-section-item {
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.nd-item-dot { color: var(--primary); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+.nd-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color var(--transition);
+}
+.nd-link:hover { color: var(--primary-dark); text-decoration: underline; }

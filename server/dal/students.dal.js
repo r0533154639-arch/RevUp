@@ -4,7 +4,7 @@ export const findUserByEmail = async (email) => {
   const [rows] = await pool.query(
     `SELECT u.id, u.name, u.email, u.phone, u.date_of_birth, u.profile_image, u.is_blocked,
             u.role, p.password_hash AS password,
-            ds.instructor_id,
+            ds.instructor_id, ds.status,
             di.user_id AS instructor_user_id
      FROM users u
      JOIN passwords p ON p.user_id = u.id
@@ -20,7 +20,7 @@ export const findUserById = async (id) => {
   const [rows] = await pool.query(
     `SELECT u.id, u.name, u.email, u.phone, u.date_of_birth, u.profile_image, u.is_blocked,
             u.role, p.password_hash AS password,
-            ds.instructor_id,
+            ds.instructor_id, ds.status,
             di.user_id AS instructor_user_id
      FROM users u
      JOIN passwords p ON p.user_id = u.id

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth.js';
 import { api } from '../../services/api.js';
 import '../../styles/tests.css';
 
@@ -9,6 +11,7 @@ const STATUS_LABELS = {
 };
 
 export default function DrivingTest() {
+  const { user } = useAuth();
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -44,6 +47,17 @@ export default function DrivingTest() {
       <p style={{ fontSize: 20, color: '#166534', fontWeight: 600 }}>עברת את טסט הנהיגה בהצלחה!</p>
       <p style={{ fontSize: 16, color: '#555', marginTop: 12 }}>ברוך הבא לעולם הנהגים המורשים 🚗</p>
       <div style={{ marginTop: 24, fontSize: 40 }}>🎉🎊🎉</div>
+      <Link
+        to={`/users/${user?.id}/newDriver`}
+        style={{
+          display: 'inline-block', marginTop: 28,
+          background: '#6366f1', color: '#fff',
+          padding: '12px 28px', borderRadius: 10,
+          fontWeight: 700, fontSize: 16, textDecoration: 'none'
+        }}
+      >
+        🚗 למדריך נהג חדש
+      </Link>
     </div>
   );
 

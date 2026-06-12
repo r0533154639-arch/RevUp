@@ -10,6 +10,7 @@ import Dashboard from '../../pages/Lessons/Dashboard.jsx';
 import ScheduleLessons from '../../pages/Lessons/ScheduleLessons.jsx';
 import DrivingTest from '../../pages/Tests/DrivingTest.jsx';
 import LicenseReady from '../../pages/Graduation/LicenseReady.jsx';
+import NewDriverDashboard from '../../pages/Graduation/NewDriverDashboard.jsx';
 import StudentsList from '../../pages/Instructor/StudentsList.jsx';
 import Achievements from '../../pages/Instructor/Achievements.jsx';
 import Posts from '../../pages/Instructor/Posts.jsx';
@@ -30,6 +31,7 @@ const PAGE_MAP = {
   schedule:            { component: ScheduleLessons,   allowedRoles: ['student', 'instructor', 'admin'] },
   test:                { component: DrivingTest,       allowedRoles: ['student', 'admin'] },
   license:             { component: LicenseReady,      allowedRoles: ['student', 'admin'] },
+  newDriver:           { component: NewDriverDashboard, allowedRoles: ['student', 'admin'], requireStatus: 'licensed' },
   students:            { component: StudentsList,      allowedRoles: ['instructor', 'admin'] },
   achievements:        { component: Achievements,      allowedRoles: ['instructor', 'admin'] },
   posts:               { component: Posts },
@@ -75,6 +77,7 @@ export default function DynamicPage() {
   }
 
   if (entry.allowedRoles && !entry.allowedRoles.includes(user.role) && user.role !== 'admin') return <Navigate to="/" />;
+  if (entry.requireStatus && user.status !== entry.requireStatus && user.role !== 'admin') return <Navigate to="/" />;
 
   const needsInstructor = (page === 'lessons' || page === 'schedule') && user.role === 'student' && !user.instructor_id;
   if (needsInstructor) {
