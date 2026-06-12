@@ -9,7 +9,7 @@ export const getAllInstructors = async ({ areas, vehicle_types, min_rating } = {
     sharon:    ['נתניה','רעננה','כפר סבא','הוד השרון','רמת השרון','הרצליה','רא"ש העין','טייבה','קלנסווה'],
   };
 
-  const conditions = [];
+  const conditions = ['di.profile_status = \'active\'', 'u.is_blocked = 0'];
   const params = [];
 
   if (areas?.length) {
