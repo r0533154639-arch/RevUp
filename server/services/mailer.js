@@ -99,3 +99,14 @@ export const sendTestScheduledEmail = (to, studentName, date, time) =>
       <p>בהצלחה!</p>
     </div>
   `);
+
+export const sendGeneralFeedbackEmail = (to, studentName, notes, rating) =>
+  send(to, 'קיבלת משוב חדש מהמורה 📝', `
+    <div dir="rtl" style="font-family:Arial,sans-serif">
+      <h2>שלום ${studentName}!</h2>
+      <p>המורה שלך כתב לך משוב חדש:</p>
+      <p><strong>דירוג:</strong> ${rating}/5</p>
+      <p><strong>הערות:</strong> ${notes}</p>
+      <p>אפשר לצפות בכל המשובים באזור האישי.</p>
+    </div>
+  `);

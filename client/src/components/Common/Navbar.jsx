@@ -159,7 +159,7 @@ function ProfileDropdown({ user, onLogout, onClose }) {
             <input type="file" accept="image/*" onChange={handleImageChange} style={{ fontSize: 12, margin: 0, padding: '3px 0' }} />
           </div>
           <input placeholder="טלפון" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
-          <input type="date" value={form.date_of_birth} onChange={e => setForm(f => ({ ...f, date_of_birth: e.target.value }))} />
+          <input type="date" value={form.date_of_birth} disabled style={{ opacity: 0.6, cursor: 'not-allowed' }} />
           {user.role === 'instructor' && (
             <>
               <label>עיר</label>
