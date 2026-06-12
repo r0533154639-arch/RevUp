@@ -426,7 +426,7 @@ function LessonCard({ lesson: l, isInstructor, onCancel, past, onFeedbackSaved }
           <span style={{ background: statusColor + '22', color: statusColor, borderRadius: 12, padding: '2px 10px', fontWeight: 600, fontSize: 12 }}>
             {statusLabel}
           </span>
-          {!past && l.status !== 'cancelled' && onCancel && (
+          {!past && l.status !== 'cancelled' && l.status !== 'pending' && onCancel && (
             <>
               <button
                 onClick={() => setConfirmCancel(true)}
