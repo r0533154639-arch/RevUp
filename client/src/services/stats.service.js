@@ -17,3 +17,5 @@ export const getMyInstructor = () => api.get('/students/my-instructor');
 export const chooseInstructor = (instructorId) => api.put('/students/choose-instructor', { instructorId });
 export const submitLessonFeedback = (data) => api.post('/communication/feedback', data);
 export const getMyLessonFeedback = () => api.get('/communication/feedback');
+export const submitGeneralFeedback = (data) => api.post('/communication/general-feedback', data);
+export const getMyGeneralFeedback = () => api.get('/communication/general-feedback');

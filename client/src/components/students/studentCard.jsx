@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { submitLessonFeedback } from '../../services/stats.service.js';
+import { submitGeneralFeedback } from '../../services/stats.service.js';
 
 export default function StudentCard({ student, onStatusChange }) {
   const [open, setOpen] = useState(false);
@@ -16,11 +16,9 @@ export default function StudentCard({ student, onStatusChange }) {
   };
 
   const handleSubmitFeedback = async () => {
-    if (!student.last_lesson_id) return;
     setLoading(true);
     try {
-      await submitLessonFeedback({
-        lessonId: student.last_lesson_id,
+      await submitGeneralFeedback({
         studentId: student.id,
         rating: form.rating,
         notes: form.notes,
@@ -99,12 +97,8 @@ export default function StudentCard({ student, onStatusChange }) {
               </button>
             )}
 
-            <button
-              onClick={() => { if (student.last_lesson_id) { setFeedbackOpen(p => !p); setSent(false); } }}
-              disabled={!student.last_lesson_id}
-              title={!student.last_lesson_id ? 'אין שיעור קודם עם תלמיד זה' : ''}
-            >
-              📋 {feedbackOpen ? 'סגור משוב' : 'כתוב משוב על השיעור האחרון'}
+            <button onClick={() => { setFeedbackOpen(p => !p); setSent(false); }}>
+              📋 {feedbackOpen ? 'סגור משוב' : 'כתוב משוב'}
             </button>
 
             {feedbackOpen && (
@@ -114,7 +108,7 @@ export default function StudentCard({ student, onStatusChange }) {
                 ) : (
                   <>
                     <div className="feedback-rating">
-                      <span className="label">דירוג השיעור</span>
+                      <span className="label">דירוג</span>
                       <div className="stars">
                         {[1,2,3,4,5].map(n => (
                           <span
@@ -127,7 +121,7 @@ export default function StudentCard({ student, onStatusChange }) {
                     </div>
                     <textarea
                       className="feedback-textarea"
-                      placeholder={`כתוב משוב ל${student.name} על השיעור האחרון...`}
+                      placeholder={`כתוב משוב ל${student.name}...`}
                       value={form.notes}
                       onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
                       rows={4}
