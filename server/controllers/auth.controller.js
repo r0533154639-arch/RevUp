@@ -59,6 +59,13 @@ export const getMe = async (req, res) => {
       date_of_birth: user.date_of_birth,
       status: user.status ?? null,
     };
+    if (user.role === 'student') {
+      const [[vtRow]] = await pool.query(
+        `SELECT vt.name FROM vehicle_types vt JOIN driving_students ds ON ds.vehicle_type_id = vt.id WHERE ds.user_id = ?`,
+        [user.id]
+      );
+      response.vehicle_type_name = vtRow?.name || null;
+    }
     if (user.role === 'instructor') {
       const [instrRows] = await pool.query('SELECT area FROM driving_instructor WHERE user_id = ?', [user.id]);
       response.area = instrRows[0]?.area || '';

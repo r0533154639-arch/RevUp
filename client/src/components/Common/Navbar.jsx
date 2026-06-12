@@ -141,6 +141,9 @@ function ProfileDropdown({ user, onLogout, onClose }) {
           {displayUser.phone && <span>📞 {displayUser.phone}</span>}
           {displayUser.date_of_birth && <span>🎂 {new Date(displayUser.date_of_birth).toLocaleDateString('he-IL')}</span>}
           {displayUser.area && <span>📍 {displayUser.area}</span>}
+          {user.role === 'student' && fullUser?.vehicle_type_name && (
+            <span>🚗 {fullUser.vehicle_type_name}</span>
+          )}
           {user.role === 'instructor' && fullUser?.vehicle_types?.length > 0 && (
             <span>🚗 {vehicleTypeOptions.filter(v => fullUser.vehicle_types.includes(v.id)).map(v => v.name).join(', ')}</span>
           )}
