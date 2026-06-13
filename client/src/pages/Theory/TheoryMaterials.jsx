@@ -18,13 +18,14 @@ function ActionButton({ label, hint, variant, ...props }) {
 export default function TheoryMaterials() {
   const navigate = useNavigate();
   const { username } = useParams();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const handlePassedTheory = async () => {
     setLoading(true);
     try {
       await updateStudentStatus(undefined, 'lessons');
+      updateUser({ status: 'lessons' });
       navigate(`/users/${user.id}/instructors`);
     } catch {
       alert('שגיאה בעדכון הסטטוס');

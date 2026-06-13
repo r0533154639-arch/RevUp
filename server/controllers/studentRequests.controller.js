@@ -3,58 +3,35 @@ import {
   getPendingRequestsForInstructor, getPendingRequestsCount,
   approveStudentRequest, rejectStudentRequest
 } from '../dal/studentRequests.dal.js';
+import { asyncHandler } from '../utils/controllerFactory.js';
 
-export const sendRequest = async (req, res) => {
-  try {
-    const { instructorUserId } = req.body;
-    await createStudentRequest(req.user.id, instructorUserId);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+export const sendRequest = asyncHandler(async (req, res) => {
+  const { instructorUserId } = req.body;
+  await createStudentRequest(req.user.id, instructorUserId);
+  res.json({ success: true });
+});
 
-export const getMyRequestStatus = async (req, res) => {
-  try {
-    const data = await getStudentRequestStatus(req.user.id);
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+export const getMyRequestStatus = asyncHandler(async (req, res) => {
+  const data = await getStudentRequestStatus(req.user.id);
+  res.json(data);
+});
 
-export const getPendingRequests = async (req, res) => {
-  try {
-    const data = await getPendingRequestsForInstructor(req.user.id);
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+export const getPendingRequests = asyncHandler(async (req, res) => {
+  const data = await getPendingRequestsForInstructor(req.user.id);
+  res.json(data);
+});
 
-export const getPendingCount = async (req, res) => {
-  try {
-    const count = await getPendingRequestsCount(req.user.id);
-    res.json({ count });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+export const getPendingCount = asyncHandler(async (req, res) => {
+  const count = await getPendingRequestsCount(req.user.id);
+  res.json({ count });
+});
 
-export const approveRequest = async (req, res) => {
-  try {
-    const studentId = await approveStudentRequest(req.params.id, req.user.id);
-    res.json({ success: true, studentId });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+export const approveRequest = asyncHandler(async (req, res) => {
+  const studentId = await approveStudentRequest(req.params.id, req.user.id);
+  res.json({ success: true, studentId });
+});
 
-export const rejectRequest = async (req, res) => {
-  try {
-    await rejectStudentRequest(req.params.id, req.user.id);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+export const rejectRequest = asyncHandler(async (req, res) => {
+  await rejectStudentRequest(req.params.id, req.user.id);
+  res.json({ success: true });
+});
