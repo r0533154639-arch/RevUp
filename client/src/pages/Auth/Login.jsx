@@ -29,7 +29,7 @@ export default function Login() {
       <h2>כניסה</h2>
       <input type="email" placeholder="אימייל" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
       <input type="password" placeholder="סיסמה" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <span className="error-msg">{error}</span>}
       <button type="submit">כניסה</button>
       <p>אין לך חשבון? <Link to="/register">הרשמה</Link></p>
     </form>

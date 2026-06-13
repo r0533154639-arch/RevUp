@@ -1,17 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
-
-const SERVER = 'http://localhost:3000';
+import { SERVER, STUDENT_STATUSES } from '../../constants/index.js';
 
 function ProfileModal({ user: u, onClose, onBlock }) {
-  console.log('ProfileModal user:', u);
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-box" onClick={e => e.stopPropagation()} style={{ textAlign: 'right', minWidth: 300 }}>
-        {u.profile_image && (
-          <img src={`${SERVER}/uploads/${u.profile_image}`} alt="" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', display: 'block', margin: '0 auto 12px' }} />
-        )}
+      <div className="modal-box admin-profile-modal" onClick={e => e.stopPropagation()}>
+        {u.profile_image && <img src={`${SERVER}/uploads/${u.profile_image}`} alt="" className="admin-profile-image" />}
         <p><strong>שם:</strong> {u.name}</p>
         {u.email && <p><strong>אימייל:</strong> {u.email}</p>}
         {u.phone && <p><strong>טלפון:</strong> {u.phone}</p>}
@@ -22,18 +18,15 @@ function ProfileModal({ user: u, onClose, onBlock }) {
         {u.student_count !== undefined && <p><strong>תלמידים:</strong> {u.student_count}</p>}
         {'is_blocked' in u && <p><strong>סטטוס:</strong> {u.is_blocked ? '🚫 חסום' : '✅ פעיל'}</p>}
         {'is_blocked' in u && (
-          <div style={{ display: 'flex', gap: 8, marginTop: 16, justifyContent: 'center' }}>
-            <button
-              onClick={() => onBlock(u)}
-              style={{ background: u.is_blocked ? '#22c55e' : '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 16px', cursor: 'pointer' }}
-            >
+          <div className="admin-profile-actions">
+            <button className={`admin-block-btn ${u.is_blocked ? 'unblock' : 'block'}`} onClick={() => onBlock(u)}>
               {u.is_blocked ? 'בטל חסימה' : 'חסום משתמש'}
             </button>
             <button onClick={onClose} className="btn-secondary">סגור</button>
           </div>
         )}
         {'is_blocked' in u === false && (
-          <div style={{ marginTop: 16, textAlign: 'center' }}>
+          <div className="admin-profile-actions">
             <button onClick={onClose} className="btn-secondary">סגור</button>
           </div>
         )}
@@ -46,33 +39,17 @@ function EditCellModal({ cell, onClose, onSave }) {
   const [value, setValue] = useState(cell.value ?? '');
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-box" onClick={e => e.stopPropagation()} style={{ textAlign: 'right', minWidth: 320 }}>
-        <p style={{ marginBottom: 8, fontWeight: 600 }}>עריכת: {cell.label}</p>
+      <div className="modal-box admin-edit-modal" onClick={e => e.stopPropagation()}>
+        <p className="admin-edit-title">עריכת: {cell.label}</p>
         {cell.options ? (
-          <select
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            autoFocus
-            style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
-          >
+          <select value={value} onChange={e => setValue(e.target.value)} autoFocus className="admin-edit-input">
             {cell.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         ) : (
-          <textarea
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            rows={3}
-            style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, resize: 'vertical', boxSizing: 'border-box' }}
-            autoFocus
-          />
+          <textarea value={value} onChange={e => setValue(e.target.value)} rows={3} autoFocus className="admin-edit-textarea" />
         )}
-        <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'center' }}>
-          <button
-            onClick={() => onSave(value)}
-            style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', cursor: 'pointer' }}
-          >
-            שמור
-          </button>
+        <div className="admin-edit-actions">
+          <button onClick={() => onSave(value)}>שמור</button>
           <button onClick={onClose} className="btn-secondary">ביטול</button>
         </div>
       </div>
@@ -80,12 +57,6 @@ function EditCellModal({ cell, onClose, onSave }) {
   );
 }
 
-const STUDENT_STATUSES = [
-  { value: 'theory', label: 'תיאוריה' },
-  { value: 'lessons', label: 'שיעורים' },
-  { value: 'test', label: 'טסט' },
-  { value: 'licensed', label: 'מורשה' },
-];
 const LESSON_STATUSES = [
   { value: 'pending', label: 'ממתין' },
   { value: 'approved', label: 'מאושר' },
@@ -97,12 +68,6 @@ const BLOCKED_OPTIONS = [
   { value: '0', label: '✅ פעיל' },
   { value: '1', label: '🚫 חסום' },
 ];
-
-const tStyle = { width: '100%', borderCollapse: 'collapse', fontSize: 14 };
-const thStyle = { background: '#f3f4f6', padding: '8px 12px', textAlign: 'right', borderBottom: '2px solid #e5e7eb' };
-const tdStyle = { padding: '7px 12px', borderBottom: '1px solid #e5e7eb' };
-const tdEditStyle = { ...tdStyle, cursor: 'pointer' };
-const linkBtn = { border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontSize: 13 };
 
 export default function AdminDashboard({ user }) {
   const { page } = useParams();
@@ -180,62 +145,53 @@ export default function AdminDashboard({ user }) {
   ];
 
   return (
-    <div className="page-container" style={{ direction: 'rtl' }}>
+    <div className="page-container admin-page">
       {selected && <ProfileModal user={selected} onClose={() => setSelected(null)} onBlock={handleBlock} />}
       {testResultModal && (
         <div className="modal-overlay" onClick={() => setTestResultModal(null)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ textAlign: 'center', minWidth: 300 }}>
-            <p style={{ fontWeight: 700, fontSize: 16, marginBottom: 16 }}>עדכון תוצאת טסט - {testResultModal.name}</p>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-              <button onClick={() => handleTestResult(testResultModal.id, 'passed')} style={{ background: '#22c55e', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', cursor: 'pointer', fontWeight: 600 }}>✅ עבר</button>
-              <button onClick={() => handleTestResult(testResultModal.id, 'failed')} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', cursor: 'pointer', fontWeight: 600 }}>❌ לא עבר</button>
-              <button onClick={() => setTestResultModal(null)} style={{ background: '#e5e7eb', border: 'none', borderRadius: 6, padding: '8px 16px', cursor: 'pointer' }}>ביטול</button>
+          <div className="modal-box admin-test-result-modal" onClick={e => e.stopPropagation()}>
+            <p className="admin-test-result-title">עדכון תוצאת טסט - {testResultModal.name}</p>
+            <div className="admin-test-result-actions">
+              <button className="admin-test-result-btn-pass" onClick={() => handleTestResult(testResultModal.id, 'passed')}>✅ עבר</button>
+              <button className="admin-test-result-btn-fail" onClick={() => handleTestResult(testResultModal.id, 'failed')}>❌ לא עבר</button>
+              <button className="admin-test-result-btn-cancel" onClick={() => setTestResultModal(null)}>ביטול</button>
             </div>
           </div>
         </div>
       )}
       {editCell && <EditCellModal cell={editCell} onClose={() => setEditCell(null)} onSave={handleSave} />}
 
-      <h2 style={{ marginBottom: 8 }}>ניהול האתר</h2>
-      <p style={{ color: '#888', marginBottom: 4 }}>
-        סה"כ משתמשים: {data.total_users} | תלמידים: {data.total_students} | מורים: {data.total_instructors}
-      </p>
-      <p style={{ color: '#aaa', fontSize: 12, marginBottom: 20 }}>💡 לחיצה כפולה על תא כדי לערוך</p>
+      <h2>ניהול האתר</h2>
+      <p className="admin-stats">סה"כ משתמשים: {data.total_users} | תלמידים: {data.total_students} | מורים: {data.total_instructors}</p>
+      <p className="admin-hint">💡 לחיצה כפולה על תא כדי לערוך</p>
 
-      {/* באנר מורים ממתינים */}
       {!dismissPending && pendingInstructors.length > 0 && (
-        <div style={{ background: '#fef9c3', border: '1px solid #fbbf24', borderRadius: 8, padding: '12px 16px', marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontWeight: 600 }}>⚠️ {pendingInstructors.length} מורים ממתינים לאישור מנהל מערכת</span>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => setPendingModal(true)} style={{ background: '#f59e0b', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontWeight: 600 }}>אשר עכשיו</button>
-            <button onClick={() => setDismissPending(true)} style={{ background: 'none', border: '1px solid #d97706', color: '#92400e', borderRadius: 6, padding: '6px 14px', cursor: 'pointer' }}>הזכר לי מאוחר יותר</button>
+        <div className="admin-pending-banner">
+          <span className="admin-pending-banner-text">⚠️ {pendingInstructors.length} מורים ממתינים לאישור מנהל מערכת</span>
+          <div className="admin-pending-banner-actions">
+            <button className="admin-pending-banner-btn-approve" onClick={() => setPendingModal(true)}>אשר עכשיו</button>
+            <button className="admin-pending-banner-btn-dismiss" onClick={() => setDismissPending(true)}>הזכר לי מאוחר יותר</button>
           </div>
         </div>
       )}
 
-      {/* modal רשימת מורים ממתינים */}
       {pendingModal && (
         <div className="modal-overlay" onClick={() => setPendingModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ textAlign: 'right', minWidth: 380, maxHeight: '80vh', overflowY: 'auto' }}>
-            <p style={{ fontWeight: 700, fontSize: 16, marginBottom: 16 }}>מורים הממתינים לאישור</p>
+          <div className="modal-box admin-pending-modal" onClick={e => e.stopPropagation()}>
+            <p className="admin-pending-modal-title">מורים הממתינים לאישור</p>
             {pendingInstructors.map(inst => (
-              <div key={inst.id} style={{ padding: '10px 0', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div key={inst.id} className="admin-pending-item">
                 <div>
-                  <div style={{ fontWeight: 600 }}>{inst.name}</div>
-                  <div style={{ fontSize: 13, color: '#666' }}>{inst.email}</div>
-                  {inst.area && <div style={{ fontSize: 13, color: '#666' }}>אזור: {inst.area}</div>}
-                  {inst.years_experience != null && <div style={{ fontSize: 13, color: '#666' }}>ניסיון: {inst.years_experience} שנים</div>}
+                  <div className="admin-pending-item-name">{inst.name}</div>
+                  <div className="admin-pending-item-details">{inst.email}</div>
+                  {inst.area && <div className="admin-pending-item-details">אזור: {inst.area}</div>}
+                  {inst.years_experience != null && <div className="admin-pending-item-details">ניסיון: {inst.years_experience} שנים</div>}
                 </div>
-                <button
-                  onClick={() => handleApprove(inst.id)}
-                  style={{ background: '#22c55e', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}
-                >
-                  אשר ✓
-                </button>
+                <button className="admin-pending-item-btn" onClick={() => handleApprove(inst.id)}>אשר ✓</button>
               </div>
             ))}
-            {pendingInstructors.length === 0 && <p style={{ color: '#888' }}>אין מורים ממתינים</p>}
-            <div style={{ marginTop: 16, textAlign: 'center' }}>
+            {pendingInstructors.length === 0 && <p className="admin-pending-empty">אין מורים ממתינים</p>}
+            <div className="admin-pending-close">
               <button onClick={() => setPendingModal(false)} className="btn-secondary">סגור</button>
             </div>
           </div>
@@ -245,22 +201,22 @@ export default function AdminDashboard({ user }) {
 
 
       {tab === 'students' && (
-        <table style={tStyle}>
-          <thead><tr>{['שם', 'אימייל', 'טלפון', 'מורה', 'סטטוס', 'חסום', 'פרופיל'].map(h => <th key={h} style={thStyle}>{h}</th>)}</tr></thead>
+        <table className="admin-table">
+          <thead><tr>{['שם', 'אימייל', 'טלפון', 'מורה', 'סטטוס', 'חסום', 'פרופיל'].map(h => <th key={h} className="admin-th">{h}</th>)}</tr></thead>
           <tbody>
             {data.students.map(s => (
               <tr key={s.id}>
-                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', s.id, 'name', s.name, 'שם')}>{s.name}</td>
-                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', s.id, 'email', s.email, 'אימייל')}>{s.email}</td>
-                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', s.id, 'phone', s.phone, 'טלפון')}>{s.phone}</td>
-                <td style={tdStyle}>{s.instructor_name || '—'}</td>
-                <td style={tdEditStyle} onDoubleClick={() => openEdit('driving_students', s.id, 'status', s.status, 'סטטוס תלמיד', STUDENT_STATUSES)}>{s.status}</td>
-                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', s.id, 'is_blocked', String(s.is_blocked), 'חסימה', BLOCKED_OPTIONS)}>{s.is_blocked ? '🚫' : '✅'}</td>
-                <td style={tdStyle}>
+                <td className="admin-td-edit" onDoubleClick={() => openEdit('users', s.id, 'name', s.name, 'שם')}>{s.name}</td>
+                <td className="admin-td-edit" onDoubleClick={() => openEdit('users', s.id, 'email', s.email, 'אימייל')}>{s.email}</td>
+                <td className="admin-td-edit" onDoubleClick={() => openEdit('users', s.id, 'phone', s.phone, 'טלפון')}>{s.phone}</td>
+                <td className="admin-td">{s.instructor_name || '—'}</td>
+                <td className="admin-td-edit" onDoubleClick={() => openEdit('driving_students', s.id, 'status', s.status, 'סטטוס תלמיד', STUDENT_STATUSES)}>{s.status}</td>
+                <td className="admin-td-edit" onDoubleClick={() => openEdit('users', s.id, 'is_blocked', String(s.is_blocked), 'חסימה', BLOCKED_OPTIONS)}>{s.is_blocked ? '🚫' : '✅'}</td>
+                <td className="admin-td">
                   {s.status === 'test' && (
-                    <button style={{ ...linkBtn, background: '#f59e0b', color: '#fff', marginLeft: 4 }} onClick={() => setTestResultModal(s)}>עדכן תוצאת טסט</button>
+                    <button className="admin-link-btn admin-link-btn-primary" onClick={() => setTestResultModal(s)}>עדכן תוצאת טסט</button>
                   )}
-                  <button style={{ ...linkBtn, background: '#e5e7eb' }} onClick={() => setSelected(s)}>צפה</button>
+                  <button className="admin-link-btn" onClick={() => setSelected(s)}>צפה</button>
                 </td>
               </tr>
             ))}
@@ -269,40 +225,23 @@ export default function AdminDashboard({ user }) {
       )}
 
       {tab === 'instructors' && (
-        <table style={tStyle}>
-          <thead><tr>{['שם', 'אימייל', 'אזור', 'תלמידים', 'סטאטוס', 'פרופיל'].map(h => <th key={h} style={thStyle}>{h}</th>)}</tr></thead>
+        <table className="admin-table">
+          <thead><tr>{['שם', 'אימייל', 'אזור', 'תלמידים', 'סטאטוס', 'פרופיל'].map(h => <th key={h} className="admin-th">{h}</th>)}</tr></thead>
           <tbody>
             {data.instructors.map(i => {
               const status = i.is_blocked ? 'חסום' : (i.profile_status === 'active' ? 'מאושר' : i.profile_status === 'pending' ? 'ממתין' : 'טיוטא');
-              const statusColor = i.is_blocked ? '#ef4444' : i.profile_status === 'active' ? '#22c55e' : '#f59e0b';
               return (
               <tr key={i.id}>
-                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', i.id, 'name', i.name, 'שם')}>{i.name}</td>
-                <td style={tdEditStyle} onDoubleClick={() => openEdit('users', i.id, 'email', i.email, 'אימייל')}>{i.email}</td>
-                <td style={tdStyle}>{i.area || '—'}</td>
-                <td style={tdStyle}>{i.student_count}</td>
-                <td style={tdStyle}>
-                  <span style={{ background: statusColor + '22', color: statusColor, borderRadius: 12, padding: '2px 10px', fontWeight: 600, fontSize: 13 }}>
-                    {status}
-                  </span>
-                  {!i.is_blocked && (
-                    <button
-                      onClick={() => api.put(`/admin/users/${i.id}/block`, { block: true }).then(load)}
-                      style={{ marginRight: 8, fontSize: 11, color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-                    >
-                      חסום
-                    </button>
-                  )}
-                  {i.is_blocked && (
-                    <button
-                      onClick={() => api.put(`/admin/users/${i.id}/block`, { block: false }).then(load)}
-                      style={{ marginRight: 8, fontSize: 11, color: '#22c55e', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-                    >
-                      בטל חסימה
-                    </button>
-                  )}
+                <td className="admin-td-edit" onDoubleClick={() => openEdit('users', i.id, 'name', i.name, 'שם')}>{i.name}</td>
+                <td className="admin-td-edit" onDoubleClick={() => openEdit('users', i.id, 'email', i.email, 'אימייל')}>{i.email}</td>
+                <td className="admin-td">{i.area || '—'}</td>
+                <td className="admin-td">{i.student_count}</td>
+                <td className="admin-td">
+                  <span className={`admin-status-badge ${i.is_blocked ? 'blocked' : i.profile_status === 'active' ? 'active' : 'pending'}`}>{status}</span>
+                  {!i.is_blocked && <button className="admin-block-btn block" onClick={() => api.put(`/admin/users/${i.id}/block`, { block: true }).then(load)}>חסום</button>}
+                  {i.is_blocked && <button className="admin-block-btn unblock" onClick={() => api.put(`/admin/users/${i.id}/block`, { block: false }).then(load)}>בטל חסימה</button>}
                 </td>
-                <td style={tdStyle}><button style={{ ...linkBtn, background: '#e5e7eb' }} onClick={() => setSelected(i)}>צפה</button></td>
+                <td className="admin-td"><button className="admin-link-btn" onClick={() => setSelected(i)}>צפה</button></td>
               </tr>
             )})}
           </tbody>
@@ -310,19 +249,17 @@ export default function AdminDashboard({ user }) {
       )}
 
       {tab === 'posts' && (
-        <table style={tStyle}>
-          <thead><tr>{['כותרת', 'תוכן', 'מחבר', 'תאריך', 'פרופיל מחבר'].map(h => <th key={h} style={thStyle}>{h}</th>)}</tr></thead>
+        <table className="admin-table">
+          <thead><tr>{['כותרת', 'תוכן', 'מחבר', 'תאריך', 'פרופיל מחבר'].map(h => <th key={h} className="admin-th">{h}</th>)}</tr></thead>
           <tbody>
             {data.posts.map(p => (
               <tr key={p.id}>
-                <td style={tdEditStyle} onDoubleClick={() => openEdit('posts', p.id, 'title', p.title, 'כותרת')}>{p.title}</td>
-                <td style={{ ...tdEditStyle, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} onDoubleClick={() => openEdit('posts', p.id, 'content', p.content, 'תוכן')}>{p.content}</td>
-                <td style={tdStyle}>{p.author_name}</td>
-                <td style={tdStyle}>{new Date(p.created_at).toLocaleDateString('he-IL')}</td>
-                <td style={tdStyle}>
-                  <button style={{ ...linkBtn, background: '#e5e7eb' }} onClick={() => setSelected({ id: p.author_id, name: p.author_name, profile_image: p.author_image })}>
-                    פרופיל
-                  </button>
+                <td className="admin-td-edit" onDoubleClick={() => openEdit('posts', p.id, 'title', p.title, 'כותרת')}>{p.title}</td>
+                <td className="admin-td-ellipsis" onDoubleClick={() => openEdit('posts', p.id, 'content', p.content, 'תוכן')}>{p.content}</td>
+                <td className="admin-td">{p.author_name}</td>
+                <td className="admin-td">{new Date(p.created_at).toLocaleDateString('he-IL')}</td>
+                <td className="admin-td">
+                  <button className="admin-link-btn" onClick={() => setSelected({ id: p.author_id, name: p.author_name, profile_image: p.author_image })}>פרופיל</button>
                 </td>
               </tr>
             ))}
@@ -331,15 +268,15 @@ export default function AdminDashboard({ user }) {
       )}
 
       {tab === 'comments' && (
-        <table style={tStyle}>
-          <thead><tr>{['תוכן', 'כותב', 'פוסט', 'תאריך'].map(h => <th key={h} style={thStyle}>{h}</th>)}</tr></thead>
+        <table className="admin-table">
+          <thead><tr>{['תוכן', 'כותב', 'פוסט', 'תאריך'].map(h => <th key={h} className="admin-th">{h}</th>)}</tr></thead>
           <tbody>
             {data.comments.map(c => (
               <tr key={c.id}>
-                <td style={{ ...tdEditStyle, maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} onDoubleClick={() => openEdit('post_comments', c.id, 'content', c.content, 'תוכן תגובה')}>{c.content}</td>
-                <td style={tdStyle}>{c.author_name}</td>
-                <td style={tdStyle}>{c.post_title}</td>
-                <td style={tdStyle}>{new Date(c.created_at).toLocaleDateString('he-IL')}</td>
+                <td className="admin-td-ellipsis" onDoubleClick={() => openEdit('post_comments', c.id, 'content', c.content, 'תוכן תגובה')}>{c.content}</td>
+                <td className="admin-td">{c.author_name}</td>
+                <td className="admin-td">{c.post_title}</td>
+                <td className="admin-td">{new Date(c.created_at).toLocaleDateString('he-IL')}</td>
               </tr>
             ))}
           </tbody>
@@ -348,39 +285,27 @@ export default function AdminDashboard({ user }) {
 
       {tab === 'lessons' && (
         <>
-          <div style={{ marginBottom: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div className="admin-sort-row">
             <span>מיין לפי:</span>
             {['date', 'instructor'].map(s => (
-              <button key={s} onClick={() => setLessonSort(s)} style={{
-                ...linkBtn,
-                background: lessonSort === s ? '#3b82f6' : '#e5e7eb',
-                color: lessonSort === s ? '#fff' : '#111',
-              }}>
+              <button key={s} onClick={() => setLessonSort(s)} className={`admin-sort-btn ${lessonSort === s ? 'active' : ''}`}>
                 {s === 'date' ? 'תאריך' : 'מורה'}
               </button>
             ))}
           </div>
-          <table style={tStyle}>
-            <thead><tr>{['תאריך', 'שעה', 'תלמיד', 'מורה', 'סוג רכב', 'סטטוס', 'משוב מורה'].map(h => <th key={h} style={thStyle}>{h}</th>)}</tr></thead>
+          <table className="admin-table">
+            <thead><tr>{['תאריך', 'שעה', 'תלמיד', 'מורה', 'סוג רכב', 'סטטוס', 'משוב מורה'].map(h => <th key={h} className="admin-th">{h}</th>)}</tr></thead>
             <tbody>
               {sortedLessons.map(l => (
                 <tr key={l.id}>
-                  <td style={tdStyle}>{new Date(l.date).toLocaleDateString('he-IL')}</td>
-                  <td style={tdStyle}>{l.time}</td>
-                  <td style={tdStyle}>{l.student_name}</td>
-                  <td style={tdStyle}>{l.instructor_name}</td>
-                  <td style={tdStyle}>{l.vehicle_type || '—'}</td>
-                  <td style={tdEditStyle} onDoubleClick={() => openEdit('driving_lessons', l.id, 'status', l.status, 'סטטוס שיעור')}>{l.status}</td>
-                  <td
-                    style={{ ...tdEditStyle, maxWidth: 220, color: l.feedback_notes ? '#111' : '#aaa', fontStyle: l.feedback_notes ? 'normal' : 'italic' }}
-                    onDoubleClick={() => l.feedback_id && openEdit('lesson_feedback', l.feedback_id, 'notes', l.feedback_notes, 'משוב מורה')}
-                    title={l.feedback_id ? 'לחץ פעמיים לעריכה' : 'לא נכתב משוב עדיין'}
-                  >
-                    {l.feedback_notes
-                      ? l.feedback_notes
-                      : l.feedback_id
-                        ? '(ריק)'
-                        : 'לא נכתב משוב עדיין'}
+                  <td className="admin-td">{new Date(l.date).toLocaleDateString('he-IL')}</td>
+                  <td className="admin-td">{l.time}</td>
+                  <td className="admin-td">{l.student_name}</td>
+                  <td className="admin-td">{l.instructor_name}</td>
+                  <td className="admin-td">{l.vehicle_type || '—'}</td>
+                  <td className="admin-td-edit" onDoubleClick={() => openEdit('driving_lessons', l.id, 'status', l.status, 'סטטוס שיעור')}>{l.status}</td>
+                  <td className={`admin-feedback-cell ${l.feedback_notes ? 'has-notes' : 'no-notes'}`} onDoubleClick={() => l.feedback_id && openEdit('lesson_feedback', l.feedback_id, 'notes', l.feedback_notes, 'משוב מורה')} title={l.feedback_id ? 'לחץ פעמיים לעריכה' : 'לא נכתב משוב עדיין'}>
+                    {l.feedback_notes || (l.feedback_id ? '(ריק)' : 'לא נכתב משוב עדיין')}
                   </td>
                 </tr>
               ))}

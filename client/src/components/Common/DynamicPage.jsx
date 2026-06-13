@@ -15,9 +15,6 @@ import StudentsList from '../../pages/Instructor/StudentsList.jsx';
 import Achievements from '../../pages/Instructor/Achievements.jsx';
 import Posts from '../../pages/Instructor/Posts.jsx';
 import AdminDashboard from '../../pages/Admin/AdminDashboard.jsx';
-import AdminStudents from '../../pages/Admin/AdminStudents.jsx';
-import AdminInstructors from '../../pages/Admin/AdminInstructors.jsx';
-import AdminPosts from '../../pages/Admin/AdminPosts.jsx';
 import AdminContacts from '../../pages/Admin/AdminContacts.jsx';
 import InstructorStatusBanner from './InstructorStatusBanner.jsx';
 

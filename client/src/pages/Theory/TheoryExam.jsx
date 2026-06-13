@@ -57,10 +57,8 @@ export default function TheoryExam() {
 
   return (
     <div className="theory-page">
-      <div style={{ textAlign: 'left', marginBottom: 12 }}>
-        <button className="btn-secondary" onClick={() => navigate(`/users/${username}/theory`)}>
-          חזור לעמוד התאוריה
-        </button>
+      <div className="theory-back-btn">
+        <button className="btn-secondary" onClick={() => navigate(`/users/${username}/theory`)}>חזור לעמוד התאוריה</button>
       </div>
       <h2>שאלה {current + 1} מתוך {questions.length}</h2>
       <QuestionCard
@@ -70,28 +68,14 @@ export default function TheoryExam() {
         revealed={answered}
         onAnswer={handleAnswer}
       />
-      <div className="btn-row" style={{ marginTop: 12, justifyContent: 'space-between' }}>
+      <div className="theory-nav-row">
         <div>
-          {current > 0 && (
-            <button className="btn-secondary" onClick={() => setCurrent(c => c - 1)}>
-              → שאלה קודמת
-            </button>
-          )}
+          {current > 0 && <button className="btn-secondary" onClick={() => setCurrent(c => c - 1)}>→ שאלה קודמת</button>}
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          {answered && (
-            <button className="btn-secondary" onClick={() => setAnswers(prev => { const n = {...prev}; delete n[current]; return n; })}>
-              נקה בחירה
-            </button>
-          )}
-          {!isLast && (
-            <button onClick={() => setCurrent(c => c + 1)} disabled={!answered}>
-              שאלה הבאה ←
-            </button>
-          )}
-          {isLast && allAnswered && (
-            <button onClick={handleSubmit}>סיים מבחן</button>
-          )}
+        <div className="theory-nav-actions">
+          {answered && <button className="btn-secondary" onClick={() => setAnswers(prev => { const n = {...prev}; delete n[current]; return n; })}>נקה בחירה</button>}
+          {!isLast && <button onClick={() => setCurrent(c => c + 1)} disabled={!answered}>שאלה הבאה ←</button>}
+          {isLast && allAnswered && <button onClick={handleSubmit}>סיים מבחן</button>}
         </div>
       </div>
     </div>

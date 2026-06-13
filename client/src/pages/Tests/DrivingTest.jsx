@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { api } from '../../services/api.js';
-import '../../styles/tests.css';
 
 const STATUS_LABELS = {
   scheduled: 'ממתין לתשובה',

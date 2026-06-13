@@ -2,13 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-
-const VEHICLE_TYPES = [
-  { id: 1, name: 'רכב פרטי' },
-  { id: 2, name: 'אופנוע' },
-  { id: 3, name: 'משאית' },
-  { id: 4, name: 'אוטובוס' },
-];
+import { VEHICLE_TYPES } from '../../constants/index.js';
 
 const validate = (form) => {
   const errors = {};
@@ -92,7 +86,7 @@ export default function Register() {
     }
   };
 
-  const err = (field) => errors[field] && <span style={{ color: 'red', fontSize: '0.75rem' }}>{errors[field]}</span>;
+  const err = (field) => errors[field] && <span className="form-error">{errors[field]}</span>;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -130,11 +124,9 @@ export default function Register() {
       {form.role === 'student' && (
         <>
           <div>
-            <label style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>תמונת פרופיל (אופציונלי)</label>
-            <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ padding: 0 }} />
-            {photoPreview && (
-              <img src={photoPreview} alt="preview" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', marginTop: 8 }} />
-            )}
+            <label className="form-label">תמונת פרופיל (אופציונלי)</label>
+            <input type="file" accept="image/*" onChange={handlePhotoChange} className="form-file" />
+            {photoPreview && <img src={photoPreview} alt="preview" className="form-photo-preview" />}
           </div>
           <Select
             options={[
@@ -160,13 +152,11 @@ export default function Register() {
       )}
 
       {form.role === 'instructor' && (
-        <div style={{ marginTop: 8 }}>
-          <label style={{ fontSize: 14, display: 'block', marginBottom: 4 }}>תמונת פרופיל (אופציונלי)</label>
-          <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ padding: 0 }} />
-          {photoPreview && (
-            <img src={photoPreview} alt="preview" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', marginTop: 8 }} />
-          )}
-          <p style={{ fontSize: 13, color: '#666', marginTop: 8 }}>לאחר ההרשמה תועבר להשלמת פרטי הפרופיל שלך.</p>
+        <div className="form-section">
+          <label className="form-label">תמונת פרופיל (אופציונלי)</label>
+          <input type="file" accept="image/*" onChange={handlePhotoChange} className="form-file" />
+          {photoPreview && <img src={photoPreview} alt="preview" className="form-photo-preview" />}
+          <p className="form-hint">לאחר ההרשמה תועבר להשלמת פרטי הפרופיל שלך.</p>
         </div>
       )}
 

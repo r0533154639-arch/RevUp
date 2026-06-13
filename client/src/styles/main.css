@@ -671,6 +671,10 @@ button[type="submit"] {
 
 .theory-page a:hover { text-decoration: underline; }
 
+.theory-back-btn { text-align: left; margin-bottom: 12px; }
+.theory-nav-row { display: flex; justify-content: space-between; margin-top: 12px; }
+.theory-nav-actions { display: flex; gap: 8px; }
+
 .theory-score {
   margin-top: 24px;
   padding: 16px;
@@ -1493,6 +1497,104 @@ button[type="submit"] {
   white-space: pre-wrap;
 }
 
+/* ─── Question Card ─── */
+.question-card {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.question-text { margin: 0; color: var(--text); }
+.question-image { max-width: 200px; display: block; margin-bottom: 8px; border-radius: var(--radius-sm); }
+.question-options { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.question-option {
+  text-align: right;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  background: var(--bg-soft);
+  color: var(--text);
+  font-size: 14px;
+  transition: background var(--transition), border-color var(--transition);
+}
+.question-option:hover:not(:disabled) { border-color: var(--primary); }
+.question-option:disabled { cursor: default; opacity: 0.7; }
+.question-option.correct { background: rgba(16,185,129,0.2); border-color: var(--success); color: #059669; }
+.question-option.wrong { background: rgba(239,68,68,0.2); border-color: var(--danger); color: #dc2626; }
+
+/* ─── Notification Badge ─── */
+.notification-badge-wrap { position: relative; display: inline-block; }
+.notification-badge {
+  background: var(--danger);
+  color: var(--white);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: default;
+  box-shadow: var(--shadow-sm);
+}
+.notification-tooltip {
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+  box-shadow: var(--shadow-md);
+  min-width: 160px;
+  text-align: right;
+  line-height: 1.6;
+}
+.notification-tooltip-arrow {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #1f2937;
+}
+
+/* ─── Instructor Banner ─── */
+.instructor-banner {
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.instructor-banner.draft { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
+.instructor-banner.pending { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+.instructor-banner-text { font-weight: 500; }
+.instructor-banner-btn {
+  background: #ffc107;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 13px;
+  margin: 0;
+}
+.instructor-banner-btn:hover { background: #e0a800; }
+
 /* ─── Responsive ─── */
 @media (max-width: 600px) {
   nav { padding: 0 16px; }
@@ -1513,6 +1615,87 @@ button[type="submit"] {
 @media (max-width: 400px) {
   .dashboard-cards-container { grid-template-columns: 1fr; }
 }
+
+/* ─── Calendar ─── */
+.calendar-layout { display: flex; gap: 20px; direction: rtl; align-items: flex-start; }
+.calendar-grid-wrap { flex: 1; }
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.calendar-nav-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 0 8px; color: var(--text); }
+.calendar-title { font-weight: 700; font-size: 16px; color: var(--text); }
+.calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin-bottom: 4px; }
+.calendar-weekday { font-size: 12px; color: var(--text-muted); padding: 2px 0; }
+.calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.calendar-day {
+  padding: 8px 2px; text-align: center; border-radius: 6px;
+  background: var(--bg-soft); color: var(--text);
+  cursor: pointer; font-size: 13px; border: 1px solid transparent;
+  transition: background var(--transition), border-color var(--transition);
+}
+.calendar-day:hover { border-color: var(--primary); }
+.calendar-day.past { background: #e5e7eb; color: #999; }
+.calendar-day.past-lesson { background: #fef3c7; color: #999; }
+.calendar-day.has-slots { background: #dbeafe; }
+.calendar-day.has-lesson { background: #fef9c3; }
+.calendar-day.selected { background: var(--primary); color: #fff; }
+.calendar-day.today { border: 2px solid var(--primary); font-weight: 700; }
+.calendar-day-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--warning); margin: 2px auto 0; }
+.calendar-day.selected .calendar-day-dot { background: #fff; }
+
+.calendar-side-panel { width: 260px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
+.calendar-side-title { font-weight: 700; margin-bottom: 12px; font-size: 15px; color: var(--text); }
+.calendar-past-label { font-size: 11px; color: var(--text-muted); margin-right: 6px; }
+.calendar-empty-msg { color: var(--text-muted); font-size: 13px; }
+.calendar-slot-hint { font-size: 12px; color: var(--text-light); margin-bottom: 8px; }
+.calendar-slot-btn {
+  display: block; width: 100%; margin-bottom: 6px; padding: 8px;
+  border-radius: var(--radius-sm); background: #dbeafe; border: 1px solid #93c5fd;
+  color: #1d4ed8; cursor: pointer; font-weight: 600; font-size: 13px;
+}
+.calendar-slot-btn.chosen { background: var(--primary); border-color: #1d4ed8; color: #fff; }
+.calendar-book-btn {
+  margin-top: 10px; width: 100%; padding: 10px;
+  background: var(--success); color: #fff; border: none;
+  border-radius: var(--radius); cursor: pointer; font-weight: 700; font-size: 14px;
+}
+.calendar-lesson-card { margin-bottom: 8px; padding: 8px; border-radius: var(--radius-sm); font-size: 13px; }
+.calendar-lesson-card.past { background: var(--bg); }
+.calendar-lesson-card.upcoming { background: #fef9c3; }
+.calendar-lesson-time { font-weight: 600; color: var(--text); }
+.calendar-lesson-instructor { color: var(--text-muted); }
+.calendar-lesson-status { color: var(--text-light); font-size: 11px; }
+.calendar-lesson-phone { color: var(--text-muted); }
+.calendar-cancel-btn { margin-top: 4px; font-size: 11px; color: var(--danger); background: none; border: 1px solid #fca5a5; border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+
+/* ─── Weekly Template Editor ─── */
+.template-editor { direction: rtl; }
+.template-hint { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+.template-days { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.template-day-btn {
+  padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--bg-soft); color: var(--text); font-weight: 400;
+  cursor: pointer; font-size: 13px; transition: all var(--transition);
+}
+.template-day-btn.active { background: var(--primary); color: var(--white); font-weight: 700; }
+.template-day-btn.has-slots { background: #dbeafe; }
+.template-day-btn.active.has-slots { background: var(--primary); }
+.template-day-count { margin-right: 4px; font-size: 11px; opacity: 0.8; }
+.template-header { margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.template-day-label { font-weight: 600; color: var(--text); }
+.template-actions { display: flex; gap: 10px; align-items: center; }
+.template-range-hint { font-size: 12px; color: var(--primary); font-weight: 600; }
+.template-action-btn { font-size: 12px; color: var(--primary); background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; margin: 0; }
+.template-action-btn.secondary { color: var(--text-muted); }
+.template-friday-note { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+.template-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.template-slot {
+  padding: 8px 4px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--bg-soft); color: var(--text); font-size: 13px;
+  cursor: pointer; font-weight: 400; transition: all var(--transition);
+}
+.template-slot.selected { background: var(--primary); border-color: var(--primary); color: var(--white); font-weight: 600; }
+.template-slot.range-start { background: #fef9c3; border-color: var(--warning); color: #92400e; font-weight: 600; }
+.template-save-btn { margin-top: 20px; padding: 10px 28px; border-radius: var(--radius-sm); background: var(--primary); color: var(--white); border: none; cursor: pointer; font-weight: 600; }
+.template-save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* ─── New Driver Dashboard ─── */
 .nd-page { max-width: 700px; }

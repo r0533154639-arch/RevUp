@@ -4,8 +4,7 @@ import { useAuth } from '../../hooks/useAuth.js';
 import { getMyInstructor } from '../../services/stats.service.js';
 import ContactModal from './ContactModal.jsx';
 import Select from 'react-select';
-
-const SERVER = 'http://localhost:3000';
+import { SERVER } from '../../constants/index.js';
 
 const INSTRUCTOR_LINKS = [
   { label: 'לוח זמנים', page: 'schedule' },

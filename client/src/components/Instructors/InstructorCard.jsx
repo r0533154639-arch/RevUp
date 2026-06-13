@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../hooks/useAuth.js';
-
-const SERVER = 'http://localhost:3000';
+import { SERVER } from '../../constants/index.js';
 
 export default function InstructorCard({ instructor, requestStatus }) {
   const { user } = useAuth();

@@ -1,7 +1,5 @@
 import { useState } from 'react';
-
-const DAYS_HE = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
-const MONTHS_HE = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+import { DAYS_HE, MONTHS_HE } from '../../constants/index.js';
 
 function getDaysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
@@ -78,20 +76,19 @@ export default function CalendarView({ lessons = [], availableSlots = {}, onBook
 
   return (
     <>
-      <div style={{ display: 'flex', gap: 20, direction: 'rtl', alignItems: 'flex-start' }}>
-        {/* לוח שנה */}
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <button onClick={nextMonth} style={navBtnStyle}>{'→'}</button>
-            <span style={{ fontWeight: 700, fontSize: 16 }}>{MONTHS_HE[month]} {year}</span>
-            <button onClick={prevMonth} style={navBtnStyle}>{'←'}</button>
+      <div className="calendar-layout">
+        <div className="calendar-grid-wrap">
+          <div className="calendar-header">
+            <button onClick={nextMonth} className="calendar-nav-btn">→</button>
+            <span className="calendar-title">{MONTHS_HE[month]} {year}</span>
+            <button onClick={prevMonth} className="calendar-nav-btn">←</button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', marginBottom: 4 }}>
-            {DAYS_HE.map(d => <div key={d} style={{ fontSize: 12, color: '#888', padding: '2px 0' }}>{d}</div>)}
+          <div className="calendar-weekdays">
+            {DAYS_HE.map(d => <div key={d} className="calendar-weekday">{d}</div>)}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
+          <div className="calendar-days">
             {Array.from({ length: firstDayOfWeek }).map((_, i) => <div key={`e${i}`} />)}
             {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
               const dateStr = toDateStr(year, month, day);
@@ -101,89 +98,63 @@ export default function CalendarView({ lessons = [], availableSlots = {}, onBook
               const isSelected = selectedDate === day;
               const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
 
-              let bg = '#f9f9f9';
-              if (isPast && hasLesson) bg = '#fef3c7';
-              else if (isPast) bg = '#e5e7eb';
-              else if (hasSlots) bg = '#dbeafe';
-              else if (hasLesson) bg = '#fef9c3';
-              if (isSelected) bg = '#3b82f6';
+              let dayClass = 'calendar-day';
+              if (isPast && hasLesson) dayClass += ' past-lesson';
+              else if (isPast) dayClass += ' past';
+              else if (hasSlots) dayClass += ' has-slots';
+              else if (hasLesson) dayClass += ' has-lesson';
+              if (isSelected) dayClass += ' selected';
+              if (isToday) dayClass += ' today';
 
               return (
-                <div
-                  key={day}
-                  onClick={() => handleSelectDate(day)}
-                  style={{
-                    padding: '8px 2px', textAlign: 'center', borderRadius: 6,
-                    background: bg,
-                    color: isSelected ? '#fff' : isPast ? '#999' : '#222',
-                    cursor: 'pointer',
-                    fontWeight: isToday ? 700 : 400,
-                    border: isToday ? '2px solid #3b82f6' : '1px solid transparent',
-                    fontSize: 13,
-                  }}
-                >
+                <div key={day} onClick={() => handleSelectDate(day)} className={dayClass}>
                   {day}
-                  {hasLesson && <div style={{ width: 5, height: 5, borderRadius: '50%', background: isSelected ? '#fff' : '#f59e0b', margin: '2px auto 0' }} />}
+                  {hasLesson && <div className="calendar-day-dot" />}
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* פאנל צד */}
         {selectedDate && (
-          <div style={{ width: 260, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: 16 }}>
-            <div style={{ fontWeight: 700, marginBottom: 12, fontSize: 15 }}>
+          <div className="calendar-side-panel">
+            <div className="calendar-side-title">
               {selectedDate} {MONTHS_HE[month]} {year}
-              {selectedIsPast && <span style={{ fontSize: 11, color: '#999', marginRight: 6 }}>(עבר)</span>}
+              {selectedIsPast && <span className="calendar-past-label">(עבר)</span>}
             </div>
 
             {role === 'student' && (
               <>
                 {selectedIsPast ? (
                   selectedLessons.length === 0
-                    ? <p style={{ color: '#888', fontSize: 13 }}>אין שיעורים ביום זה</p>
+                    ? <p className="calendar-empty-msg">אין שיעורים ביום זה</p>
                     : selectedLessons.map(l => (
-                      <div key={l.id} style={{ marginBottom: 8, padding: 8, background: '#f0fdf4', borderRadius: 6, fontSize: 13 }}>
-                        <div style={{ fontWeight: 600 }}>{l.time?.slice(0, 5)}</div>
-                        <div style={{ color: '#555' }}>מורה: {l.instructor_name}</div>
-                        <div style={{ color: '#888', fontSize: 11 }}>{l.status}</div>
+                      <div key={l.id} className="calendar-lesson-card past">
+                        <div className="calendar-lesson-time">{l.time?.slice(0, 5)}</div>
+                        <div className="calendar-lesson-instructor">מורה: {l.instructor_name}</div>
+                        <div className="calendar-lesson-status">{l.status}</div>
                       </div>
                     ))
                 ) : (
                   <>
                     {selectedSlots.length === 0
-                      ? <p style={{ color: '#888', fontSize: 13 }}>אין שעות פנויות ביום זה</p>
+                      ? <p className="calendar-empty-msg">אין שעות פנויות ביום זה</p>
                       : <>
-                          <p style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>בחר שעה אחת או יותר:</p>
+                          <p className="calendar-slot-hint">בחר שעה אחת או יותר:</p>
                           {selectedSlots.map(s => {
                             const isChosen = selectedSlotTimes.includes(s.time);
                             return (
                               <button
                                 key={s.slot_index}
                                 onClick={() => toggleSlot(s.time)}
-                                style={{
-                                  display: 'block', width: '100%', marginBottom: 6, padding: '8px',
-                                  borderRadius: 6,
-                                  background: isChosen ? '#3b82f6' : '#dbeafe',
-                                  border: isChosen ? '2px solid #1d4ed8' : '1px solid #93c5fd',
-                                  color: isChosen ? '#fff' : '#1d4ed8',
-                                  cursor: 'pointer', fontWeight: 600,
-                                }}
+                                className={`calendar-slot-btn ${isChosen ? 'chosen' : ''}`}
                               >
                                 {s.time} {isChosen ? '✓' : ''}
                               </button>
                             );
                           })}
                           {selectedSlotTimes.length > 0 && (
-                            <button
-                              onClick={handleConfirmBook}
-                              style={{
-                                marginTop: 10, width: '100%', padding: '10px',
-                                background: '#22c55e', color: '#fff', border: 'none',
-                                borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 14,
-                              }}
-                            >
+                            <button onClick={handleConfirmBook} className="calendar-book-btn">
                               קבע {selectedSlotTimes.length} שיעור{selectedSlotTimes.length > 1 ? 'ים' : ''}
                             </button>
                           )}
@@ -197,18 +168,15 @@ export default function CalendarView({ lessons = [], availableSlots = {}, onBook
             {role !== 'student' && (
               <>
                 {selectedLessons.length === 0
-                  ? <p style={{ color: '#888', fontSize: 13 }}>אין שיעורים ביום זה</p>
+                  ? <p className="calendar-empty-msg">אין שיעורים ביום זה</p>
                   : selectedLessons.map(l => (
-                    <div key={l.id} style={{ marginBottom: 10, padding: 8, background: selectedIsPast ? '#f9fafb' : '#fef9c3', borderRadius: 6, fontSize: 13 }}>
-                      <div style={{ fontWeight: 600 }}>{l.time?.slice(0, 5)}</div>
+                    <div key={l.id} className={`calendar-lesson-card ${selectedIsPast ? 'past' : 'upcoming'}`}>
+                      <div className="calendar-lesson-time">{l.time?.slice(0, 5)}</div>
                       <div>{l.student_name}</div>
-                      {l.student_phone && <div style={{ color: '#666' }}>{l.student_phone}</div>}
-                      <div style={{ color: '#888', fontSize: 11 }}>{l.status}</div>
+                      {l.student_phone && <div className="calendar-lesson-phone">{l.student_phone}</div>}
+                      <div className="calendar-lesson-status">{l.status}</div>
                       {!selectedIsPast && l.status !== 'cancelled' && (
-                        <button
-                          onClick={() => setCancelConfirm(l.id)}
-                          style={{ marginTop: 4, fontSize: 11, color: '#ef4444', background: 'none', border: '1px solid #fca5a5', borderRadius: 4, padding: '2px 8px', cursor: 'pointer' }}
-                        >
+                        <button onClick={() => setCancelConfirm(l.id)} className="calendar-cancel-btn">
                           בטל שיעור
                         </button>
                       )}
@@ -227,7 +195,7 @@ export default function CalendarView({ lessons = [], availableSlots = {}, onBook
             <p className="modal-title">⚠️ ביטול שיעור</p>
             <p className="modal-text">האם אתה בטוח שברצונך לבטל את השיעור?</p>
             <div className="modal-actions">
-              <button onClick={() => { onCancelLesson?.(cancelConfirm); setCancelConfirm(null); }} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', cursor: 'pointer', fontWeight: 600 }}>
+              <button onClick={() => { onCancelLesson?.(cancelConfirm); setCancelConfirm(null); }} className="btn-danger">
                 כן, בטל
               </button>
               <button className="btn-secondary" onClick={() => setCancelConfirm(null)}>לא, חזור</button>
@@ -238,5 +206,3 @@ export default function CalendarView({ lessons = [], availableSlots = {}, onBook
     </>
   );
 }
-
-const navBtnStyle = { background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', padding: '0 8px', color: '#111' };

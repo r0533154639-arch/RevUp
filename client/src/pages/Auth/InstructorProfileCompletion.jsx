@@ -4,13 +4,7 @@ import { useAuth } from '../../hooks/useAuth.js';
 import Select from 'react-select';
 import WeeklyTemplateEditor from '../../components/Lessons/WeeklyTemplateEditor.jsx';
 import { api } from '../../services/api.js';
-
-const VEHICLE_TYPES = [
-  { id: 1, name: 'רכב פרטי' },
-  { id: 2, name: 'אופנוע' },
-  { id: 3, name: 'משאית' },
-  { id: 4, name: 'אוטובוס' },
-];
+import { VEHICLE_TYPES } from '../../constants/index.js';
 
 export default function InstructorProfileCompletion() {
   const { user, token, updateUser } = useAuth();
@@ -55,7 +49,6 @@ export default function InstructorProfileCompletion() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.message); return; }
-      // שמירת זמינות אם הוגדרה
       if (availabilitySlots.length > 0) {
         await api.put('/availability/template', { slots: availabilitySlots });
       }
@@ -73,9 +66,7 @@ export default function InstructorProfileCompletion() {
   return (
     <form onSubmit={handleSubmit}>
       <h2>השלמת פרופיל מורה</h2>
-      <p style={{ color: '#555', marginBottom: 16 }}>
-        מלא את הפרטים כדי שתלמידים יוכלו למצוא אותך. הפרופיל יישלח לאישור המנהל.
-      </p>
+      <p className="form-hint">מלא את הפרטים כדי שתלמידים יוכלו למצוא אותך. הפרופיל יישלח לאישור המנהל.</p>
 
       <div>
         <Select
@@ -88,7 +79,7 @@ export default function InstructorProfileCompletion() {
         />
       </div>
 
-      <div style={{ margin: '12px 0' }}>
+      <div className="form-input-group">
         <input
           type="number"
           placeholder="שנות ניסיון"
@@ -115,11 +106,11 @@ export default function InstructorProfileCompletion() {
         </div>
       </fieldset>
 
-      {error && <p style={{ color: 'red', fontSize: '0.85rem' }}>{error}</p>}
+      {error && <p className="form-error">{error}</p>}
 
-      <div style={{ marginTop: 20 }}>
-        <h3 style={{ marginBottom: 8 }}>זמינות שבועית (אופציונלי)</h3>
-        <p style={{ fontSize: 13, color: '#666', marginBottom: 12 }}>בחר את השעות הקבועות בהן אתה זמין בכל שבוע. ניתן לשנות בכל עת.</p>
+      <div className="form-section">
+        <h3 className="form-section-title">זמינות שבועית (אופציונלי)</h3>
+        <p className="form-hint">בחר את השעות הקבועות בהן אתה זמין בכל שבוע. ניתן לשנות בכל עת.</p>
         <WeeklyTemplateEditor
           initialTemplate={{}}
           onSave={(slots) => setAvailabilitySlots(slots)}
@@ -127,11 +118,9 @@ export default function InstructorProfileCompletion() {
         />
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+      <div className="form-actions">
         <button type="submit" disabled={loading}>{loading ? 'שומר...' : 'שמור ושלח לאישור'}</button>
-        <button type="button" onClick={handleSkip} style={{ background: 'transparent', color: '#666', border: '1px solid #ccc' }}>
-          דלג לעת עתה
-        </button>
+        <button type="button" onClick={handleSkip} className="btn-secondary">דלג לעת עתה</button>
       </div>
     </form>
   );
