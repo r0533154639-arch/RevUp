@@ -203,7 +203,7 @@ function ProfileDropdown({ user, onLogout, onClose }) {
 export default function Navbar() {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
 
   useEffect(() => {
