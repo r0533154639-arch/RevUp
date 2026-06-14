@@ -1,7 +1,6 @@
-import { insertLog, queryLogs } from '../dal/auditLog.repository.js';
+import { insertLog, queryLogs } from '../dal/auditLog.dal.js';
 import logger from '../middleware/logger.js';
 
-// fire-and-forget — כישלון בלוג לא שובר את הפעולה הראשית
 export const audit = (data) => {
   insertLog(data).catch(err =>
     logger.warn('Audit log failed', { message: err.message, data })
@@ -9,8 +8,6 @@ export const audit = (data) => {
 };
 
 export const getAuditLogs = (filters) => queryLogs(filters);
-
-// --- פעולות מוגדרות מראש ---
 
 export const auditUserRegistered  = (userId, name, role, ip) =>
   audit({ user_id: userId, action: 'USER_REGISTERED', entity_type: 'user', entity_id: userId, details: { name, role }, ip });

@@ -50,14 +50,12 @@ export const cancelLesson = async (lessonId, userId, role) => {
   if (!isStudent && !isInstructor && role !== 'admin')
     throw Object.assign(new Error('אין הרשאה'), { status: 403 });
 
-  // יותר מ-48 שעות — ביטול ישיר
   if (lesson.days_until >= 2 || role === 'admin') {
     await pool.query(`DELETE FROM driving_lessons WHERE id = ?`, [lessonId]);
     auditLessonCancelled(userId, lessonId, role, null);
     return { cancelled: true };
   }
 
-  // פחות מ-48 שעות — בקשת ביטול משותפת
   if (lesson.cancel_requested_by && lesson.cancel_requested_by !== role) {
     await pool.query(`DELETE FROM driving_lessons WHERE id = ?`, [lessonId]);
     auditLessonCancelled(userId, lessonId, role, null);

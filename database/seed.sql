@@ -1,6 +1,5 @@
 USE revup;
 
-<<<<<<< HEAD
 INSERT IGNORE INTO vehicle_types (id, name) VALUES
 (1, 'רכב פרטי'),
 (2, 'אופנוע'),
@@ -42,7 +41,6 @@ INSERT IGNORE INTO driving_students (user_id, status, vehicle_type_id, instructo
 (5, 'test',     1, 1),
 (6, 'licensed', 1, 1),
 (7, 'lessons',  2, 1);
-=======
 INSERT INTO users (id, name, email, phone, date_of_birth, role)
 VALUES
 (
@@ -58,4 +56,3 @@ VALUES (
     1,
     '$2b$10$cc8uwm2UeHNW//64WYoJ4.3g2NfEs/Yf67aORYJ7j1FhaSh1dvQ1S'
 );
->>>>>>> fix
