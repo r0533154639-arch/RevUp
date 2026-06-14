@@ -44,6 +44,8 @@ body {
 .app-shell {
   min-height: 100vh;
   background: var(--bg);
+  display: flex;
+  flex-direction: column;
 }
 
 /* ─── Navbar ─── */
@@ -282,13 +284,9 @@ nav a:hover {
 
 /* ─── Page Container ─── */
 .page-container {
-  max-width: 860px;
-  margin: 36px auto;
-  padding: 32px;
+  min-height: calc(100vh - var(--nav-height));
+  padding: 48px 100px;
   background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
 }
 
 .page-container h2,
@@ -394,8 +392,7 @@ button:hover { background: var(--primary-dark); }
 button:active { transform: scale(0.98); }
 
 button[type="submit"] {
-  width: 100%;
-  padding: 11px;
+  padding: 11px 32px;
   margin-top: 8px;
   font-size: 15px;
 }
@@ -602,13 +599,9 @@ button[type="submit"] {
 
 /* ─── Lessons Dashboard ─── */
 .lessons-dashboard {
-  padding: 32px;
-  max-width: 600px;
-  margin: 36px auto;
+  padding: 48px 100px;
+  min-height: calc(100vh - var(--nav-height));
   background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
 }
 
 .lessons-dashboard h2 {
@@ -640,13 +633,9 @@ button[type="submit"] {
 
 /* ─── Theory pages ─── */
 .theory-page {
-  max-width: 600px;
-  margin: 36px auto;
-  padding: 32px;
+  min-height: calc(100vh - var(--nav-height));
+  padding: 48px 100px;
   background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
   direction: rtl;
 }
 
@@ -698,13 +687,9 @@ button[type="submit"] {
 
 /* ─── Driving Test ─── */
 .test-page {
-  max-width: 500px;
-  margin: 36px auto;
-  padding: 32px;
+  min-height: calc(100vh - var(--nav-height));
+  padding: 48px 100px;
   background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
 }
 
 .test-page h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; color: var(--text); }
@@ -728,13 +713,9 @@ button[type="submit"] {
 
 /* ─── License Ready ─── */
 .license-page {
-  max-width: 500px;
-  margin: 60px auto;
-  padding: 40px 32px;
+  min-height: calc(100vh - var(--nav-height));
+  padding: 48px 100px;
   background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-lg);
   text-align: center;
 }
 
@@ -1598,7 +1579,7 @@ button[type="submit"] {
 /* ─── Responsive ─── */
 @media (max-width: 600px) {
   nav { padding: 0 16px; }
-  .page-container { margin: 16px; padding: 20px; }
+  .page-container { padding: 20px 24px; }
   form { margin: 16px; padding: 24px 16px; }
   .dashboard-cards-container { grid-template-columns: 1fr 1fr; gap: 10px; }
   .nav-links { display: none; }
@@ -1698,7 +1679,7 @@ button[type="submit"] {
 .template-save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* ─── New Driver Dashboard ─── */
-.nd-page { max-width: 700px; }
+.nd-page { width: 100%; }
 
 .nd-hero {
   display: flex;

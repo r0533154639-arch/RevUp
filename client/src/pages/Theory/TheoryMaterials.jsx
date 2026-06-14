@@ -7,7 +7,7 @@ import { updateStudentStatus } from '../../services/stats.service.js';
 function ActionButton({ label, hint, variant, ...props }) {
   return (
     <div>
-      <button className={variant === 'secondary' ? 'btn-secondary' : ''} style={{ width: '100%' }} {...props}>
+      <button className={variant === 'secondary' ? 'btn-secondary' : ''} {...props}>
         {label}
       </button>
       <span style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, display: 'block' }}>{hint}</span>
