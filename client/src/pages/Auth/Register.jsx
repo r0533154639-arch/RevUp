@@ -83,6 +83,9 @@ export default function Register() {
       }
     } catch (error) {
       console.error('Registration error:', error);
+      if (error.message.includes('Duplicate entry') && error.message.includes('email')) {
+        setErrors(prev => ({ ...prev, email: 'כתובת אימייל זו כבר רשומה במערכת' }));
+      }
     }
   };
 
@@ -97,11 +100,12 @@ export default function Register() {
         {err('name')}
       </div>
       <div>
-        <input type="email" placeholder="אימייל" value={form.email} onChange={(e) => handleChange('email', e.target.value)} />
+        
+<input type="email" placeholder="אימייל" autoComplete="email" value={form.email} onChange={(e) => handleChange('email', e.target.value)} />
         {err('email')}
       </div>
       <div>
-        <input type="tel" placeholder="טלפון" dir="rtl" value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} />
+        <input type="tel" placeholder="טלפון" autoComplete="tel" dir="rtl" value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} />
         {err('phone')}
       </div>
       <div>

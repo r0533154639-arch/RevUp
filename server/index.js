@@ -17,6 +17,7 @@ import availabilityRoutes from './routes/availability.routes.js';
 import studentRequestsRoutes from './routes/studentRequests.routes.js';
 import notificationsRoutes from './routes/notifications.routes.js';
 import theoryRoutes from './routes/theory.routes.js';
+import auditLogRoutes from './routes/auditLog.routes.js';
 process.on('uncaughtException', err => {
   logger.error('Uncaught Exception', { message: err.message, stack: err.stack });
   process.exit(1);
@@ -43,6 +44,7 @@ app.use('/api/availability', availabilityRoutes);
 app.use('/api/student-requests', studentRequestsRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/theory', theoryRoutes);
+app.use('/api/admin/audit-logs', auditLogRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => logger.info(`Server running on port ${PORT}`));

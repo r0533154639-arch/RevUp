@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import pool from '../config/db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const XML_PATH = path.join(__dirname, '../../theoryexamhe-data.xml');
+const XML_PATH = path.join(__dirname, '../data/theoryexamhe-data.xml');
 
 let cachedQuestions = null;
 

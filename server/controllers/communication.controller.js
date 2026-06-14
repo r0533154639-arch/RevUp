@@ -1,6 +1,6 @@
 import { saveLessonFeedback, getFeedbackForStudent, getFeedbackForLesson, saveContactMessage, getAllContactMessages, saveGeneralFeedback, getGeneralFeedbackForStudent } from '../dal/communication.dal.js';
 import { findUserById } from '../dal/students.dal.js';
-import { sendGeneralFeedbackEmail } from '../services/mailer.js';
+import { sendGeneralFeedbackEmail } from '../utils/mailer.js';
 import { asyncHandler } from '../utils/controllerFactory.js';
 
 export const submitLessonFeedback = asyncHandler(async (req, res) => {

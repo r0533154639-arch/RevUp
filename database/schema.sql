@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS instructor_student_requests (
   instructor_id INT NOT NULL,
   status VARCHAR(20) NOT NULL DEFAULT 'pending',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uq_student_request (student_id),
+  UNIQUE KEY uq_instructor_student_requests_student_id (student_id),
   FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (instructor_id) REFERENCES driving_instructor(id) ON DELETE CASCADE
 );
@@ -257,7 +257,23 @@ CREATE TABLE IF NOT EXISTS test_requests (
   instructor_id INT NOT NULL,
   status ENUM('pending', 'scheduled') NOT NULL DEFAULT 'pending',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uq_student_request (student_id),
+  UNIQUE KEY uq_test_requests_student_id (student_id),
   FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (instructor_id) REFERENCES driving_instructor(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT DEFAULT NULL,
+  action VARCHAR(100) NOT NULL,
+  entity_type VARCHAR(50) DEFAULT NULL,
+  entity_id INT DEFAULT NULL,
+  details JSON DEFAULT NULL,
+  ip VARCHAR(45) DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_user_id (user_id),
+  INDEX idx_action (action),
+  INDEX idx_entity (entity_type, entity_id),
+  INDEX idx_created_at (created_at)
 );
