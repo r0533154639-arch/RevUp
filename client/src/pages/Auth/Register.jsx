@@ -130,7 +130,7 @@ export default function Register() {
           <div>
             <label className="form-label">תמונת פרופיל (אופציונלי)</label>
             <input type="file" accept="image/*" onChange={handlePhotoChange} className="form-file" />
-            {photoPreview && <img src={photoPreview} alt="preview" className="form-photo-preview" />}
+            {photoPreview && <img src={photoPreview} alt="preview" className="photo-preview" />}
           </div>
           <Select
             options={[
@@ -159,7 +159,7 @@ export default function Register() {
         <div className="form-section">
           <label className="form-label">תמונת פרופיל (אופציונלי)</label>
           <input type="file" accept="image/*" onChange={handlePhotoChange} className="form-file" />
-          {photoPreview && <img src={photoPreview} alt="preview" className="form-photo-preview" />}
+          {photoPreview && <img src={photoPreview} alt="preview" className="photo-preview" />}
           <p className="form-hint">לאחר ההרשמה תועבר להשלמת פרטי הפרופיל שלך.</p>
         </div>
       )}
