@@ -183,8 +183,11 @@ export default function AdminDashboard({ user }) {
                 <td className="admin-td">{i.student_count}</td>
                 <td className="admin-td">
                   <span className={`admin-status-badge ${i.is_blocked ? 'blocked' : i.profile_status === 'active' ? 'active' : 'pending'}`}>{status}</span>
-                  {!i.is_blocked && <button className="admin-block-btn block" onClick={() => api.put(`/admin/users/${i.id}/block`, { block: true }).then(load)}>חסום</button>}
-                  {i.is_blocked && <button className="admin-block-btn unblock" onClick={() => api.put(`/admin/users/${i.id}/block`, { block: false }).then(load)}>בטל חסימה</button>}
+                  {i.is_blocked ? (
+                    <button className="admin-block-btn unblock" onClick={() => api.put(`/admin/users/${i.id}/block`, { block: false }).then(load)}>בטל חסימה</button>
+                  ) : (
+                    <button className="admin-block-btn block" onClick={() => api.put(`/admin/users/${i.id}/block`, { block: true }).then(load)}>חסום</button>
+                  )}
                 </td>
                 <td className="admin-td"><button className="admin-link-btn" onClick={() => setSelected(i)}>צפה</button></td>
               </tr>
