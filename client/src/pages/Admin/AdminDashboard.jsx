@@ -1,61 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
-import { SERVER, STUDENT_STATUSES } from '../../constants/index.js';
-
-function ProfileModal({ user: u, onClose, onBlock }) {
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-box admin-profile-modal" onClick={e => e.stopPropagation()}>
-        {u.profile_image && <img src={`${SERVER}/uploads/${u.profile_image}`} alt="" className="admin-profile-image" />}
-        <p><strong>שם:</strong> {u.name}</p>
-        {u.email && <p><strong>אימייל:</strong> {u.email}</p>}
-        {u.phone && <p><strong>טלפון:</strong> {u.phone}</p>}
-        {u.date_of_birth && <p><strong>ת. לידה:</strong> {new Date(u.date_of_birth).toLocaleDateString('he-IL')}</p>}
-        {u.area && <p><strong>אזור:</strong> {u.area}</p>}
-        {u.vehicle_type && <p><strong>סוג רכב:</strong> {u.vehicle_type}</p>}
-        {u.instructor_name && <p><strong>מורה:</strong> {u.instructor_name}</p>}
-        {u.student_count !== undefined && <p><strong>תלמידים:</strong> {u.student_count}</p>}
-        {'is_blocked' in u && <p><strong>סטטוס:</strong> {u.is_blocked ? '🚫 חסום' : '✅ פעיל'}</p>}
-        {'is_blocked' in u && (
-          <div className="admin-profile-actions">
-            <button className={`admin-block-btn ${u.is_blocked ? 'unblock' : 'block'}`} onClick={() => onBlock(u)}>
-              {u.is_blocked ? 'בטל חסימה' : 'חסום משתמש'}
-            </button>
-            <button onClick={onClose} className="btn-secondary">סגור</button>
-          </div>
-        )}
-        {'is_blocked' in u === false && (
-          <div className="admin-profile-actions">
-            <button onClick={onClose} className="btn-secondary">סגור</button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function EditCellModal({ cell, onClose, onSave }) {
-  const [value, setValue] = useState(cell.value ?? '');
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-box admin-edit-modal" onClick={e => e.stopPropagation()}>
-        <p className="admin-edit-title">עריכת: {cell.label}</p>
-        {cell.options ? (
-          <select value={value} onChange={e => setValue(e.target.value)} autoFocus className="admin-edit-input">
-            {cell.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        ) : (
-          <textarea value={value} onChange={e => setValue(e.target.value)} rows={3} autoFocus className="admin-edit-textarea" />
-        )}
-        <div className="admin-edit-actions">
-          <button onClick={() => onSave(value)}>שמור</button>
-          <button onClick={onClose} className="btn-secondary">ביטול</button>
-        </div>
-      </div>
-    </div>
-  );
-}
+import { STUDENT_STATUSES } from '../../constants/index.js';
+import ProfileModal from '../../components/Admin/ProfileModal.jsx';
+import EditCellModal from '../../components/Admin/EditCellModal.jsx';
 
 const LESSON_STATUSES = [
   { value: 'pending', label: 'ממתין' },
@@ -71,14 +19,13 @@ const BLOCKED_OPTIONS = [
 
 export default function AdminDashboard({ user }) {
   const { page } = useParams();
-  const navigate = useNavigate();
   const PAGE_TAB_MAP = { adminStudents: 'students', adminInstructors: 'instructors', adminPosts: 'posts', adminComments: 'comments', adminLessons: 'lessons' };
   const tab = PAGE_TAB_MAP[page] || 'students';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [lessonSort, setLessonSort] = useState('date');
-  const [editCell, setEditCell] = useState(null); // { table, id, field, value, label }
+  const [editCell, setEditCell] = useState(null);
 
   const load = () => {
     setLoading(true);
@@ -197,8 +144,6 @@ export default function AdminDashboard({ user }) {
           </div>
         </div>
       )}
-
-
 
       {tab === 'students' && (
         <table className="admin-table">
