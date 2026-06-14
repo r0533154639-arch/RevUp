@@ -215,14 +215,20 @@ export default function Navbar() {
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
-  const studentLinks = [
-    { label: 'תאוריה', page: 'theory' },
-    { label: 'שיעורים', page: 'lessons' },
-    { label: 'טסט', page: 'test' },
-    { label: 'פוסטים', page: 'posts' },
-    ...(!user?.instructor_id ? [{ label: 'חפש מורה', page: 'instructors' }] : []),
-    ...(user?.status === 'licensed' ? [{ label: '🎉 נהג חדש', page: 'newDriver' }] : []),
-  ];
+  const isLicensed = user?.status === 'licensed';
+  const studentLinks = isLicensed
+    ? [
+        { label: '🎉 נהג חדש', page: 'newDriver' },
+        { label: 'פוסטים', page: 'posts' },
+        { label: 'דרג מורה', page: 'test' },
+      ]
+    : [
+        { label: 'תאוריה', page: 'theory' },
+        { label: 'שיעורים', page: 'lessons' },
+        { label: 'טסט', page: 'test' },
+        { label: 'פוסטים', page: 'posts' },
+        ...(!user?.instructor_id ? [{ label: 'חפש מורה', page: 'instructors' }] : []),
+      ];
 
   const links = user?.role === 'instructor' ? INSTRUCTOR_LINKS : studentLinks;
 

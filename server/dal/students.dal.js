@@ -100,14 +100,13 @@ export const getStudentsByInstructor = async (instructorId, role) => {
   if (role === 'admin') {
     const [rows] = await pool.query(
       `SELECT u.id, u.name, u.email, u.phone, u.date_of_birth,
-              ss.name AS status, vt.name AS vehicle_type,
+              ds.status, vt.name AS vehicle_type,
               ui.name AS instructor_name,
               (SELECT dl.id FROM driving_lessons dl
                WHERE dl.student_id = u.id
                ORDER BY dl.date DESC LIMIT 1) AS last_lesson_id
        FROM driving_students ds
        JOIN users u ON u.id = ds.user_id
-       LEFT JOIN student_statuses ss ON ss.id = ds.status_id
        LEFT JOIN vehicle_types vt ON vt.id = ds.vehicle_type_id
        LEFT JOIN driving_instructor di ON di.id = ds.instructor_id
        LEFT JOIN users ui ON ui.id = di.user_id`
@@ -116,13 +115,12 @@ export const getStudentsByInstructor = async (instructorId, role) => {
   }
   const [rows] = await pool.query(
     `SELECT u.id, u.name, u.email, u.phone, u.date_of_birth,
-            ss.name AS status, vt.name AS vehicle_type,
+            ds.status, vt.name AS vehicle_type,
             (SELECT dl.id FROM driving_lessons dl
              WHERE dl.student_id = u.id AND dl.instructor_id = di.id
              ORDER BY dl.date DESC LIMIT 1) AS last_lesson_id
      FROM driving_students ds
      JOIN users u ON u.id = ds.user_id
-     LEFT JOIN student_statuses ss ON ss.id = ds.status_id
      LEFT JOIN vehicle_types vt ON vt.id = ds.vehicle_type_id
      JOIN driving_instructor di ON di.id = ds.instructor_id
      WHERE di.user_id = ?`,
@@ -136,18 +134,17 @@ export const getInstructorAchievements = async (instructorId, role) => {
   const params = role === 'admin' ? [] : [instructorId];
   const [[stats]] = await pool.query(
     `SELECT
-       COUNT(DISTINCT ds.user_id)                                        AS total_students,
-       COUNT(DISTINCT CASE WHEN ds.status = 'licensed' THEN ds.user_id END) AS tests_passed,
-       COUNT(dl.id)                                                      AS total_lessons,
-       COALESCE(SUM(ls.name = 'completed'), 0)                           AS completed_lessons,
-       ROUND(SUM(ls.name = 'completed') / NULLIF(COUNT(dl.id),0)*100)    AS completion_rate,
-       ROUND(AVG(ir.rating),1)                                           AS avg_rating,
-       COUNT(DISTINCT ir.id)                                             AS total_reviews
+       COUNT(DISTINCT CASE WHEN ds.status != 'licensed' THEN ds.user_id END) AS total_students,
+       COUNT(DISTINCT CASE WHEN ds.status = 'licensed' THEN ds.user_id END)  AS tests_passed,
+       COUNT(dl.id)                                                           AS total_lessons,
+       COALESCE(SUM(dl.status = 'completed'), 0)                             AS completed_lessons,
+       ROUND(SUM(dl.status = 'completed') / NULLIF(COUNT(dl.id),0)*100)      AS completion_rate,
+       ROUND(AVG(ir.rating),1)                                               AS avg_rating,
+       COUNT(DISTINCT ir.id)                                                 AS total_reviews
      FROM driving_instructor di
-     LEFT JOIN driving_students ds   ON ds.instructor_id = di.id
-     LEFT JOIN driving_lessons dl    ON dl.instructor_id = di.id
-     LEFT JOIN lesson_statuses ls    ON ls.id = dl.status_id
-     LEFT JOIN instructor_review ir  ON ir.instructor_id = di.id
+     LEFT JOIN driving_students ds  ON ds.instructor_id = di.id
+     LEFT JOIN driving_lessons dl   ON dl.instructor_id = di.id
+     LEFT JOIN instructor_review ir ON ir.instructor_id = di.id
      ${where}`,
     params
   );

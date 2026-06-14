@@ -1,6 +1,6 @@
 import pool from '../config/db.js';
 import { getTestsByStudent, createTest, createAppeal, getCompletedLessonsCount, getTestRequest, createTestRequest, getLatestTest, getTestRequestsForInstructor, scheduleTestByInstructor as scheduleTestDAL } from '../dal/tests.dal.js';
-import { sendTestRequestEmail, sendTestScheduledEmail } from '../utils/mailer.js';
+import { sendTestRequestEmail, sendTestScheduledEmail, sendLicensedEmail } from '../utils/mailer.js';
 
 const MIN_LESSONS = 28;
 

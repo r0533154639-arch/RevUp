@@ -73,3 +73,24 @@ export const getGeneralFeedbackForStudent = async (studentId) => {
   );
   return rows;
 };
+
+export const saveInstructorReview = async (studentId, instructorId, rating, comment) => {
+  await pool.query(
+    `INSERT INTO instructor_review (student_id, instructor_id, rating, comment, reason)
+     VALUES (?, ?, ?, ?, 'completed')
+     ON DUPLICATE KEY UPDATE rating = ?, comment = ?`,
+    [studentId, instructorId, rating, comment, rating, comment]
+  );
+};
+
+export const getInstructorReviewByStudent = async (studentId) => {
+  const [[row]] = await pool.query(
+    `SELECT ir.rating, ir.comment, u.name AS instructor_name
+     FROM instructor_review ir
+     JOIN driving_instructor di ON di.id = ir.instructor_id
+     JOIN users u ON u.id = di.user_id
+     WHERE ir.student_id = ?`,
+    [studentId]
+  );
+  return row || null;
+};

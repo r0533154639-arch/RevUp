@@ -1,7 +1,8 @@
-import { saveLessonFeedback, getFeedbackForStudent, getFeedbackForLesson, saveContactMessage, getAllContactMessages, saveGeneralFeedback, getGeneralFeedbackForStudent } from '../dal/communication.dal.js';
+import { saveLessonFeedback, getFeedbackForStudent, getFeedbackForLesson, saveContactMessage, getAllContactMessages, saveGeneralFeedback, getGeneralFeedbackForStudent, saveInstructorReview, getInstructorReviewByStudent } from '../dal/communication.dal.js';
 import { findUserById } from '../dal/students.dal.js';
 import { sendGeneralFeedbackEmail } from '../utils/mailer.js';
 import { asyncHandler } from '../utils/controllerFactory.js';
+import pool from '../config/db.js';
 
 export const submitLessonFeedback = asyncHandler(async (req, res) => {
   const { lessonId, studentId, rating, notes } = req.body;
@@ -44,4 +45,18 @@ export const submitGeneralFeedback = asyncHandler(async (req, res) => {
 export const getMyGeneralFeedback = asyncHandler(async (req, res) => {
   const data = await getGeneralFeedbackForStudent(req.user.id);
   res.json(data);
+});
+
+export const submitInstructorReview = asyncHandler(async (req, res) => {
+  const { rating, comment } = req.body;
+  const [[ds]] = await pool.query(
+    'SELECT instructor_id FROM driving_students WHERE user_id = ?', [req.user.id]
+  );
+  if (!ds?.instructor_id) return res.status(400).json({ message: 'אין מורה מקושר' });
+  await saveInstructorReview(req.user.id, ds.instructor_id, rating, comment ?? '');
+  res.json({ success: true });
+});
+
+export const getMyInstructorReview = asyncHandler(async (req, res) => {
+  res.json(await getInstructorReviewByStudent(req.user.id));
 });

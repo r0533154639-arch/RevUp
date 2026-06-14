@@ -9,12 +9,65 @@ const STATUS_LABELS = {
   failed: 'לא עבר',
 };
 
+function StarRating({ value, onChange }) {
+  const [hovered, setHovered] = useState(0);
+  return (
+    <div style={{ display: 'flex', gap: 6, fontSize: 32, cursor: 'pointer' }}>
+      {[1, 2, 3, 4, 5].map(n => (
+        <span
+          key={n}
+          style={{ color: n <= (hovered || value) ? 'var(--warning)' : 'var(--border)', transition: 'color 0.1s' }}
+          onMouseEnter={() => setHovered(n)}
+          onMouseLeave={() => setHovered(0)}
+          onClick={() => onChange(n)}
+        >★</span>
+      ))}
+    </div>
+  );
+}
+
+function InstructorReviewForm({ onSaved }) {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!rating) return alert('אנא בחר דירוג');
+    setSaving(true);
+    try {
+      await api.post('/communication/instructor-review', { rating, comment });
+      onSaved(rating);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{ marginTop: 28, background: 'var(--bg-soft)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px', maxWidth: 400, margin: '28px auto 0', textAlign: 'right' }}>
+      <p style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>⭐ דרג את המורה שלך</p>
+      <StarRating value={rating} onChange={setRating} />
+      <textarea
+        value={comment}
+        onChange={e => setComment(e.target.value)}
+        placeholder="תגובה (אופציונלי)"
+        rows={3}
+        style={{ marginTop: 12, width: '100%', resize: 'vertical' }}
+      />
+      <button onClick={handleSubmit} disabled={saving || !rating} style={{ marginTop: 8 }}>
+        {saving ? 'שומר...' : 'שלח דירוג'}
+      </button>
+    </div>
+  );
+}
+
 export default function DrivingTest() {
   const { user } = useAuth();
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [existingReview, setExistingReview] = useState(undefined); // undefined = טרם נטען
 
   useEffect(() => {
     api.get('/tests/status')
@@ -22,11 +75,18 @@ export default function DrivingTest() {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (status?.phase === 'licensed') {
+      api.get('/communication/instructor-review')
+        .then(setExistingReview)
+        .catch(() => setExistingReview(null));
+    }
+  }, [status?.phase]);
+
   const handleRequest = async () => {
     setSending(true);
     try {
       await api.post('/tests/request');
-      setSent(true);
       setStatus({ phase: 'requested' });
     } catch (err) {
       alert(err.message);
@@ -57,6 +117,15 @@ export default function DrivingTest() {
       >
         🚗 למדריך נהג חדש
       </Link>
+
+      {existingReview === undefined && null}
+      {existingReview !== undefined && (
+        existingReview
+          ? <div style={{ marginTop: 28, color: 'var(--success)', fontWeight: 600 }}>
+              ✅ דירגת את המורה שלך: {'★'.repeat(existingReview.rating)}
+            </div>
+          : <InstructorReviewForm onSaved={r => setExistingReview({ rating: r })} />
+      )}
     </div>
   );
 

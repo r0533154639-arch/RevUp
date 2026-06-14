@@ -171,7 +171,7 @@ export default function AdminDashboard({ user }) {
 
       {tab === 'instructors' && (
         <table className="admin-table">
-          <thead><tr>{['שם', 'אימייל', 'אזור', 'תלמידים', 'סטאטוס', 'פרופיל'].map(h => <th key={h} className="admin-th">{h}</th>)}</tr></thead>
+          <thead><tr>{['שם', 'אימייל', 'אזור', 'תלמידים', 'דירוג', 'סטאטוס', 'פרופיל'].map(h => <th key={h} className="admin-th">{h}</th>)}</tr></thead>
           <tbody>
             {data.instructors.map(i => {
               const status = i.is_blocked ? 'חסום' : (i.profile_status === 'active' ? 'מאושר' : i.profile_status === 'pending' ? 'ממתין' : 'טיוטא');
@@ -181,6 +181,11 @@ export default function AdminDashboard({ user }) {
                 <td className="admin-td-edit" onDoubleClick={() => openEdit('users', i.id, 'email', i.email, 'אימייל')}>{i.email}</td>
                 <td className="admin-td">{i.area || '—'}</td>
                 <td className="admin-td">{i.student_count}</td>
+                <td className="admin-td">
+                  {i.avg_rating != null
+                    ? `${'★'.repeat(Math.round(i.avg_rating))} (${i.avg_rating})`
+                    : <span style={{ color: '#aaa', fontStyle: 'italic' }}>לא דורג עדיין</span>}
+                </td>
                 <td className="admin-td">
                   <span className={`admin-status-badge ${i.is_blocked ? 'blocked' : i.profile_status === 'active' ? 'active' : 'pending'}`}>{status}</span>
                   {i.is_blocked ? (

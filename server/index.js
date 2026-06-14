@@ -18,6 +18,7 @@ import studentRequestsRoutes from './routes/studentRequests.routes.js';
 import notificationsRoutes from './routes/notifications.routes.js';
 import theoryRoutes from './routes/theory.routes.js';
 import auditLogRoutes from './routes/auditLog.routes.js';
+
 process.on('uncaughtException', err => {
   logger.error('Uncaught Exception', { message: err.message, stack: err.stack });
   process.exit(1);

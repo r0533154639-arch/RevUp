@@ -1,10 +1,6 @@
 CREATE DATABASE IF NOT EXISTS revup;
 USE revup;
 
--- =========================
--- LOOKUP TABLES
--- =========================
-
 CREATE TABLE IF NOT EXISTS user_roles (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(50) UNIQUE NOT NULL
@@ -33,13 +29,7 @@ CREATE TABLE IF NOT EXISTS vehicle_types (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(50) NOT NULL
 );
-
-CREATE TABLE IF NOT EXISTS test_centers (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100),
-  city VARCHAR(100),
-  address VARCHAR(255)
-);
+INSERT IGNORE INTO vehicle_types (name) VALUES ('רכב פרטי'), ('אופנוע'), ('משאית'),('אוטובוס');
 
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -85,9 +75,7 @@ CREATE TABLE IF NOT EXISTS driving_instructor (
   area VARCHAR(100),
   years_experience INT DEFAULT NULL,
   profile_status VARCHAR(20) NOT NULL DEFAULT 'draft',
-  test_center_id INT DEFAULT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (test_center_id) REFERENCES test_centers(id)
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS instructor_vehicle_types (

@@ -32,10 +32,13 @@ export const getDashboardData = async () => {
     WHERE u.role = 'student' ORDER BY u.name
   `);
   const [instructors] = await pool.query(`
-    SELECT u.id, u.name, u.email, u.phone, u.profile_image, u.is_blocked, di.area, di.profile_status, COUNT(DISTINCT ds.user_id) AS student_count
+    SELECT u.id, u.name, u.email, u.phone, u.profile_image, u.is_blocked, di.area, di.profile_status,
+           COUNT(DISTINCT ds.user_id) AS student_count,
+           ROUND(AVG(ir.rating), 1) AS avg_rating
     FROM users u
     JOIN driving_instructor di ON di.user_id = u.id
     LEFT JOIN driving_students ds ON ds.instructor_id = di.id
+    LEFT JOIN instructor_review ir ON ir.instructor_id = di.id
     WHERE u.role = 'instructor' GROUP BY u.id ORDER BY u.name
   `);
   const [posts] = await pool.query(`
@@ -73,8 +76,8 @@ export const editCell = async (table, id, field, value) => {
   await pool.query(`UPDATE ${table} SET ${field} = ? WHERE ${pkCol} = ?`, [value, id]);
   auditAdminAction(null, 'CELL_EDIT', table, id, { field, value }, null);
   if (table === 'driving_students' && field === 'status' && value === 'licensed') {
-    const [[user]] = await pool.query('SELECT name, email FROM users WHERE id = ?', [id]);
-    if (user) sendLicensedEmail(user.email, user.name).catch(console.error);
+    const [[user]] = await pool.query('SELECT id, name, email FROM users WHERE id = ?', [id]);
+    if (user) sendLicensedEmail(user.email, user.name, user.id).catch(console.error);
   }
 };
 
@@ -92,7 +95,7 @@ export const processTestResult = async (studentId, result) => {
   const [[user]] = await pool.query('SELECT name, email FROM users WHERE id = ?', [studentId]);
   if (result === 'passed') {
     await updateStudentStatus(studentId, 'licensed');
-    if (user) sendLicensedEmail(user.email, user.name).catch(console.error);
+    if (user) sendLicensedEmail(user.email, user.name, studentId).catch(console.error);
   } else {
     await updateStudentStatus(studentId, 'lessons');
     if (user) sendTestFailedEmail(user.email, user.name).catch(console.error);

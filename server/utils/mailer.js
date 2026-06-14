@@ -60,12 +60,18 @@ export const sendLessonScheduledEmail = (to, instructorName, studentName, date, 
     </div>
   `);
 
-export const sendLicensedEmail = (to, name) =>
+export const sendLicensedEmail = (to, name, userId) =>
   send(to, 'מזל טוב! עברת את הטסט 🏆', `
     <div dir="rtl" style="font-family:Arial,sans-serif">
       <h2>מזל טוב ${name}!</h2>
       <p>אנו שמחים לבשר לך שעברת את טסט הנהיגה בהצלחה!</p>
       <p>ברוך הבא לעולם הנהגים המורשים 🚗</p>
+      <div style="margin-top:20px">
+        <a href="http://localhost:5173/users/${userId}/drivingTest"
+           style="background:#6366f1;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">
+          ⭐ דרג את המורה שלך
+        </a>
+      </div>
     </div>
   `);
 
