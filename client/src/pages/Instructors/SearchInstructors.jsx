@@ -58,7 +58,8 @@ export default function SearchInstructors() {
   const hasFilters = areas.length > 0 || minRating > 0;
 
   return (
-    <div className="page-container" style={{ maxWidth: 1000 }}>
+    <div className="page-container">
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
       <h2>חיפוש מורים</h2>
 
       {myRequest?.status === 'pending' && (
@@ -119,6 +120,7 @@ export default function SearchInstructors() {
             />
           ))}
         </div>
+      </div>
       </div>
     </div>
   );
